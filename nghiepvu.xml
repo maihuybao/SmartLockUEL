@@ -125,7 +125,7 @@
             <mxPoint x="732" y="598" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="yIBto1E1Fbrr8lnHNlra-23" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="Tìm kiếm &amp;amp; Lọc" vertex="1">
+        <mxCell id="yIBto1E1Fbrr8lnHNlra-23" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="Search &amp;amp; Lọc" vertex="1">
           <mxGeometry height="60" width="120" x="691" y="488" as="geometry" />
         </mxCell>
         <mxCell id="yIBto1E1Fbrr8lnHNlra-24" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="&lt;div&gt;- Theo sức chứa (50 người, 100 người).&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;- Theo thời gian (Sáng/Chiều/Tối).&lt;/span&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
@@ -221,7 +221,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="yIBto1E1Fbrr8lnHNlra-42" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="Quản trị lịch đặt phòng" vertex="1">
+        <mxCell id="yIBto1E1Fbrr8lnHNlra-42" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="Administrator lịch đặt phòng" vertex="1">
           <mxGeometry height="60" width="140" x="1191" y="348" as="geometry" />
         </mxCell>
         <mxCell id="yIBto1E1Fbrr8lnHNlra-43" parent="1" style="whiteSpace=wrap;html=1;rounded=0;" value="Xem thống kê (Dashboard)" vertex="1">

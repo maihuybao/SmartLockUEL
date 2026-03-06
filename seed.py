@@ -25,13 +25,13 @@ def seed():
 
     # Sample rooms
     sample_rooms = [
-        ("A101", "Phong hoc", 50, "Available"),
-        ("A102", "Phong hoc", 50, "Available"),
-        ("A201", "Phong hoc", 100, "Available"),
-        ("B101", "Phong hoi thao", 100, "Available"),
-        ("B102", "Phong hoi thao", 50, "Occupied"),
-        ("C101", "Phong tu hoc", 50, "Available"),
-        ("C102", "Phong tu hoc", 50, "Cleaning"),
+        ("A101", "Classroom", 50, "Available"),
+        ("A102", "Classroom", 50, "Available"),
+        ("A201", "Classroom", 100, "Available"),
+        ("B101", "Meeting room", 100, "Available"),
+        ("B102", "Meeting room", 50, "Occupied"),
+        ("C101", "Study room", 50, "Available"),
+        ("C102", "Study room", 50, "Cleaning"),
     ]
     for room_id, rtype, cap, status in sample_rooms:
         existing = conn.execute(

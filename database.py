@@ -32,7 +32,7 @@ def init_db():
             room_type TEXT NOT NULL,
             capacity INTEGER NOT NULL DEFAULT 50,
             status TEXT NOT NULL DEFAULT 'Available'
-                CHECK(status IN ('Available', 'Occupied', 'Booked', 'Cleaning'))
+                CHECK(status IN ('Available', 'Occupied', 'Full', 'Cleaning'))
         )
     """)
 
@@ -41,7 +41,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             room_id INTEGER NOT NULL,
-            session TEXT NOT NULL CHECK(session IN ('Sang', 'Chieu', 'Toi')),
+            session TEXT NOT NULL,
             reason TEXT NOT NULL,
             status TEXT NOT NULL DEFAULT 'Pending'
                 CHECK(status IN ('Pending', 'Approved', 'Rejected')),

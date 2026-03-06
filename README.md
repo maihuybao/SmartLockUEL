@@ -23,10 +23,10 @@ python3 main.py
 
 ## Tài khoản mặc định
 
-| Vai trò | Username | Password |
-|---------|----------|----------|
-| Admin | admin | admin123 |
-| User | sv001@st.uel.edu.vn | 123456 |
+| Vai trò | Username            | Password |
+| ------- | ------------------- | -------- |
+| Admin   | admin               | admin123 |
+| User    | sv001@st.uel.edu.vn | 123456   |
 
 ## Cấu trúc dự án
 
@@ -54,13 +54,15 @@ Source/
 ## Chức năng
 
 ### User (Sinh viên / Giảng viên)
+
 - Đăng nhập bằng email/mật khẩu
-- Xem danh sách phòng (lọc theo trạng thái, tìm kiếm)
+- Xem danh sách phòng (lọc theo trạng thái, Search)
 - Đặt phòng (chọn buổi Sáng/Chiều/Tối, nhập lý do)
 - Xem lịch sử đặt phòng, hủy booking chưa duyệt
 - Nhận mật khẩu tủ thiết bị khi booking được duyệt
 
-### Admin (Quản trị viên)
+### Admin (Administrator viên)
+
 - Quản lý phòng: thêm, sửa, xóa
 - Quản lý user: thêm, sửa, xóa
 - Duyệt / từ chối yêu cầu đặt phòng

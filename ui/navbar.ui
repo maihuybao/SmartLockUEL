@@ -65,13 +65,13 @@
     <widget class="QLineEdit" name="lineEditSearch">
      <property name="minimumSize">
       <size>
-       <width>200</width>
+       <width>150</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>200</width>
+       <width>400</width>
        <height>16777215</height>
       </size>
      </property>
@@ -88,7 +88,7 @@ QLineEdit::placeholder {
 }</string>
      </property>
      <property name="placeholderText">
-      <string>Tìm kiếm...</string>
+      <string>Search...</string>
      </property>
     </widget>
    </item>

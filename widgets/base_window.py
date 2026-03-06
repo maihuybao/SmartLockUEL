@@ -2,6 +2,8 @@ import os
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication,
 )
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6 import uic
 
 from widgets.navbar import NavBar
@@ -25,7 +27,12 @@ class BaseWindow(QMainWindow):
         super().__init__()
         self.current_user = user
         self.setWindowTitle(title)
-        self.setFixedSize(1000, 600)
+        self.setMinimumSize(800, 500)
+        self.resize(1000, 600)
+
+        # F11 toggle fullscreen
+        shortcut = QShortcut(QKeySequence(Qt.Key.Key_F11), self)
+        shortcut.activated.connect(self._toggle_fullscreen)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -53,7 +60,7 @@ class BaseWindow(QMainWindow):
         self.content_area = QWidget()
         self.content_layout = QVBoxLayout(self.content_area)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
-        body.addWidget(self.content_area)
+        body.addWidget(self.content_area, 1)  # stretch factor = 1
 
         main_layout.addLayout(body)
 
@@ -91,6 +98,12 @@ class BaseWindow(QMainWindow):
         self._win = UsersManagementController(self.current_user)
         self._win.show()
         self.close()
+
+    def _toggle_fullscreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
 
     def _logout(self):
         from controllers.main_window import MainWindowController

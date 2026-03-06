@@ -82,19 +82,19 @@
    </item>
    <item>
     <widget class="QFrame" name="tablePanel">
-     <property name="minimumSize"><size><width>350</width><height>0</height></size></property>
-     <property name="maximumSize"><size><width>350</width><height>16777215</height></size></property>
+     <property name="minimumSize"><size><width>300</width><height>0</height></size></property>
+     <property name="maximumSize"><size><width>16777215</width><height>16777215</height></size></property>
      <property name="styleSheet"><string notr="true">QFrame{background-color:white;border-radius:12px;border:1px solid #E3EAF2;}</string></property>
      <layout class="QVBoxLayout" name="tableLayout">
       <item>
        <widget class="QLineEdit" name="lineEditSearch">
         <property name="styleSheet"><string notr="true">color: black; padding: 5px; border: 1px solid #ddd; border-radius: 6px;</string></property>
-        <property name="placeholderText"><string>Tìm kiếm...</string></property>
+        <property name="placeholderText"><string>Search...</string></property>
        </widget>
       </item>
       <item>
        <widget class="QTableWidget" name="tableWidget">
-        <property name="maximumSize"><size><width>16777215</width><height>350</height></size></property>
+        <property name="maximumSize"><size><width>16777215</width><height>16777215</height></size></property>
         <property name="styleSheet"><string notr="true">QTableWidget{background-color:white;color:black;border:1px solid #E3EAF2;}QHeaderView::section{background-color:#1F4F82;color:white;padding:6px;border:none;}</string></property>
         <column><property name="text"><string>Room ID</string></property></column>
         <column><property name="text"><string>Room Type</string></property></column>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>740</width>
-    <height>957</height>
+    <width>1237</width>
+    <height>734</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,127 +36,6 @@
     <property name="verticalSpacing">
      <number>0</number>
     </property>
-    <item row="1" column="0">
-     <widget class="QFrame" name="frame_5">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>65</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>65</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_24">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_19">
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">color:#003F87;
-font-size:12px;
-font-weight:600;
-padding:8px 0px;</string>
-           </property>
-           <property name="text">
-            <string>Trường Đại Học Kinh Tế - Luật</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QFrame" name="frame_6">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>1</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>1</height>
-            </size>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::HLine</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Plain</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QFrame" name="frame_2">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: #1f4f82;</string>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_11">
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <family>Baskerville Old Face</family>
-           <pointsize>16</pointsize>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">color: rgb(255, 255, 255);</string>
-         </property>
-         <property name="text">
-          <string>SmartStock UEL</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="4" column="0">
      <layout class="QVBoxLayout" name="verticalLayout_17">
       <item>
@@ -179,18 +58,18 @@ padding:8px 0px;</string>
     </item>
     <item row="3" column="0">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
+      <item row="0" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
        <widget class="QWidget" name="widget" native="true">
         <property name="minimumSize">
          <size>
-          <width>0</width>
-          <height>0</height>
+          <width>400</width>
+          <height>380</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>400</width>
-          <height>500</height>
+          <height>380</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -206,93 +85,74 @@ padding:8px 0px;</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <spacer name="verticalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Minimum</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>13</width>
-             <height>17</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QFrame" name="frame_3">
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="label">
-                <property name="minimumSize">
-                 <size>
-                  <width>120</width>
-                  <height>120</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>120</width>
-                  <height>120</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="pixmap">
-                 <pixmap>../../../../../../../KIM YEN/Downloads/UEL_Logo final-09.png</pixmap>
-                </property>
-                <property name="scaledContents">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>125</width>
+               <height>125</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>125</width>
+               <height>125</height>
+              </size>
+             </property>
+             <property name="lineWidth">
+              <number>0</number>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="pixmap">
+              <pixmap>../images/UEL_Logo.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>true</bool>
+             </property>
+             <property name="wordWrap">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QLabel" name="label_3">
@@ -317,7 +177,7 @@ QLineEdit::placeholder { color: #9aa0a6;}
 </string>
            </property>
            <property name="text">
-            <string>admin</string>
+            <string>sv001@st.uel.edu.vn</string>
            </property>
            <property name="placeholderText">
             <string>example@st.uel.edu.vn/example@uel.edu.vn  </string>
@@ -380,13 +240,25 @@ QLineEdit::placeholder { color: #9aa0a6;}
 }</string>
               </property>
               <property name="text">
-               <string/>
+               <string>123456</string>
+              </property>
+              <property name="maxLength">
+               <number>32772</number>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
               </property>
               <property name="echoMode">
                <enum>QLineEdit::Password</enum>
               </property>
+              <property name="dragEnabled">
+               <bool>false</bool>
+              </property>
               <property name="placeholderText">
                <string>Nhập mật khẩu </string>
+              </property>
+              <property name="clearButtonEnabled">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -420,22 +292,6 @@ QLineEdit::placeholder { color: #9aa0a6;}
           </widget>
          </item>
          <item>
-          <spacer name="verticalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Minimum</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>13</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QRadioButton" name="radioButtonUser">
@@ -452,7 +308,7 @@ spacing: 8px
 </string>
              </property>
              <property name="text">
-              <string>Giảng viên/ Sinh viên</string>
+              <string>Lecturer/Student</string>
              </property>
              <property name="checked">
               <bool>false</bool>
@@ -467,7 +323,7 @@ font-size: 13px;
 spacing: 8px</string>
              </property>
              <property name="text">
-              <string>Quản trị viên</string>
+              <string>Administrator</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -475,22 +331,6 @@ spacing: 8px</string>
             </widget>
            </item>
           </layout>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>13</width>
-             <height>17</height>
-            </size>
-           </property>
-          </spacer>
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -536,6 +376,121 @@ QPushButton:pressed {background-color: #ffb347}
        </spacer>
       </item>
      </layout>
+    </item>
+    <item row="0" column="0">
+     <widget class="QFrame" name="frame_2">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #1f4f82;</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <family>Baskerville Old Face</family>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string>SmartStock UEL</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QFrame" name="frame_5">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>65</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_24">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_19">
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color:#003F87;
+font-size:12px;
+font-weight:600;
+padding:8px 0px;</string>
+           </property>
+           <property name="text">
+            <string>Trường Đại học Kinh tế – Luật, Đại học Quốc gia Thành phố Hồ Chí Minh</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_6">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>1</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>1</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::HLine</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>

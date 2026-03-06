@@ -111,3 +111,15 @@ def get_dashboard_stats():
         "approved": approved,
         "rejected": rejected,
     }
+
+
+def get_bookings_by_room(room_pk):
+    """Get active bookings (Pending/Approved) for a specific room."""
+    conn = get_connection()
+    rows = conn.execute(
+        """SELECT session, status FROM bookings
+           WHERE room_id = ? AND status IN ('Pending', 'Approved')""",
+        (room_pk,),
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]

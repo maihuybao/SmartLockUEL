@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BookingDialog</class>
+ <widget class="QDialog" name="BookingDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Đặt phòng</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog { background: white; }
+QLabel { color: #333; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin"><number>20</number></property>
+   <property name="topMargin"><number>20</number></property>
+   <property name="rightMargin"><number>20</number></property>
+   <property name="bottomMargin"><number>20</number></property>
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text">
+      <string>Đặt phòng</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 18px; font-weight: bold; color: #1F4F82;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="separator">
+     <property name="frameShape">
+      <enum>QFrame::HLine</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: #E3EAF2;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblRoom">
+     <property name="text">
+      <string>Chọn phòng:</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-weight: 600; font-size: 13px;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="comboRoom">
+     <property name="styleSheet">
+      <string notr="true">QComboBox { padding: 8px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #333; background: white; }
+QComboBox:focus { border: 1px solid #1F4F82; }</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblSession">
+     <property name="text">
+      <string>Select sessions (multiple allowed):</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-weight: 600; font-size: 13px;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="sessionGrid">
+     <property name="spacing">
+      <number>8</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="btnCa1">
+       <property name="text">
+        <string>Session 1
+07:00 – 09:30</string>
+       </property>
+       <property name="minimumSize">
+        <size><width>0</width><height>50</height></size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }
+QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btnCa2">
+       <property name="text">
+        <string>Session 2
+09:45 – 12:15</string>
+       </property>
+       <property name="minimumSize">
+        <size><width>0</width><height>50</height></size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }
+QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="btnCa3">
+       <property name="text">
+        <string>Session 3
+12:30 – 15:00</string>
+       </property>
+       <property name="minimumSize">
+        <size><width>0</width><height>50</height></size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }
+QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="btnCa4">
+       <property name="text">
+        <string>Session 4
+15:15 – 17:45</string>
+       </property>
+       <property name="minimumSize">
+        <size><width>0</width><height>50</height></size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }
+QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblReason">
+     <property name="text">
+      <string>Lý do:</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-weight: 600; font-size: 13px;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="txtReason">
+     <property name="placeholderText">
+      <string>Họp nhóm, sinh hoạt CLB, tự học, dạy bù, hội thảo...</string>
+     </property>
+     <property name="maximumSize">
+      <size><width>16777215</width><height>70</height></size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTextEdit { border: 1px solid #ddd; border-radius: 8px; padding: 6px; font-size: 13px; color: #333; }
+QTextEdit:focus { border: 1px solid #1F4F82; }</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="btnLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="btnCancel">
+       <property name="text">
+        <string>Hủy</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #F5F5F5; border: 1px solid #ddd; border-radius: 8px; padding: 8px 20px; color: #666; font-size: 13px; }
+QPushButton:hover { background: #E0E0E0; }</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSubmit">
+       <property name="text">
+        <string>Xác nhận đặt phòng</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #1F4F82; border: none; border-radius: 8px; padding: 8px 20px; color: white; font-size: 13px; font-weight: bold; }
+QPushButton:hover { background: #163D66; }</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

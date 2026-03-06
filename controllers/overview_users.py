@@ -1,30 +1,35 @@
 from PyQt6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout,
-    QDialog, QComboBox, QTextEdit, QDialogButtonBox,
-    QMessageBox, QTableWidget, QTableWidgetItem, QPushButton,
-    QHeaderView, QApplication,
+    QDialog,
+    QMessageBox,
+    QTableWidgetItem,
+    QPushButton,
+    QHeaderView,
+    QApplication,
 )
-from PyQt6.QtCore import Qt
+from PyQt6 import uic
+import os
 
 from widgets.base_window import BaseWindow
+from widgets.room_card import create_room_card
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
 from models.booking_model import (
-    create_booking, get_bookings_by_user, cancel_booking,
+    create_booking,
+    get_bookings_by_user,
+    cancel_booking,
 )
 
-STATUS_COLORS = {
-    "Available": "#4CAF50",
-    "Occupied": "#F44336",
-    "Booked": "#FF9800",
-    "Cleaning": "#2196F3",
-}
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 class OverviewUsersController(BaseWindow):
     def __init__(self, user):
         super().__init__(
-            user, role_text="User", show_search=True,
-            show_sidebar=False, title="SmartLocker UEL - User",
+            user,
+            role_text="User",
+            show_search=True,
+            show_sidebar=False,
+            title="SmartLocker UEL - User",
         )
         self._current_filter = "All"
 
@@ -40,7 +45,7 @@ class OverviewUsersController(BaseWindow):
         self.ui.btnAll.clicked.connect(lambda: self._apply_filter("All"))
         self.ui.btnAvailable.clicked.connect(lambda: self._apply_filter("Available"))
         self.ui.btnOccupied.clicked.connect(lambda: self._apply_filter("Occupied"))
-        self.ui.btnBooked.clicked.connect(lambda: self._apply_filter("Booked"))
+        self.ui.btnBooked.clicked.connect(lambda: self._apply_filter("Full"))
         self.ui.btnCleaning.clicked.connect(lambda: self._apply_filter("Cleaning"))
 
         # Search
@@ -69,6 +74,12 @@ class OverviewUsersController(BaseWindow):
         self._render_room_cards(rooms)
 
     def _render_room_cards(self, rooms):
+        self._rooms_data = rooms
+        self._reflow_grid()
+
+    def _reflow_grid(self):
+        if not hasattr(self, "_rooms_data"):
+            return
         layout = self.ui.gridLayout
         while layout.count():
             item = layout.takeAt(0)
@@ -76,40 +87,25 @@ class OverviewUsersController(BaseWindow):
             if w:
                 w.deleteLater()
 
-        cols = 3
-        for i, room in enumerate(rooms):
+        card_min_w = 180
+        spacing = layout.horizontalSpacing() or 10
+        available = self.content_area.width() - 20
+        cols = max(1, available // (card_min_w + spacing))
+
+        for i, room in enumerate(self._rooms_data):
             card = self._create_room_card(room)
             layout.addWidget(card, i // cols, i % cols)
 
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._reflow_grid()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._reflow_grid()
+
     def _create_room_card(self, room):
-        color = STATUS_COLORS.get(room["status"], "#9E9E9E")
-        card = QWidget()
-        card.setFixedSize(180, 120)
-        card.setStyleSheet(
-            f"background-color: white; border: 2px solid {color};"
-            f"border-radius: 10px;"
-        )
-        vbox = QVBoxLayout(card)
-        vbox.setContentsMargins(10, 8, 10, 8)
-
-        lbl_id = QLabel(room["room_id"])
-        lbl_id.setStyleSheet("font-weight: bold; font-size: 14px; border: none;")
-        lbl_type = QLabel(room["room_type"])
-        lbl_type.setStyleSheet("color: #666; font-size: 11px; border: none;")
-        lbl_cap = QLabel(f"Sức chứa: {room['capacity']}")
-        lbl_cap.setStyleSheet("color: #666; font-size: 11px; border: none;")
-        lbl_status = QLabel(room["status"])
-        lbl_status.setStyleSheet(
-            f"color: white; background-color: {color};"
-            f"border-radius: 8px; padding: 2px 8px; font-size: 11px;"
-        )
-        lbl_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        vbox.addWidget(lbl_id)
-        vbox.addWidget(lbl_type)
-        vbox.addWidget(lbl_cap)
-        vbox.addWidget(lbl_status)
-        return card
+        return create_room_card(room)
 
     def _apply_filter(self, status):
         self._current_filter = status
@@ -126,46 +122,69 @@ class OverviewUsersController(BaseWindow):
             QMessageBox.information(self, "Thông báo", "Không có phòng trống.")
             return
 
+        # Load dialog from .ui file
         dlg = QDialog(self)
-        dlg.setWindowTitle("Đặt phòng")
-        dlg.setMinimumWidth(350)
-        layout = QVBoxLayout(dlg)
+        uic.loadUi(os.path.join(UI_DIR, "BookingDialog.ui"), dlg)
 
-        layout.addWidget(QLabel("Chọn phòng:"))
-        combo_room = QComboBox()
+        # Populate room combo
         for r in available:
-            combo_room.addItem(
-                f"{r['room_id']} - {r['room_type']} ({r['capacity']} chỗ)", r["id"],
+            dlg.comboRoom.addItem(
+                f"{r['room_id']} – {r['room_type']} ({r['capacity']} chỗ)",
+                r["id"],
             )
-        layout.addWidget(combo_room)
 
-        layout.addWidget(QLabel("Buổi:"))
-        combo_session = QComboBox()
-        combo_session.addItems(["Sang", "Chieu", "Toi"])
-        layout.addWidget(combo_session)
+        # Session multi-select toggle logic
+        session_buttons = [dlg.btnCa1, dlg.btnCa2, dlg.btnCa3, dlg.btnCa4]
+        selected_sessions = set()
 
-        layout.addWidget(QLabel("Lý do:"))
-        txt_reason = QTextEdit()
-        txt_reason.setPlaceholderText("Họp nhóm, sinh hoạt CLB, tự học, dạy bù, hội thảo, báo cáo luận văn...")
-        txt_reason.setMaximumHeight(80)
-        layout.addWidget(txt_reason)
-
-        buttons = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        btn_normal = (
+            "QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2;"
+            " border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }"
+            "QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }"
         )
-        buttons.accepted.connect(dlg.accept)
-        buttons.rejected.connect(dlg.reject)
-        layout.addWidget(buttons)
+        btn_selected = (
+            "QPushButton { background: #1F4F82; border: 2px solid #1F4F82;"
+            " border-radius: 10px; padding: 10px 6px; color: white; font-size: 12px;"
+            " font-weight: bold; }"
+        )
+
+        def on_session_click(idx):
+            if idx in selected_sessions:
+                selected_sessions.discard(idx)
+            else:
+                selected_sessions.add(idx)
+            for j, b in enumerate(session_buttons):
+                b.setStyleSheet(btn_selected if j in selected_sessions else btn_normal)
+
+        for i, btn in enumerate(session_buttons):
+            btn.clicked.connect(lambda _, idx=i: on_session_click(idx))
+
+        # Connect action buttons
+        dlg.btnCancel.clicked.connect(dlg.reject)
+        dlg.btnSubmit.clicked.connect(dlg.accept)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            room_pk = combo_room.currentData()
-            session = combo_session.currentText()
-            reason = txt_reason.toPlainText().strip()
+            room_pk = dlg.comboRoom.currentData()
+            if not selected_sessions:
+                QMessageBox.warning(self, "Lỗi", "Vui lòng chọn ít nhất một session.")
+                return
+            reason = dlg.txtReason.toPlainText().strip()
             if not reason:
                 QMessageBox.warning(self, "Lỗi", "Vui lòng nhập lý do.")
                 return
-            if create_booking(self.current_user["id"], room_pk, session, reason):
-                QMessageBox.information(self, "Thành công", "Đã gửi yêu cầu đặt phòng.")
+
+            success_count = 0
+            for idx in sorted(selected_sessions):
+                session_name, session_time = self.SESSIONS[idx]
+                session = f"{session_name} ({session_time})"
+                if create_booking(self.current_user["id"], room_pk, session, reason):
+                    success_count += 1
+
+            if success_count > 0:
+                QMessageBox.information(
+                    self, "Thành công",
+                    f"Đã gửi yêu cầu đặt phòng cho {success_count} session.",
+                )
                 self._load_rooms()
             else:
                 QMessageBox.warning(self, "Lỗi", "Không thể đặt phòng.")
@@ -173,18 +192,23 @@ class OverviewUsersController(BaseWindow):
     # ── Booking history ──────────────────────────────────
 
     def _show_history(self):
-        bookings = get_bookings_by_user(self.current_user["id"])
         dlg = QDialog(self)
-        dlg.setWindowTitle("Lịch sử đặt phòng")
-        dlg.setMinimumSize(600, 400)
-        layout = QVBoxLayout(dlg)
-
-        table = QTableWidget(len(bookings), 7)
-        table.setHorizontalHeaderLabels(
-            ["Phòng", "Loại", "Buổi", "Lý do", "Trạng thái", "Mật khẩu tủ", ""]
+        uic.loadUi(os.path.join(UI_DIR, "BookingHistory.ui"), dlg)
+        dlg.tableHistory.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        dlg.btnClose.clicked.connect(dlg.accept)
+        dlg.comboFilter.currentTextChanged.connect(
+            lambda f: self._populate_history(dlg, f)
         )
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self._populate_history(dlg, "All Status")
+        dlg.exec()
 
+    def _populate_history(self, dlg, filter_text):
+        bookings = get_bookings_by_user(self.current_user["id"])
+        if filter_text != "All Status":
+            bookings = [b for b in bookings if b["status"] == filter_text]
+
+        table = dlg.tableHistory
+        table.setRowCount(len(bookings))
         for row, b in enumerate(bookings):
             table.setItem(row, 0, QTableWidgetItem(b["room_name"]))
             table.setItem(row, 1, QTableWidgetItem(b["room_type"]))
@@ -192,20 +216,24 @@ class OverviewUsersController(BaseWindow):
             table.setItem(row, 3, QTableWidgetItem(b["reason"]))
             table.setItem(row, 4, QTableWidgetItem(b["status"]))
             table.setItem(row, 5, QTableWidgetItem(b.get("locker_password") or ""))
-
+            table.setCellWidget(row, 6, None)
             if b["status"] == "Pending":
-                btn_cancel = QPushButton("Hủy")
-                btn_cancel.setStyleSheet("background:#C62828;color:white;border-radius:4px;padding:4px;")
-                btn_cancel.clicked.connect(lambda _, bid=b["id"]: self._cancel_booking(bid, dlg))
+                btn_cancel = QPushButton("Cancel")
+                btn_cancel.setStyleSheet(
+                    "background:#C62828;color:white;border-radius:4px;padding:4px;"
+                )
+                btn_cancel.clicked.connect(
+                    lambda _, bid=b["id"]: self._cancel_booking(bid, dlg)
+                )
                 table.setCellWidget(row, 6, btn_cancel)
 
-        layout.addWidget(table)
-        dlg.exec()
+        dlg.lblCount.setText(f"{len(bookings)} bookings")
 
     def _cancel_booking(self, booking_id, dlg):
-        reply = QMessageBox.question(self, "Xác nhận", "Bạn có chắc muốn hủy lịch đặt này?")
+        reply = QMessageBox.question(
+            self, "Confirm", "Are you sure you want to cancel this booking?"
+        )
         if reply == QMessageBox.StandardButton.Yes:
             cancel_booking(booking_id)
-            dlg.close()
-            self._show_history()
+            self._populate_history(dlg, dlg.comboFilter.currentText())
             self._load_rooms()

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BookingApproval</class>
+ <widget class="QDialog" name="BookingApproval">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>860</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Booking Approval</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog { background: #F5F7FA; }
+QLabel { color: #333; border: none; }
+QTableWidget { background: white; border: 1px solid #E3EAF2; border-radius: 8px; gridline-color: #F0F0F0; font-size: 12px; }
+QTableWidget::item { padding: 6px; }
+QHeaderView::section { background: #1F4F82; color: white; font-weight: bold; font-size: 12px; padding: 8px; border: none; }
+QScrollBar:vertical { width: 8px; background: #F0F0F0; border-radius: 4px; }
+QScrollBar::handle:vertical { background: #C0C0C0; border-radius: 4px; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin"><number>20</number></property>
+   <property name="topMargin"><number>20</number></property>
+   <property name="rightMargin"><number>20</number></property>
+   <property name="bottomMargin"><number>20</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="headerLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="lblTitle">
+       <property name="text">
+        <string>Booking Approval</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font-size: 18px; font-weight: bold; color: #1F4F82;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="headerSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size><width>40</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboFilter">
+       <property name="minimumSize">
+        <size><width>130</width><height>32</height></size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QComboBox { padding: 4px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; background: white; color: #333; }
+QComboBox:focus { border: 1px solid #1F4F82; }</string>
+       </property>
+       <item><property name="text"><string>All Status</string></property></item>
+       <item><property name="text"><string>Pending</string></property></item>
+       <item><property name="text"><string>Approved</string></property></item>
+       <item><property name="text"><string>Rejected</string></property></item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="statsLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <item>
+      <widget class="QFrame" name="cardTotal">
+       <property name="minimumSize">
+        <size><width>0</width><height>60</height></size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame { background: #1565C0; border-radius: 8px; }
+QLabel { color: white; border: none; }</string>
+       </property>
+       <layout class="QVBoxLayout" name="cardTotalLayout">
+        <property name="spacing"><number>2</number></property>
+        <property name="leftMargin"><number>12</number></property>
+        <property name="topMargin"><number>8</number></property>
+        <property name="rightMargin"><number>12</number></property>
+        <property name="bottomMargin"><number>8</number></property>
+        <item>
+         <widget class="QLabel" name="lblTotalVal">
+          <property name="text"><string>0</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 20px; font-weight: bold;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblTotalText">
+          <property name="text"><string>Total</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 11px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="cardPending">
+       <property name="minimumSize">
+        <size><width>0</width><height>60</height></size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame { background: #9C27B0; border-radius: 8px; }
+QLabel { color: white; border: none; }</string>
+       </property>
+       <layout class="QVBoxLayout" name="cardPendingLayout">
+        <property name="spacing"><number>2</number></property>
+        <property name="leftMargin"><number>12</number></property>
+        <property name="topMargin"><number>8</number></property>
+        <property name="rightMargin"><number>12</number></property>
+        <property name="bottomMargin"><number>8</number></property>
+        <item>
+         <widget class="QLabel" name="lblPendingVal">
+          <property name="text"><string>0</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 20px; font-weight: bold;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblPendingText">
+          <property name="text"><string>Pending</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 11px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="cardApproved">
+       <property name="minimumSize">
+        <size><width>0</width><height>60</height></size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame { background: #4CAF50; border-radius: 8px; }
+QLabel { color: white; border: none; }</string>
+       </property>
+       <layout class="QVBoxLayout" name="cardApprovedLayout">
+        <property name="spacing"><number>2</number></property>
+        <property name="leftMargin"><number>12</number></property>
+        <property name="topMargin"><number>8</number></property>
+        <property name="rightMargin"><number>12</number></property>
+        <property name="bottomMargin"><number>8</number></property>
+        <item>
+         <widget class="QLabel" name="lblApprovedVal">
+          <property name="text"><string>0</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 20px; font-weight: bold;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblApprovedText">
+          <property name="text"><string>Approved</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 11px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="cardRejected">
+       <property name="minimumSize">
+        <size><width>0</width><height>60</height></size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QFrame { background: #F44336; border-radius: 8px; }
+QLabel { color: white; border: none; }</string>
+       </property>
+       <layout class="QVBoxLayout" name="cardRejectedLayout">
+        <property name="spacing"><number>2</number></property>
+        <property name="leftMargin"><number>12</number></property>
+        <property name="topMargin"><number>8</number></property>
+        <property name="rightMargin"><number>12</number></property>
+        <property name="bottomMargin"><number>8</number></property>
+        <item>
+         <widget class="QLabel" name="lblRejectedVal">
+          <property name="text"><string>0</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 20px; font-weight: bold;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblRejectedText">
+          <property name="text"><string>Rejected</string></property>
+          <property name="alignment"><set>Qt::AlignCenter</set></property>
+          <property name="styleSheet"><string notr="true">font-size: 11px;</string></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="separator">
+     <property name="frameShape">
+      <enum>QFrame::HLine</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: #E3EAF2;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableBookings">
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+     <column>
+      <property name="text"><string>User</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Room</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Type</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Session</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Reason</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Status</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Approve</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Reject</string></property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="footerLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="lblCount">
+       <property name="text">
+        <string>0 bookings</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: #888; font-size: 11px;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="footerSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size><width>40</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>Close</string>
+       </property>
+       <property name="minimumSize">
+        <size><width>90</width><height>34</height></size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #1F4F82; border: none; border-radius: 8px; padding: 6px 20px; color: white; font-size: 13px; font-weight: bold; }
+QPushButton:hover { background: #163D66; }</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -467,7 +467,7 @@ font-size: 13px;
 spacing: 8px</string>
              </property>
              <property name="text">
-              <string>Quản trị viên</string>
+              <string>Administrator viên</string>
              </property>
              <property name="checked">
               <bool>true</bool>
