@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditContent</class>
+ <widget class="QWidget" name="EditContent">
+  <property name="styleSheet">
+   <string notr="true">background-color: white;</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin"><number>10</number></property>
+   <property name="topMargin"><number>10</number></property>
+   <property name="rightMargin"><number>10</number></property>
+   <property name="bottomMargin"><number>10</number></property>
+   <item>
+    <widget class="QWidget" name="formPanel" native="true">
+     <layout class="QVBoxLayout" name="formLayout">
+      <item>
+       <widget class="QLabel" name="roomIDLabel">
+        <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
+        <property name="text"><string>Room ID</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="LineEditRoomID">
+        <property name="styleSheet"><string notr="true">color: black; padding: 6px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="roomTypeLabel">
+        <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
+        <property name="text"><string>Room Type</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="LineEditRoomType">
+        <property name="styleSheet"><string notr="true">color: black; padding: 6px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="statusLabel">
+        <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
+        <property name="text"><string>Status</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="LineEditStatus">
+        <property name="styleSheet"><string notr="true">color: black; padding: 6px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="btnFrame">
+        <property name="styleSheet"><string notr="true">border-radius: 12px; border: 1px solid #E3EAF2;</string></property>
+        <layout class="QHBoxLayout" name="btnLayout">
+         <item>
+          <widget class="QPushButton" name="btnUpdate">
+           <property name="styleSheet"><string notr="true">QPushButton{background-color:#E8F5E9;border:1px solid #81C784;border-radius:15px;padding:6px 15px;color:#2E7D32;font-weight:500;}QPushButton:hover{background-color:#4CAF50;color:white;}</string></property>
+           <property name="text"><string>Update</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCreate">
+           <property name="styleSheet"><string notr="true">QPushButton{background-color:#E3F2FD;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
+           <property name="text"><string>Create</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDelete">
+           <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFEBEE;border:1px solid #E57373;border-radius:15px;padding:6px 15px;color:#C62828;font-weight:500;}QPushButton:hover{background-color:#EF5350;color:white;}</string></property>
+           <property name="text"><string>Delete</string></property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation"><enum>Qt::Vertical</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="tablePanel">
+     <property name="minimumSize"><size><width>350</width><height>0</height></size></property>
+     <property name="maximumSize"><size><width>350</width><height>16777215</height></size></property>
+     <property name="styleSheet"><string notr="true">QFrame{background-color:white;border-radius:12px;border:1px solid #E3EAF2;}</string></property>
+     <layout class="QVBoxLayout" name="tableLayout">
+      <item>
+       <widget class="QLineEdit" name="lineEditSearch">
+        <property name="styleSheet"><string notr="true">color: black; padding: 5px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+        <property name="placeholderText"><string>Tìm kiếm...</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="tableWidget">
+        <property name="maximumSize"><size><width>16777215</width><height>350</height></size></property>
+        <property name="styleSheet"><string notr="true">QTableWidget{background-color:white;color:black;border:1px solid #E3EAF2;}QHeaderView::section{background-color:#1F4F82;color:white;padding:6px;border:none;}</string></property>
+        <column><property name="text"><string>Room ID</string></property></column>
+        <column><property name="text"><string>Room Type</string></property></column>
+        <column><property name="text"><string>Capacity</string></property></column>
+        <column><property name="text"><string>Status</string></property></column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
