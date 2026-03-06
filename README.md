@@ -61,7 +61,7 @@ Source/
 - Xem lịch sử đặt phòng, hủy booking chưa duyệt
 - Nhận mật khẩu tủ thiết bị khi booking được duyệt
 
-### Admin (Administrator viên)
+### Admin (Administrator)
 
 - Quản lý phòng: thêm, sửa, xóa
 - Quản lý user: thêm, sửa, xóa
