@@ -1,7 +1,6 @@
 """Helper to create room cards with session status indicators."""
 from PyQt6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QHBoxLayout,
-    QGridLayout, QSizePolicy,
+    QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QSizePolicy,
 )
 from PyQt6.QtCore import Qt
 from models.booking_model import get_bookings_by_room
@@ -13,6 +12,13 @@ STATUS_COLORS = {
     "Cleaning": "#2196F3",
 }
 
+STATUS_BG = {
+    "Available": "#E8F5E9",
+    "Occupied": "#FFEBEE",
+    "Full": "#FFF3E0",
+    "Cleaning": "#E3F2FD",
+}
+
 SESSIONS = [
     ("Session 1", "07:00 – 09:30"),
     ("Session 2", "09:45 – 12:15"),
@@ -21,68 +27,107 @@ SESSIONS = [
 ]
 
 
+def get_display_status(room):
+    bookings = get_bookings_by_room(room["id"])
+    smap = {b["session"]: b["status"] for b in bookings}
+    booked_count = sum(
+        1 for name, tr in SESSIONS
+        if smap.get(f"{name} ({tr})") in ("Pending", "Approved")
+    )
+    return "Full" if booked_count == 4 else room["status"]
+
+
 def create_room_card(room):
-    # Get bookings to check session status
     bookings = get_bookings_by_room(room["id"])
     smap = {b["session"]: b["status"] for b in bookings}
 
-    # Auto-detect Full: if all 4 sessions are booked
-    booked_count = 0
-    for name, tr in SESSIONS:
-        key = f"{name} ({tr})"
-        if smap.get(key) in ("Pending", "Approved"):
-            booked_count += 1
+    booked_count = sum(
+        1 for name, tr in SESSIONS
+        if smap.get(f"{name} ({tr})") in ("Pending", "Approved")
+    )
     display_status = "Full" if booked_count == 4 else room["status"]
 
-    color = STATUS_COLORS.get(display_status, "#9E9E9E")
+    border_color = STATUS_COLORS.get(display_status, "#9E9E9E")
+    badge_bg = STATUS_BG.get(display_status, "#F5F5F5")
+
     card = QWidget()
-    card.setMinimumSize(200, 175)
-    card.setMaximumHeight(220)
-    card.setSizePolicy(
-        QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
-    )
+    card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+    card.setMinimumWidth(160)
+    card.setFixedHeight(110)
     card.setStyleSheet(
-        f"background:white;border:2px solid {color};border-radius:10px;"
+        f"QWidget#roomCard {{"
+        f"  background: white;"
+        f"  border: 2px solid {border_color};"
+        f"  border-radius: 10px;"
+        f"}}"
     )
+    card.setObjectName("roomCard")
+
     vbox = QVBoxLayout(card)
-    vbox.setContentsMargins(10, 8, 10, 6)
-    vbox.setSpacing(3)
+    vbox.setContentsMargins(12, 10, 12, 10)
+    vbox.setSpacing(6)
+
+    # -- Header row: room ID + status badge --
+    header = QHBoxLayout()
+    header.setSpacing(6)
 
     lbl_id = QLabel(room["room_id"])
     lbl_id.setStyleSheet(
-        "color:#333;font-weight:bold;font-size:14px;border:none;"
+        "color:#1a1a2e;font-weight:bold;font-size:14px;border:none;"
     )
-    lbl_type = QLabel(f"{room['room_type']} - {room['capacity']} seats")
-    lbl_type.setStyleSheet("color:#666;font-size:11px;border:none;")
-    vbox.addWidget(lbl_id)
+
+    lbl_status = QLabel(display_status)
+    lbl_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    lbl_status.setFixedHeight(20)
+    lbl_status.setStyleSheet(
+        f"color:{border_color};"
+        f"background:{badge_bg};"
+        f"border:1px solid {border_color};"
+        f"border-radius:9px;"
+        f"font-size:10px;"
+        f"font-weight:bold;"
+        f"padding:0 7px;"
+    )
+
+    header.addWidget(lbl_id)
+    header.addStretch()
+    header.addWidget(lbl_status)
+    vbox.addLayout(header)
+
+    # -- Room type + capacity --
+    lbl_type = QLabel(f"{room['room_type']}  ·  {room['capacity']} seats")
+    lbl_type.setStyleSheet("color:#888;font-size:11px;border:none;")
     vbox.addWidget(lbl_type)
 
-    # Session status grid (2x2)
-    sgrid = QGridLayout()
-    sgrid.setSpacing(2)
-    sgrid.setContentsMargins(0, 4, 0, 0)
+    # -- Divider --
+    line = QFrame()
+    line.setFrameShape(QFrame.Shape.HLine)
+    line.setStyleSheet("color:#F0F0F0;border:none;background:#F0F0F0;max-height:1px;")
+    vbox.addWidget(line)
 
-    for i, (name, time_range) in enumerate(SESSIONS):
+    # -- Session dots row --
+    srow = QHBoxLayout()
+    srow.setSpacing(8)
+    srow.setContentsMargins(0, 0, 0, 0)
+    srow.addStretch()
+
+    for name, time_range in SESSIONS:
         key = f"{name} ({time_range})"
         bs = smap.get(key)
         if bs == "Approved":
-            dot_c, txt = "#4CAF50", "Approved"
+            dot_c = "#4CAF50"
         elif bs == "Pending":
-            dot_c, txt = "#FF9800", "Pending"
+            dot_c = "#FF9800"
         else:
-            dot_c, txt = "#E0E0E0", "Available"
+            dot_c = "#D0D0D0"
 
-        row = QHBoxLayout()
-        row.setSpacing(3)
-        row.setContentsMargins(0, 0, 0, 0)
         dot = QLabel("●")
-        dot.setStyleSheet(f"color:{dot_c};font-size:10px;border:none;")
-        dot.setMaximumWidth(12)
-        info = QLabel(f"{name}: {txt}")
-        info.setStyleSheet("color:#555;font-size:9px;border:none;")
-        row.addWidget(dot)
-        row.addWidget(info)
-        sgrid.addLayout(row, i // 2, i % 2)
+        dot.setStyleSheet(f"color:{dot_c};font-size:15px;border:none;")
+        dot.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        dot.setToolTip(f"{name} ({time_range}): {bs or 'Available'}")
+        srow.addWidget(dot)
 
-    vbox.addLayout(sgrid)
+    srow.addStretch()
+    vbox.addLayout(srow)
+
     return card

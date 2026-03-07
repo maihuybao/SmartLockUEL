@@ -39,7 +39,7 @@
       <widget class="QPushButton" name="btnBooked">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFF8E1;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
-       <property name="text"><string>Booked</string></property>
+       <property name="text"><string>Full</string></property>
        <property name="checkable"><bool>true</bool></property>
        <property name="autoExclusive"><bool>true</bool></property>
       </widget>

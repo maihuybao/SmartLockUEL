@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_BookingDialog(object):
     def setupUi(self, BookingDialog):
         BookingDialog.setObjectName("BookingDialog")
-        BookingDialog.resize(450, 520)
+        BookingDialog.resize(480, 520)
         BookingDialog.setStyleSheet("QDialog { background: white; }\n"
 "QLabel { color: #333; }")
         self.mainLayout = QtWidgets.QVBoxLayout(BookingDialog)
@@ -48,29 +48,21 @@ class Ui_BookingDialog(object):
         self.btnCa1 = QtWidgets.QPushButton(parent=BookingDialog)
         self.btnCa1.setMinimumSize(QtCore.QSize(0, 50))
         self.btnCa1.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        self.btnCa1.setStyleSheet("QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }\n"
-"QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }")
         self.btnCa1.setObjectName("btnCa1")
         self.sessionGrid.addWidget(self.btnCa1, 0, 0, 1, 1)
         self.btnCa2 = QtWidgets.QPushButton(parent=BookingDialog)
         self.btnCa2.setMinimumSize(QtCore.QSize(0, 50))
         self.btnCa2.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        self.btnCa2.setStyleSheet("QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }\n"
-"QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }")
         self.btnCa2.setObjectName("btnCa2")
         self.sessionGrid.addWidget(self.btnCa2, 0, 1, 1, 1)
         self.btnCa3 = QtWidgets.QPushButton(parent=BookingDialog)
         self.btnCa3.setMinimumSize(QtCore.QSize(0, 50))
         self.btnCa3.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        self.btnCa3.setStyleSheet("QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }\n"
-"QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }")
         self.btnCa3.setObjectName("btnCa3")
         self.sessionGrid.addWidget(self.btnCa3, 1, 0, 1, 1)
         self.btnCa4 = QtWidgets.QPushButton(parent=BookingDialog)
         self.btnCa4.setMinimumSize(QtCore.QSize(0, 50))
         self.btnCa4.setCursor(QtGui.QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
-        self.btnCa4.setStyleSheet("QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2; border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }\n"
-"QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }")
         self.btnCa4.setObjectName("btnCa4")
         self.sessionGrid.addWidget(self.btnCa4, 1, 1, 1, 1)
         self.mainLayout.addLayout(self.sessionGrid)
@@ -107,7 +99,7 @@ class Ui_BookingDialog(object):
         BookingDialog.setWindowTitle(_translate("BookingDialog", "Đặt phòng"))
         self.lblTitle.setText(_translate("BookingDialog", "Đặt phòng"))
         self.lblRoom.setText(_translate("BookingDialog", "Chọn phòng:"))
-        self.lblSession.setText(_translate("BookingDialog", "Select sessions (multiple allowed):"))
+        self.lblSession.setText(_translate("BookingDialog", "Chọn ca học (có thể chọn nhiều):"))
         self.btnCa1.setText(_translate("BookingDialog", "Session 1\n"
 "07:00 – 09:30"))
         self.btnCa2.setText(_translate("BookingDialog", "Session 2\n"

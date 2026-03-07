@@ -10,7 +10,7 @@ from PyQt6 import uic
 import os
 
 from widgets.base_window import BaseWindow
-from widgets.room_card import create_room_card
+from widgets.room_card import create_room_card, SESSIONS, get_display_status
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
 from models.booking_model import (
     create_booking,
@@ -69,8 +69,12 @@ class OverviewUsersController(BaseWindow):
             rooms = search_rooms(keyword)
         elif self._current_filter == "All":
             rooms = get_all_rooms()
+        elif self._current_filter == "Full":
+            rooms = [r for r in get_all_rooms() if get_display_status(r) == "Full"]
         else:
             rooms = get_rooms_by_status(self._current_filter)
+            if self._current_filter == "Available":
+                rooms = [r for r in rooms if get_display_status(r) != "Full"]
         self._render_room_cards(rooms)
 
     def _render_room_cards(self, rooms):
@@ -139,14 +143,18 @@ class OverviewUsersController(BaseWindow):
 
         btn_normal = (
             "QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2;"
-            " border-radius: 10px; padding: 10px 6px; color: #555; font-size: 12px; }"
-            "QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }"
+            " border-radius: 8px; padding: 8px 6px; color: #555; font-size: 12px; font-weight: 500; }"
+            " QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }"
         )
         btn_selected = (
             "QPushButton { background: #1F4F82; border: 2px solid #1F4F82;"
-            " border-radius: 10px; padding: 10px 6px; color: white; font-size: 12px;"
-            " font-weight: bold; }"
+            " border-radius: 8px; padding: 8px 6px; color: white; font-size: 12px; font-weight: 500; }"
         )
+
+        for btn in session_buttons:
+            btn.setFixedHeight(50)
+            btn.setFlat(True)
+            btn.setStyleSheet(btn_normal)
 
         def on_session_click(idx):
             if idx in selected_sessions:
@@ -175,7 +183,7 @@ class OverviewUsersController(BaseWindow):
 
             success_count = 0
             for idx in sorted(selected_sessions):
-                session_name, session_time = self.SESSIONS[idx]
+                session_name, session_time = SESSIONS[idx]
                 session = f"{session_name} ({session_time})"
                 if create_booking(self.current_user["id"], room_pk, session, reason):
                     success_count += 1

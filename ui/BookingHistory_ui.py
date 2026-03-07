@@ -15,8 +15,8 @@ class Ui_BookingHistory(object):
         BookingHistory.resize(700, 500)
         BookingHistory.setStyleSheet("QDialog { background: #F5F7FA; }\n"
 "QLabel { color: #333; border: none; }\n"
-"QTableWidget { background: white; border: 1px solid #E3EAF2; border-radius: 8px; gridline-color: #F0F0F0; font-size: 12px; }\n"
-"QTableWidget::item { padding: 6px; }\n"
+"QTableWidget { background: white; border: 1px solid #E3EAF2; border-radius: 8px; gridline-color: #F0F0F0; font-size: 12px; color: #333; }\n"
+"QTableWidget::item { padding: 6px; color: #333; }\n"
 "QHeaderView::section { background: #1F4F82; color: white; font-weight: bold; font-size: 12px; padding: 8px; border: none; }\n"
 "QScrollBar:vertical { width: 8px; background: #F0F0F0; border-radius: 4px; }\n"
 "QScrollBar::handle:vertical { background: #C0C0C0; border-radius: 4px; }")
