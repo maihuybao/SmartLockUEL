@@ -1,2 +1,4 @@
 CLAUDE.md
 seed.py
+*/__pycache__
+*.pyc

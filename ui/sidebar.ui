@@ -57,34 +57,21 @@ QPushButton:hover {
    <item>
     <widget class="QPushButton" name="btnOverview">
      <property name="text">
-      <string>Overview</string>
+      <string>Room Overview</string>
      </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>../images/overview.png</normaloff>../images/overview.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnBookings">
+     <property name="text">
+      <string>Booking Overview</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="btnEdit">
      <property name="text">
-      <string>Edit</string>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>../images/edit.png</normaloff>../images/edit.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
+      <string>Room Management</string>
      </property>
     </widget>
    </item>
@@ -92,16 +79,6 @@ QPushButton:hover {
     <widget class="QPushButton" name="btnUsers">
      <property name="text">
       <string>Users</string>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>../images/users.png</normaloff>../images/users.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
      </property>
     </widget>
    </item>
@@ -123,32 +100,12 @@ QPushButton:hover {
      <property name="text">
       <string>Log out</string>
      </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>../images/log out.png</normaloff>../images/log out.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="btnQuit">
      <property name="text">
       <string>Quit</string>
-     </property>
-     <property name="icon">
-      <iconset>
-       <normaloff>../images/quit.png</normaloff>../images/quit.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
      </property>
     </widget>
    </item>

@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QSizePolicy,
 )
-from PyQt6.QtGui import QIcon, QPixmap, QKeySequence, QShortcut
+from PyQt6.QtGui import QIcon, QPixmap, QKeySequence, QShortcut, QPainter
 from PyQt6.QtCore import QSize, Qt
 from PyQt6 import uic
 
@@ -14,6 +14,25 @@ from models.user_model import authenticate
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UI_DIR = os.path.join(BASE_DIR, "ui")
 IMG_DIR = os.path.join(BASE_DIR, "images")
+
+
+class _BgWidget:
+    """Mixin vẽ background.jpg scale-to-cover (giữ tỉ lệ) cho centralwidget."""
+    _bg_pixmap = None
+
+    def paintEvent(self, event):
+        if self._bg_pixmap:
+            painter = QPainter(self)
+            scaled = self._bg_pixmap.scaled(
+                self.size(),
+                Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            x = (self.width() - scaled.width()) // 2
+            y = (self.height() - scaled.height()) // 2
+            painter.drawPixmap(x, y, scaled)
+        else:
+            super().paintEvent(event)
 
 
 class MainWindowController(QMainWindow):
@@ -28,22 +47,36 @@ class MainWindowController(QMainWindow):
         shortcut = QShortcut(QKeySequence(Qt.Key.Key_F11), self)
         shortcut.activated.connect(self._toggle_fullscreen)
 
-        # Make login form responsive and centered
+        self._setup_background()
         self._make_login_responsive()
 
         self._password_visible = False
+        self._logging_in = False
         self._setup_ui()
         self._connect_signals()
 
-    def _make_login_responsive(self):
-        """Make the login form centered and responsive."""
-        form = self.widget  # the form card from Login.ui
+    def _setup_background(self):
+        bg_path = os.path.join(IMG_DIR, "background.jpg")
+        if not os.path.exists(bg_path):
+            return
+        pixmap = QPixmap(bg_path)
+        central = self.centralwidget
+        central.setStyleSheet("")
+        central.__class__ = type(
+            "BgCentral",
+            (_BgWidget, central.__class__),
+            {},
+        )
+        central._bg_pixmap = pixmap
 
-        # UI already has AlignHCenter|AlignVCenter on the grid cell.
-        # Just unlock the fixed size so the form can breathe.
-        # form.setMinimumSize(380, 450)
-        # form.setMaximumSize(520, 16777215)
+    def _make_login_responsive(self):
+        form = self.widget
         form.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        # Đảm bảo card login có nền trắng rõ trên ảnh nền
+        form.setStyleSheet(
+            "QWidget#widget { background: rgba(255,255,255,0.92); "
+            "border-radius: 12px; }"
+        )
 
     def _setup_ui(self):
         # Fix logo path
@@ -89,24 +122,30 @@ class MainWindowController(QMainWindow):
             self.btnTogglePassword.setIcon(self._eye_closed)
 
     def _handle_login(self):
+        if self._logging_in:
+            return
+        self._logging_in = True
+
         email = self.lineEditEmail.text().strip()
         password = self.lineEditPassword.text().strip()
 
         if not email or not password:
-            QMessageBox.warning(self, "Lỗi", "Vui lòng nhập đầy đủ email và mật khẩu.")
+            QMessageBox.warning(self, "Error", "Please enter your email and password.")
+            self._logging_in = False
             return
 
         user = authenticate(email, password)
         if not user:
-            QMessageBox.warning(self, "Lỗi", "Sai tên đăng nhập hoặc mật khẩu.")
+            QMessageBox.warning(self, "Error", "Incorrect email or password.")
+            self._logging_in = False
             return
 
-        # Check role matches radio button selection
         selected_role = "admin" if self.radioButtonAdmin.isChecked() else "user"
         if user["role"] != selected_role:
             QMessageBox.warning(
-                self, "Lỗi", f"Tài khoản này không có quyền '{selected_role}'."
+                self, "Error", f"This account does not have '{selected_role}' permission."
             )
+            self._logging_in = False
             return
 
         self._open_dashboard(user)

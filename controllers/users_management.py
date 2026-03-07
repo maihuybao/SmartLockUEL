@@ -23,10 +23,11 @@ class UsersManagementController(BaseWindow):
     def _connect_sidebar(self):
         """Override: Users is current page."""
         self.sidebar.btnOverview.clicked.connect(self._go_overview)
+        self.sidebar.btnBookings.clicked.connect(self._go_bookings)
         self.sidebar.btnEdit.clicked.connect(self._go_edit)
         self.sidebar.btnUsers.clicked.connect(lambda: None)
         self.sidebar.btnLogout.clicked.connect(self._logout)
-        self.sidebar.btnQuit.clicked.connect(QApplication.quit)
+        self.sidebar.btnQuit.clicked.connect(self._quit)
 
     def _connect_signals(self):
         self.ui.btnCreate.clicked.connect(self._create)
@@ -83,38 +84,38 @@ class UsersManagementController(BaseWindow):
         password = self.ui.editPassword.text().strip()
         role = self.ui.editRole.text().strip().lower()
         if not username or not password or role not in ("admin", "user"):
-            QMessageBox.warning(self, "Lỗi", "Nhập đầy đủ Username, Password và Role (admin/user).")
+            QMessageBox.warning(self, "Error", "Please enter Username, Password and Role (admin/user).")
             return
         if create_user(username, password, role):
-            QMessageBox.information(self, "Thành công", "Đã tạo user mới.")
+            QMessageBox.information(self, "Success", "User created successfully.")
             self._load_table()
         else:
-            QMessageBox.warning(self, "Lỗi", "Username đã tồn tại.")
+            QMessageBox.warning(self, "Error", "Username already exists.")
 
     def _update(self):
         if not self._selected_pk:
-            QMessageBox.warning(self, "Lỗi", "Chọn user cần cập nhật.")
+            QMessageBox.warning(self, "Error", "Please select a user to update.")
             return
         username = self.ui.editUsername.text().strip()
         password = self.ui.editPassword.text().strip()
         role = self.ui.editRole.text().strip().lower()
         if not username or role not in ("admin", "user"):
-            QMessageBox.warning(self, "Lỗi", "Nhập đầy đủ thông tin.")
+            QMessageBox.warning(self, "Error", "Please enter full information.")
             return
         if update_user(self._selected_pk, username, password, role):
-            QMessageBox.information(self, "Thành công", "Đã cập nhật user.")
+            QMessageBox.information(self, "Success", "Updated user successfully.")
             self._load_table()
         else:
-            QMessageBox.warning(self, "Lỗi", "Không thể cập nhật.")
+            QMessageBox.warning(self, "Error", "Failed to update user.")
 
     def _delete(self):
         if not self._selected_pk:
-            QMessageBox.warning(self, "Lỗi", "Chọn user cần xóa.")
+            QMessageBox.warning(self, "Error", "Please select a user to delete.")
             return
         if self._selected_pk == self.current_user["id"]:
-            QMessageBox.warning(self, "Lỗi", "Không thể xóa chính mình.")
+            QMessageBox.warning(self, "Error", "You cannot delete your own account.")
             return
-        reply = QMessageBox.question(self, "Xác nhận", "Bạn có chắc muốn xóa user này?")
+        reply = QMessageBox.question(self, "Confirm", "Are you sure you want to delete this user?")
         if reply == QMessageBox.StandardButton.Yes:
             delete_user(self._selected_pk)
             QMessageBox.information(self, "Thành công", "Đã xóa user.")

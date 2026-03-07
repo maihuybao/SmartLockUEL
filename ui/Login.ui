@@ -21,7 +21,7 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-image: url(:/newPrefix/background.jpg);</string>
+    <string notr="true"></string>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
     <property name="leftMargin">
@@ -199,21 +199,30 @@ QLineEdit::placeholder { color: #9aa0a6;}
          </item>
          <item>
           <widget class="QFrame" name="frame">
+           <property name="mouseTracking">
+            <bool>true</bool>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
+           <property name="acceptDrops">
+            <bool>true</bool>
+           </property>
            <property name="styleSheet">
-            <string notr="true">#framePasswordContainer {
+            <string notr="true">QFrame {
     border: 1px solid #dcdcdc;
     border-radius: 10px;
     background-color: white;
 }
-#framePasswordContainer:focus-within {
+QFrame:focus-within {
     border: 1px solid #1f4f82;
 }</string>
            </property>
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::NoFrame</enum>
            </property>
            <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+            <enum>QFrame::Plain</enum>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <property name="leftMargin">
@@ -255,7 +264,7 @@ QLineEdit::placeholder { color: #9aa0a6;}
                <bool>false</bool>
               </property>
               <property name="placeholderText">
-               <string>Nhập mật khẩu </string>
+               <string>Enter password</string>
               </property>
               <property name="clearButtonEnabled">
                <bool>false</bool>
@@ -346,7 +355,7 @@ QPushButton:pressed {background-color: #ffb347}
 </string>
              </property>
              <property name="text">
-              <string>Đăng nhập</string>
+              <string>Login</string>
              </property>
             </widget>
            </item>
@@ -461,7 +470,7 @@ font-weight:600;
 padding:8px 0px;</string>
            </property>
            <property name="text">
-            <string>Trường Đại học Kinh tế – Luật, Đại học Quốc gia Thành phố Hồ Chí Minh</string>
+            <string>University of Economics and Law, Vietnam National University Ho Chi Minh City</string>
            </property>
           </widget>
          </item>

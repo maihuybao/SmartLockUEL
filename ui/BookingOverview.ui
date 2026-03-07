@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BookingOverviewContent</class>
+ <widget class="QWidget" name="BookingOverviewContent">
+  <property name="styleSheet">
+   <string notr="true">background-color: #F5F8FC;</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="spacing"><number>12</number></property>
+   <property name="leftMargin"><number>16</number></property>
+   <property name="topMargin"><number>16</number></property>
+   <property name="rightMargin"><number>16</number></property>
+   <property name="bottomMargin"><number>16</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="toolbarLayout">
+     <property name="spacing"><number>8</number></property>
+     <item>
+      <widget class="QComboBox" name="comboFilter">
+       <property name="minimumSize"><size><width>130</width><height>34</height></size></property>
+       <property name="styleSheet">
+        <string notr="true">QComboBox { padding: 4px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; background: white; color: #333; }
+QComboBox:focus { border: 1px solid #1F4F82; }</string>
+       </property>
+       <item><property name="text"><string>All Status</string></property></item>
+       <item><property name="text"><string>Pending</string></property></item>
+       <item><property name="text"><string>Approved</string></property></item>
+       <item><property name="text"><string>Rejected</string></property></item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEditSearch">
+       <property name="minimumSize"><size><width>200</width><height>34</height></size></property>
+       <property name="placeholderText"><string>Search by user, room, session...</string></property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit { padding: 4px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; background: white; color: #333; }
+QLineEdit:focus { border: 1px solid #1F4F82; }</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblCount">
+       <property name="text"><string>0 bookings</string></property>
+       <property name="styleSheet"><string notr="true">color: #888; font-size: 12px;</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExportCSV">
+       <property name="text"><string>Export CSV</string></property>
+       <property name="minimumSize"><size><width>100</width><height>34</height></size></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #1F4F82; border: none; border-radius: 6px; padding: 6px 16px; color: white; font-size: 12px; font-weight: bold; }
+QPushButton:hover { background: #163D66; }</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAdd">
+       <property name="text"><string>+ Add</string></property>
+       <property name="minimumSize"><size><width>80</width><height>34</height></size></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton { background: #4CAF50; border: none; border-radius: 6px; padding: 6px 16px; color: white; font-size: 12px; font-weight: bold; }
+QPushButton:hover { background: #388E3C; }</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableBookings">
+     <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+     <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+     <property name="alternatingRowColors"><bool>true</bool></property>
+     <property name="showGrid"><bool>false</bool></property>
+     <property name="styleSheet">
+      <string notr="true">QTableWidget { background: white; border: 1px solid #E3EAF2; border-radius: 8px; font-size: 12px; color: #333; }
+QTableWidget::item { padding: 8px; color: #333; }
+QHeaderView::section { background: #1F4F82; color: white; font-weight: bold; font-size: 12px; padding: 8px; border: none; }
+QScrollBar:vertical { width: 8px; background: #F0F0F0; border-radius: 4px; }
+QScrollBar::handle:vertical { background: #C0C0C0; border-radius: 4px; }</string>
+     </property>
+     <column><property name="text"><string>User</string></property></column>
+     <column><property name="text"><string>Room</string></property></column>
+     <column><property name="text"><string>Type</string></property></column>
+     <column><property name="text"><string>Session</string></property></column>
+     <column><property name="text"><string>Reason</string></property></column>
+     <column><property name="text"><string>Status</string></property></column>
+     <column><property name="text"><string>Password</string></property></column>
+     <column><property name="text"><string>Edit</string></property></column>
+     <column><property name="text"><string>Delete</string></property></column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

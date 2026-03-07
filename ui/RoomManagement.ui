@@ -36,6 +36,17 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="capacityLabel">
+        <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
+        <property name="text"><string>Capacity</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="LineEditCapacity">
+        <property name="styleSheet"><string notr="true">color: black; padding: 6px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="statusLabel">
         <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
         <property name="text"><string>Status</string></property>
@@ -66,6 +77,12 @@
           <widget class="QPushButton" name="btnDelete">
            <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFEBEE;border:1px solid #E57373;border-radius:15px;padding:6px 15px;color:#C62828;font-weight:500;}QPushButton:hover{background-color:#EF5350;color:white;}</string></property>
            <property name="text"><string>Delete</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnImportCSV">
+           <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFF8E1;border:1px solid #F9A825;border-radius:15px;padding:6px 15px;color:#F57F17;font-weight:500;}QPushButton:hover{background-color:#FBC02D;color:white;}</string></property>
+           <property name="text"><string>Import CSV</string></property>
           </widget>
          </item>
         </layout>

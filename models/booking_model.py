@@ -113,6 +113,30 @@ def get_dashboard_stats():
     }
 
 
+def delete_booking(booking_id):
+    conn = get_connection()
+    conn.execute("DELETE FROM bookings WHERE id=?", (booking_id,))
+    conn.commit()
+    conn.close()
+
+
+def admin_update_booking(booking_id, session, reason, status):
+    conn = get_connection()
+    conn.execute(
+        "UPDATE bookings SET session=?, reason=?, status=? WHERE id=?",
+        (session, reason, status, booking_id),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_all_users_simple():
+    conn = get_connection()
+    rows = conn.execute("SELECT id, username FROM users ORDER BY username").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
 def get_bookings_by_room(room_pk):
     """Get active bookings (Pending/Approved) for a specific room."""
     conn = get_connection()

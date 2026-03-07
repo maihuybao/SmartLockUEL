@@ -1,8 +1,9 @@
 """Helper to create room cards with session status indicators."""
 from PyQt6.QtWidgets import (
-    QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QSizePolicy,
+    QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFrame, QSizePolicy, QMenu,
 )
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction
 from models.booking_model import get_bookings_by_room
 
 STATUS_COLORS = {
@@ -37,7 +38,7 @@ def get_display_status(room):
     return "Full" if booked_count == 4 else room["status"]
 
 
-def create_room_card(room):
+def create_room_card(room, on_context=None):
     bookings = get_bookings_by_room(room["id"])
     smap = {b["session"]: b["status"] for b in bookings}
 
@@ -51,9 +52,8 @@ def create_room_card(room):
     badge_bg = STATUS_BG.get(display_status, "#F5F5F5")
 
     card = QWidget()
-    card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-    card.setMinimumWidth(160)
-    card.setFixedHeight(110)
+    card.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+    card.setFixedSize(200, 110)
     card.setStyleSheet(
         f"QWidget#roomCard {{"
         f"  background: white;"
@@ -62,6 +62,12 @@ def create_room_card(room):
         f"}}"
     )
     card.setObjectName("roomCard")
+
+    if on_context:
+        card.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        card.customContextMenuRequested.connect(
+            lambda pos: on_context(room, card.mapToGlobal(pos))
+        )
 
     vbox = QVBoxLayout(card)
     vbox.setContentsMargins(12, 10, 12, 10)

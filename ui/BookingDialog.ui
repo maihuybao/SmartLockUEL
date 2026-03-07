@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Đặt phòng</string>
+   <string>Book Room</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QDialog { background: white; }
@@ -28,7 +28,7 @@ QLabel { color: #333; }</string>
    <item>
     <widget class="QLabel" name="lblTitle">
      <property name="text">
-      <string>Đặt phòng</string>
+      <string>Book Room</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -51,7 +51,7 @@ QLabel { color: #333; }</string>
    <item>
     <widget class="QLabel" name="lblRoom">
      <property name="text">
-      <string>Chọn phòng:</string>
+      <string>Select room:</string>
      </property>
      <property name="styleSheet">
       <string notr="true">font-weight: 600; font-size: 13px;</string>
@@ -69,7 +69,7 @@ QComboBox:focus { border: 1px solid #1F4F82; }</string>
    <item>
     <widget class="QLabel" name="lblSession">
      <property name="text">
-      <string>Chọn ca học (có thể chọn nhiều):</string>
+      <string>Select sessions (multiple allowed):</string>
      </property>
      <property name="styleSheet">
       <string notr="true">font-weight: 600; font-size: 13px;</string>
@@ -142,7 +142,7 @@ QComboBox:focus { border: 1px solid #1F4F82; }</string>
    <item>
     <widget class="QLabel" name="lblReason">
      <property name="text">
-      <string>Lý do:</string>
+      <string>Reason:</string>
      </property>
      <property name="styleSheet">
       <string notr="true">font-weight: 600; font-size: 13px;</string>
@@ -152,7 +152,7 @@ QComboBox:focus { border: 1px solid #1F4F82; }</string>
    <item>
     <widget class="QTextEdit" name="txtReason">
      <property name="placeholderText">
-      <string>Họp nhóm, sinh hoạt CLB, tự học, dạy bù, hội thảo...</string>
+      <string>Group meeting, club activities, self-study, make-up class, seminar...</string>
      </property>
      <property name="maximumSize">
       <size><width>16777215</width><height>70</height></size>
@@ -171,7 +171,7 @@ QTextEdit:focus { border: 1px solid #1F4F82; }</string>
      <item>
       <widget class="QPushButton" name="btnCancel">
        <property name="text">
-        <string>Hủy</string>
+        <string>Cancel</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton { background: #F5F5F5; border: 1px solid #ddd; border-radius: 8px; padding: 8px 20px; color: #666; font-size: 13px; }
@@ -182,7 +182,7 @@ QPushButton:hover { background: #E0E0E0; }</string>
      <item>
       <widget class="QPushButton" name="btnSubmit">
        <property name="text">
-        <string>Xác nhận đặt phòng</string>
+        <string>Confirm Booking</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton { background: #1F4F82; border: none; border-radius: 8px; padding: 8px 20px; color: white; font-size: 13px; font-weight: bold; }

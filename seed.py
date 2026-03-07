@@ -1,4 +1,5 @@
 """Seed initial data: admin account + sample rooms."""
+
 from database import init_db, get_connection
 from models.user_model import hash_password
 
@@ -16,7 +17,9 @@ def seed():
         )
 
     # Sample user
-    existing = conn.execute("SELECT id FROM users WHERE username='sv001@st.uel.edu.vn'").fetchone()
+    existing = conn.execute(
+        "SELECT id FROM users WHERE username='sv001@st.uel.edu.vn'"
+    ).fetchone()
     if not existing:
         conn.execute(
             "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
@@ -32,6 +35,46 @@ def seed():
         ("B102", "Meeting room", 50, "Occupied"),
         ("C101", "Study room", 50, "Available"),
         ("C102", "Study room", 50, "Cleaning"),
+        ("D101", "Classroom", 50, "Available"),
+        ("D102", "Classroom", 50, "Available"),
+        ("D103", "Classroom", 50, "Available"),
+        ("D104", "Classroom", 50, "Available"),
+        ("D105", "Classroom", 50, "Available"),
+        ("D106", "Classroom", 50, "Available"),
+        ("D107", "Classroom", 50, "Available"),
+        ("D108", "Classroom", 50, "Available"),
+        ("D109", "Classroom", 50, "Available"),
+        ("D110", "Classroom", 50, "Available"),
+        ("E101", "Classroom", 50, "Available"),
+        ("E102", "Classroom", 50, "Available"),
+        ("E103", "Classroom", 50, "Available"),
+        ("E104", "Classroom", 50, "Available"),
+        ("E105", "Classroom", 50, "Available"),
+        ("E106", "Classroom", 50, "Available"),
+        ("E107", "Classroom", 50, "Available"),
+        ("E108", "Classroom", 50, "Available"),
+        ("E109", "Classroom", 50, "Available"),
+        ("E110", "Classroom", 50, "Available"),
+        ("F101", "Classroom", 50, "Available"),
+        ("F102", "Classroom", 50, "Available"),
+        ("F103", "Classroom", 50, "Available"),
+        ("F104", "Classroom", 50, "Available"),
+        ("F105", "Classroom", 50, "Available"),
+        ("F106", "Classroom", 50, "Available"),
+        ("F107", "Classroom", 50, "Available"),
+        ("F108", "Classroom", 50, "Available"),
+        ("F109", "Classroom", 50, "Available"),
+        ("F110", "Classroom", 50, "Available"),
+        ("G101", "Classroom", 50, "Available"),
+        ("G102", "Classroom", 50, "Available"),
+        ("G103", "Classroom", 50, "Available"),
+        ("G104", "Classroom", 50, "Available"),
+        ("G105", "Classroom", 50, "Available"),
+        ("G106", "Classroom", 50, "Available"),
+        ("G107", "Classroom", 50, "Available"),
+        ("G108", "Classroom", 50, "Available"),
+        ("G109", "Classroom", 50, "Available"),
+        ("G110", "Classroom", 50, "Available"),
     ]
     for room_id, rtype, cap, status in sample_rooms:
         existing = conn.execute(

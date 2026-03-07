@@ -1,0 +1,12 @@
+room_id,room_type,capacity,status
+Example_1,Lecture Room,50,Available
+Example_2,Lab,30,Available
+Example_3,Lecture Room,50,Available
+Example_4,Lab,30,Available
+Example_5,Lecture Room,50,Available
+Example_6,Lab,30,Available
+Example_7,Lecture Room,50,Available
+Example_8,Lab,30,Available
+Example_9,Lecture Room,50,Available
+Example_10,Lab,30,Available
+
