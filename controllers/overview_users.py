@@ -12,33 +12,20 @@ from PyQt6.QtWidgets import (
     QLabel,
 )
 from PyQt6.QtCore import Qt, QDate, QTime, QSize
-from PyQt6.QtGui import QColor, QIcon, QPixmap, QPainter
-from PyQt6.QtSvg import QSvgRenderer
+from PyQt6.QtGui import QColor, QIcon
 from PyQt6 import uic
-import os, re
+import os
 
 IMAGES_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "images"
 )
 
 
-def _svg_icon(name, color, size=16):
+def _png_icon(name):
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
-    with open(path, "r", encoding="utf-8") as f:
-        svg = f.read()
-    svg = re.sub(r'fill="#[0-9a-fA-F]+"', f'fill="{color}"', svg)
-    svg = re.sub(r"fill='#[0-9a-fA-F]+'", f"fill='{color}'", svg)
-    if f'fill="{color}"' not in svg:
-        svg = svg.replace("<path ", f'<path fill="{color}" ', 1)
-    renderer = QSvgRenderer(svg.encode("utf-8"))
-    pm = QPixmap(size, size)
-    pm.fill(Qt.GlobalColor.transparent)
-    painter = QPainter(pm)
-    renderer.render(painter)
-    painter.end()
-    return QIcon(pm)
+    return QIcon(path)
 
 
 from widgets.base_window import BaseWindow
@@ -454,7 +441,7 @@ class OverviewUsersController(BaseWindow):
             btn_view = QPushButton()
             btn_view.setToolTip("View")
             btn_view.setFixedSize(22, 22)
-            btn_view.setIcon(_svg_icon("view.svg", "#6A1B9A"))
+            btn_view.setIcon(_png_icon("view.png"))
             btn_view.setIconSize(QSize(14, 14))
             btn_view.setStyleSheet(
                 "QPushButton{background:#F3E5F5;border:none;border-radius:6px;}"
@@ -469,7 +456,7 @@ class OverviewUsersController(BaseWindow):
                 btn_edit = QPushButton()
                 btn_edit.setToolTip("Edit")
                 btn_edit.setFixedSize(22, 22)
-                btn_edit.setIcon(_svg_icon("edit.svg", "#1565C0"))
+                btn_edit.setIcon(_png_icon("edit.png"))
                 btn_edit.setIconSize(QSize(14, 14))
                 btn_edit.setStyleSheet(
                     "QPushButton{background:#E3F2FD;border:none;border-radius:6px;}"
@@ -482,7 +469,7 @@ class OverviewUsersController(BaseWindow):
                 btn_cancel = QPushButton()
                 btn_cancel.setToolTip("Cancel")
                 btn_cancel.setFixedSize(22, 22)
-                btn_cancel.setIcon(_svg_icon("delete.svg", "#C62828"))
+                btn_cancel.setIcon(_png_icon("delete.png"))
                 btn_cancel.setIconSize(QSize(14, 14))
                 btn_cancel.setStyleSheet(
                     "QPushButton{background:#FFEBEE;border:none;border-radius:6px;}"

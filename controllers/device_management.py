@@ -4,31 +4,18 @@ from PyQt6.QtWidgets import (
     QComboBox, QFileDialog, QWidget, QLabel,
 )
 from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QColor, QIcon, QPixmap, QPainter
-from PyQt6.QtSvg import QSvgRenderer
-import os, re
+from PyQt6.QtGui import QColor, QIcon
+import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
 
 
-def _svg_icon(name, color, size=16):
+def _png_icon(name):
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
-    with open(path, "r", encoding="utf-8") as f:
-        svg = f.read()
-    svg = re.sub(r'fill="#[0-9a-fA-F]+"', f'fill="{color}"', svg)
-    svg = re.sub(r"fill='#[0-9a-fA-F]+'", f"fill='{color}'", svg)
-    if f'fill="{color}"' not in svg:
-        svg = svg.replace("<path ", f'<path fill="{color}" ', 1)
-    renderer = QSvgRenderer(svg.encode("utf-8"))
-    pm = QPixmap(size, size)
-    pm.fill(Qt.GlobalColor.transparent)
-    painter = QPainter(pm)
-    renderer.render(painter)
-    painter.end()
-    return QIcon(pm)
+    return QIcon(path)
 
 
 from widgets.base_window import BaseWindow
@@ -136,7 +123,7 @@ class DeviceManagementController(BaseWindow):
         btn_edit = QPushButton()
         btn_edit.setToolTip("Edit / Reset Password")
         btn_edit.setFixedSize(22, 22)
-        btn_edit.setIcon(_svg_icon("edit.svg", "#1565C0"))
+        btn_edit.setIcon(_png_icon("edit.png"))
         btn_edit.setIconSize(QSize(14, 14))
         btn_edit.setStyleSheet(
             "QPushButton{background:#E3F2FD;border:none;border-radius:5px;}"
@@ -147,7 +134,7 @@ class DeviceManagementController(BaseWindow):
         btn_del = QPushButton()
         btn_del.setToolTip("Delete")
         btn_del.setFixedSize(22, 22)
-        btn_del.setIcon(_svg_icon("delete.svg", "#C62828"))
+        btn_del.setIcon(_png_icon("delete.png"))
         btn_del.setIconSize(QSize(14, 14))
         btn_del.setStyleSheet(
             "QPushButton{background:#FFEBEE;border:none;border-radius:5px;}"
@@ -215,7 +202,7 @@ class DeviceManagementController(BaseWindow):
 
             btn_gen = QPushButton()
             btn_gen.setFixedSize(28, 28)
-            btn_gen.setIcon(_svg_icon("refresh.svg", "#F57F17"))
+            btn_gen.setIcon(_png_icon("refresh.png"))
             btn_gen.setIconSize(QSize(16, 16))
             btn_gen.setToolTip("Generate password")
             btn_gen.setStyleSheet(

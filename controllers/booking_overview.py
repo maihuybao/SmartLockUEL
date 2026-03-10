@@ -17,33 +17,18 @@ from PyQt6.QtWidgets import (
     QTimeEdit,
 )
 from PyQt6.QtCore import Qt, QDate, QTime, QSize
-from PyQt6.QtGui import QColor, QIcon, QPixmap, QPainter
-from PyQt6.QtSvg import QSvgRenderer
+from PyQt6.QtGui import QColor, QIcon
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
 
 
-def _svg_icon(name, color, size=16):
-    import re
-
+def _png_icon(name):
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
-    with open(path, "r", encoding="utf-8") as f:
-        svg = f.read()
-    svg = re.sub(r'fill="#[0-9a-fA-F]+"', f'fill="{color}"', svg)
-    svg = re.sub(r"fill='#[0-9a-fA-F]+'", f"fill='{color}'", svg)
-    if f'fill="{color}"' not in svg:
-        svg = svg.replace("<path ", f'<path fill="{color}" ', 1)
-    renderer = QSvgRenderer(svg.encode("utf-8"))
-    pm = QPixmap(size, size)
-    pm.fill(Qt.GlobalColor.transparent)
-    painter = QPainter(pm)
-    renderer.render(painter)
-    painter.end()
-    return QIcon(pm)
+    return QIcon(path)
 
 
 from widgets.base_window import BaseWindow
@@ -161,11 +146,11 @@ class BookingOverviewController(BaseWindow):
 
             table.setCellWidget(row, 9, self._make_actions_widget(b["id"], b["status"]))
 
-    def _make_icon_btn(self, icon_file, tooltip, icon_color, bg, hover, slot):
+    def _make_icon_btn(self, icon_file, tooltip, bg, hover, slot):
         btn = QPushButton()
         btn.setToolTip(tooltip)
         btn.setFixedSize(22, 22)
-        btn.setIcon(_svg_icon(icon_file, icon_color))
+        btn.setIcon(_png_icon(icon_file))
         btn.setIconSize(QSize(14, 14))
         btn.setStyleSheet(
             f"QPushButton{{background:{bg};border:none;border-radius:5px;}}"
@@ -181,9 +166,8 @@ class BookingOverviewController(BaseWindow):
         layout.setSpacing(4)
         layout.addWidget(
             self._make_icon_btn(
-                "view.svg",
+                "view.png",
                 "View",
-                "#6A1B9A",
                 "#F3E5F5",
                 "#E1BEE7",
                 lambda _, bid=booking_id: self._view_booking(bid),
@@ -192,9 +176,8 @@ class BookingOverviewController(BaseWindow):
         if status == "Pending":
             layout.addWidget(
                 self._make_icon_btn(
-                    "approve.svg",
+                    "approve.png",
                     "Approve",
-                    "#2E7D32",
                     "#E8F5E9",
                     "#C8E6C9",
                     lambda _, bid=booking_id: self._approve_booking_inline(bid),
@@ -202,9 +185,8 @@ class BookingOverviewController(BaseWindow):
             )
             layout.addWidget(
                 self._make_icon_btn(
-                    "reject.svg",
+                    "reject.png",
                     "Reject",
-                    "#E65100",
                     "#FFF3E0",
                     "#FFE0B2",
                     lambda _, bid=booking_id: self._reject_booking_inline(bid),
@@ -212,9 +194,8 @@ class BookingOverviewController(BaseWindow):
             )
         layout.addWidget(
             self._make_icon_btn(
-                "edit.svg",
+                "edit.png",
                 "Edit",
-                "#1565C0",
                 "#E3F2FD",
                 "#BBDEFB",
                 lambda _, bid=booking_id: self._edit_booking(bid),
@@ -222,9 +203,8 @@ class BookingOverviewController(BaseWindow):
         )
         layout.addWidget(
             self._make_icon_btn(
-                "delete.svg",
+                "delete.png",
                 "Delete",
-                "#C62828",
                 "#FFEBEE",
                 "#FFCDD2",
                 lambda _, bid=booking_id: self._delete_booking(bid),
