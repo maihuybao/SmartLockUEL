@@ -57,14 +57,14 @@ QPushButton:hover {
    <item>
     <widget class="QPushButton" name="pushButtonOverview">
      <property name="text">
-      <string>Room Overview</string>
+      <string>Dashboard</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pushButtonBookings">
      <property name="text">
-      <string>Booking Overview</string>
+      <string>Booking Management</string>
      </property>
     </widget>
    </item>
@@ -78,14 +78,14 @@ QPushButton:hover {
    <item>
     <widget class="QPushButton" name="pushButtonUsers">
      <property name="text">
-      <string>Users</string>
+      <string>Users Management</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pushButtonDevices">
      <property name="text">
-      <string>Devices</string>
+      <string>Devices Management</string>
      </property>
     </widget>
    </item>

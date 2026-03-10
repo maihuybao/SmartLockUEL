@@ -186,6 +186,12 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButtonHistory">
+        <property name="styleSheet"><string notr="true">QPushButton{background-color:#E3F2FD;color:#1565C0;border:1px solid #1565C0;border-radius:22px;padding:8px 24px;font-size:14px;font-weight:600;min-height:36px;}QPushButton:hover{background-color:#1565C0;color:white;}</string></property>
+        <property name="text"><string>My Bookings</string></property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="pushButtonBooking">
         <property name="styleSheet"><string notr="true">QPushButton{background:qlineargradient(x1:0,y1:0,x2:0,y2:1,stop:0 #F8BBD0,stop:1 #EC407A);color:white;border:none;border-radius:24px;padding:10px 32px;font-size:15px;font-weight:700;min-height:40px;}QPushButton:hover{background:#E91E63;}</string></property>
         <property name="text"><string>Booking</string></property>

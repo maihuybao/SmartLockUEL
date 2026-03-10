@@ -44,8 +44,6 @@ class BaseWindow(QMainWindow):
         # NavBar
         self.navbar = NavBar(role_text=role_text, show_search=show_search)
         main_layout.addWidget(self.navbar)
-        if role_text == "Admin":
-            self.navbar.btnRole.clicked.connect(self._go_bookings)
 
         # Body
         body = QHBoxLayout()

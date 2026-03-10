@@ -1,16 +1,59 @@
 from PyQt6.QtWidgets import (
-    QApplication, QMessageBox, QDialog, QFileDialog,
-    QTableWidgetItem, QPushButton, QHeaderView,
-    QVBoxLayout, QHBoxLayout, QFormLayout, QLineEdit, QComboBox, QLabel, QWidget,
-    QDateEdit, QTimeEdit,
+    QApplication,
+    QMessageBox,
+    QDialog,
+    QFileDialog,
+    QTableWidgetItem,
+    QPushButton,
+    QHeaderView,
+    QVBoxLayout,
+    QHBoxLayout,
+    QFormLayout,
+    QLineEdit,
+    QComboBox,
+    QLabel,
+    QWidget,
+    QDateEdit,
+    QTimeEdit,
 )
-from PyQt6.QtCore import Qt, QDate, QTime
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import Qt, QDate, QTime, QSize
+from PyQt6.QtGui import QColor, QIcon, QPixmap, QPainter
+from PyQt6.QtSvg import QSvgRenderer
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMAGES_DIR = os.path.join(BASE_DIR, "images")
+
+
+def _svg_icon(name, color, size=16):
+    import re
+
+    path = os.path.join(IMAGES_DIR, name)
+    if not os.path.exists(path):
+        return QIcon()
+    with open(path, "r", encoding="utf-8") as f:
+        svg = f.read()
+    svg = re.sub(r'fill="#[0-9a-fA-F]+"', f'fill="{color}"', svg)
+    svg = re.sub(r"fill='#[0-9a-fA-F]+'", f"fill='{color}'", svg)
+    if f'fill="{color}"' not in svg:
+        svg = svg.replace("<path ", f'<path fill="{color}" ', 1)
+    renderer = QSvgRenderer(svg.encode("utf-8"))
+    pm = QPixmap(size, size)
+    pm.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(pm)
+    renderer.render(painter)
+    painter.end()
+    return QIcon(pm)
+
 
 from widgets.base_window import BaseWindow
 from models.booking_model import (
-    get_all_bookings, delete_booking, admin_update_booking, create_booking,
-    approve_booking, reject_booking,
+    get_all_bookings,
+    delete_booking,
+    admin_update_booking,
+    create_booking,
+    approve_booking,
+    reject_booking,
 )
 from models.room_model import get_all_rooms
 
@@ -29,12 +72,14 @@ def _parse_session(session):
 class BookingOverviewController(BaseWindow):
     def __init__(self, user):
         super().__init__(
-            user, role_text="Admin", show_search=False,
-            show_sidebar=True, title="SmartLocker UEL - Booking Overview",
+            user,
+            role_text="Admin",
+            show_search=False,
+            show_sidebar=True,
+            title="SmartLocker UEL - Booking Management",
         )
-        self.ui = self.load_content_ui("BookingOverview.ui")
+        self.ui = self.load_content_ui("BookingManagement.ui")
         self._current_bookings = []
-        self._selected_booking_id = None
         self._connect_signals()
         self._load_table()
 
@@ -54,10 +99,8 @@ class BookingOverviewController(BaseWindow):
         self.ui.pushButtonRejected.clicked.connect(self._load_table)
         self.ui.lineEditSearch.textChanged.connect(self._load_table)
         self.ui.pushButtonAdd.clicked.connect(self._add_booking)
+        self.ui.pushButtonImportCSV.clicked.connect(self._import_csv)
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
-        self.ui.tableWidgetBookings.cellClicked.connect(self._on_row_click)
-        self.ui.pushButtonApprove.clicked.connect(self._approve_booking)
-        self.ui.pushButtonReject.clicked.connect(self._reject_booking)
 
     # -- Table ----------------------------------------------------
 
@@ -79,7 +122,8 @@ class BookingOverviewController(BaseWindow):
             bookings = [b for b in bookings if b["status"] == status_filter]
         if keyword:
             bookings = [
-                b for b in bookings
+                b
+                for b in bookings
                 if keyword in b["username"].lower()
                 or keyword in b["room_name"].lower()
                 or keyword in b["session"].lower()
@@ -91,9 +135,8 @@ class BookingOverviewController(BaseWindow):
         table.setRowCount(0)
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         table.horizontalHeader().setSectionResizeMode(9, QHeaderView.ResizeMode.Fixed)
-        table.horizontalHeader().setSectionResizeMode(10, QHeaderView.ResizeMode.Fixed)
-        table.setColumnWidth(9, 70)
-        table.setColumnWidth(10, 70)
+        table.setColumnWidth(9, 130)
+        table.verticalHeader().setDefaultSectionSize(32)
 
         for row, b in enumerate(bookings):
             date, start, end = _parse_session(b.get("session", ""))
@@ -107,64 +150,197 @@ class BookingOverviewController(BaseWindow):
             table.setItem(row, 6, QTableWidgetItem(b["reason"]))
 
             status_item = QTableWidgetItem(b["status"])
-            status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
+            status_colors = {
+                "Pending": "#FF9800",
+                "Approved": "#4CAF50",
+                "Rejected": "#F44336",
+            }
             status_item.setForeground(QColor(status_colors.get(b["status"], "#333")))
             table.setItem(row, 7, status_item)
             table.setItem(row, 8, QTableWidgetItem(b.get("locker_password") or ""))
 
-            table.setCellWidget(row, 9, self._make_btn("Edit", "#1F4F82", "#163D66", lambda _, bid=b["id"]: self._edit_booking(bid)))
-            table.setCellWidget(row, 10, self._make_btn("Delete", "#F44336", "#C62828", lambda _, bid=b["id"]: self._delete_booking(bid)))
+            table.setCellWidget(row, 9, self._make_actions_widget(b["id"], b["status"]))
 
-    def _make_btn(self, text, bg, hover, slot):
-        btn = QPushButton(text)
-        btn.setFlat(True)
+    def _make_icon_btn(self, icon_file, tooltip, icon_color, bg, hover, slot):
+        btn = QPushButton()
+        btn.setToolTip(tooltip)
+        btn.setFixedSize(22, 22)
+        btn.setIcon(_svg_icon(icon_file, icon_color))
+        btn.setIconSize(QSize(14, 14))
         btn.setStyleSheet(
-            f"QPushButton{{background:{bg};color:white;border:none;"
-            f"font-size:11px;font-family:Arial;padding:2px 6px;}}"
+            f"QPushButton{{background:{bg};border:none;border-radius:5px;}}"
             f"QPushButton:hover{{background:{hover};}}"
         )
         btn.clicked.connect(slot)
         return btn
 
-    def _on_row_click(self, row, _col):
-        if row >= len(self._current_bookings):
-            return
-        b = self._current_bookings[row]
-        self._selected_booking_id = b["id"]
-        date, start, end = _parse_session(b.get("session", ""))
-        self.ui.lineEditNumber.setText(str(b["id"]))
-        self.ui.lineEditDate.setText(date)
-        self.ui.lineEditFullName.setText(b["username"])
-        self.ui.lineEditStartTime.setText(start)
-        self.ui.lineEditNameID.setText(str(b.get("user_id", "")))
-        self.ui.lineEditEndTime.setText(end)
-        self.ui.lineEditRoom.setText(b["room_name"])
-        self.ui.lineEditPurpose.setText(b.get("reason", ""))
-
-    def _approve_booking(self):
-        if not self._selected_booking_id:
-            QMessageBox.warning(self, "Error", "Please select a booking first.")
-            return
-        password = approve_booking(self._selected_booking_id)
-        QMessageBox.information(
-            self, "Approved",
-            f"Booking approved.\nLocker password: {password}",
+    def _make_actions_widget(self, booking_id, status):
+        container = QWidget()
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(4, 2, 4, 2)
+        layout.setSpacing(4)
+        layout.addWidget(
+            self._make_icon_btn(
+                "view.svg",
+                "View",
+                "#6A1B9A",
+                "#F3E5F5",
+                "#E1BEE7",
+                lambda _, bid=booking_id: self._view_booking(bid),
+            )
         )
-        self._selected_booking_id = None
+        if status == "Pending":
+            layout.addWidget(
+                self._make_icon_btn(
+                    "approve.svg",
+                    "Approve",
+                    "#2E7D32",
+                    "#E8F5E9",
+                    "#C8E6C9",
+                    lambda _, bid=booking_id: self._approve_booking_inline(bid),
+                )
+            )
+            layout.addWidget(
+                self._make_icon_btn(
+                    "reject.svg",
+                    "Reject",
+                    "#E65100",
+                    "#FFF3E0",
+                    "#FFE0B2",
+                    lambda _, bid=booking_id: self._reject_booking_inline(bid),
+                )
+            )
+        layout.addWidget(
+            self._make_icon_btn(
+                "edit.svg",
+                "Edit",
+                "#1565C0",
+                "#E3F2FD",
+                "#BBDEFB",
+                lambda _, bid=booking_id: self._edit_booking(bid),
+            )
+        )
+        layout.addWidget(
+            self._make_icon_btn(
+                "delete.svg",
+                "Delete",
+                "#C62828",
+                "#FFEBEE",
+                "#FFCDD2",
+                lambda _, bid=booking_id: self._delete_booking(bid),
+            )
+        )
+        layout.addStretch()
+        return container
+
+    def _view_booking(self, booking_id):
+        bookings = get_all_bookings()
+        b = next((x for x in bookings if x["id"] == booking_id), None)
+        if not b:
+            return
+
+        date, start, end = _parse_session(b.get("session", ""))
+
+        status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
+        status_color = status_colors.get(b["status"], "#333")
+
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Booking Details")
+        dlg.setMinimumWidth(420)
+        dlg.setStyleSheet("QDialog { background: white; }")
+
+        layout = QVBoxLayout(dlg)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 20)
+
+        # Header strip
+        header = QLabel(f"Booking #{b['id']}")
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setStyleSheet(
+            "QLabel { background: #1F4F82; color: white; font-size: 16px;"
+            " font-weight: bold; padding: 16px; }"
+        )
+        layout.addWidget(header)
+
+        # Status badge
+        badge = QLabel(b["status"])
+        badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        badge.setStyleSheet(
+            f"QLabel {{ background: {status_color}; color: white; font-size: 12px;"
+            f" font-weight: bold; padding: 4px 0; }}"
+        )
+        layout.addWidget(badge)
+
+        # Fields
+        body = QWidget()
+        body.setStyleSheet("background: white;")
+        form = QFormLayout(body)
+        form.setSpacing(10)
+        form.setContentsMargins(24, 20, 24, 8)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+
+        field_style = (
+            "QLineEdit { border: 1px solid #E0E0E0; border-radius: 6px;"
+            " padding: 6px 10px; font-size: 13px; color: #333; background: #FAFAFA; }"
+        )
+        label_style = "color: #1F4F82; font-weight: 600; font-size: 13px;"
+
+        def _row(label, value):
+            lbl = QLabel(label)
+            lbl.setStyleSheet(label_style)
+            val = QLineEdit(str(value) if value else "—")
+            val.setReadOnly(True)
+            val.setStyleSheet(field_style)
+            form.addRow(lbl, val)
+
+        _row("User", b["username"])
+        _row("Room", f"{b['room_name']}  ({b['room_type']})")
+        _row("Date", date)
+        _row("Start Time", start)
+        _row("End Time", end)
+        _row("Purpose", b.get("reason", ""))
+        _row("Locker Password", b.get("locker_password") or "—")
+        if b.get("reject_reason"):
+            _row("Reject Reason", b["reject_reason"])
+
+        layout.addWidget(body)
+
+        btn_row = QHBoxLayout()
+        btn_row.setContentsMargins(24, 0, 24, 0)
+        btn_row.addStretch()
+        btn_close = QPushButton("Close")
+        btn_close.setFlat(True)
+        btn_close.setStyleSheet(
+            "QPushButton { background: #1F4F82; border: none; border-radius: 6px;"
+            " padding: 8px 28px; color: white; font-size: 13px; font-weight: bold; }"
+            "QPushButton:hover { background: #163D66; }"
+        )
+        btn_close.clicked.connect(dlg.accept)
+        btn_row.addWidget(btn_close)
+        layout.addLayout(btn_row)
+
+        dlg.exec()
+
+    def _approve_booking_inline(self, booking_id):
+        password = approve_booking(booking_id)
+        QMessageBox.information(
+            self, "Approved", f"Booking approved.\nLocker password: {password}"
+        )
         self._load_table()
 
-    def _reject_booking(self):
-        if not self._selected_booking_id:
-            QMessageBox.warning(self, "Error", "Please select a booking first.")
+    def _reject_booking_inline(self, booking_id):
+        bookings = get_all_bookings()
+        b = next((x for x in bookings if x["id"] == booking_id), None)
+        if not b:
             return
-        reject_note = self.ui.txtRejectReason.toPlainText().strip()
-        if not reject_note:
-            QMessageBox.warning(self, "Error", "Please enter a rejection reason.")
-            return
-        reject_booking(self._selected_booking_id, reject_note)
-        self._selected_booking_id = None
-        self.ui.txtRejectReason.clear()
-        self._load_table()
+        dlg = self._build_booking_dialog(booking=b, reject_mode=True)
+        if dlg.exec() == QDialog.DialogCode.Accepted:
+            reason = dlg.editRejectReason.text().strip()
+            if not reason:
+                QMessageBox.warning(self, "Error", "Please enter a rejection reason.")
+                return
+            reject_booking(booking_id, reason)
+            self._load_table()
 
     # -- Actions --------------------------------------------------
 
@@ -211,8 +387,71 @@ class BookingOverviewController(BaseWindow):
             delete_booking(booking_id)
             self._load_table()
 
+    def _import_csv(self):
+        import csv
+        from models.user_model import get_all_users
+
+        path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv)")
+        if not path:
+            return
+
+        users = {u["username"]: u["id"] for u in get_all_users()}
+        rooms = {r["room_id"]: r["id"] for r in get_all_rooms()}
+        imported = 0
+        skipped = 0
+        errors = []
+
+        try:
+            with open(path, newline="", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                for i, row in enumerate(reader, start=2):
+                    username = (row.get("username") or "").strip()
+                    room_id_str = (row.get("room_id") or "").strip()
+                    date_str = (row.get("date") or "").strip()
+                    start_str = (row.get("start_time") or "").strip()
+                    end_str = (row.get("end_time") or "").strip()
+                    reason = (row.get("reason") or "").strip()
+
+                    if not all(
+                        [username, room_id_str, date_str, start_str, end_str, reason]
+                    ):
+                        errors.append(f"Row {i}: missing required fields")
+                        skipped += 1
+                        continue
+                    user_pk = users.get(username)
+                    if not user_pk:
+                        errors.append(f"Row {i}: username '{username}' not found")
+                        skipped += 1
+                        continue
+                    room_pk = rooms.get(room_id_str)
+                    if not room_pk:
+                        errors.append(f"Row {i}: room_id '{room_id_str}' not found")
+                        skipped += 1
+                        continue
+
+                    session = f"{date_str} | {start_str} - {end_str}"
+                    if create_booking(user_pk, room_pk, session, reason):
+                        imported += 1
+                    else:
+                        errors.append(
+                            f"Row {i}: conflict or error for '{username}' in '{room_id_str}'"
+                        )
+                        skipped += 1
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to read file:\n{e}")
+            return
+
+        self._load_table()
+        msg = f"Imported: {imported}  |  Skipped: {skipped}"
+        if errors:
+            msg += "\n\nDetails:\n" + "\n".join(errors[:10])
+            if len(errors) > 10:
+                msg += f"\n... and {len(errors) - 10} more"
+        QMessageBox.information(self, "Import Complete", msg)
+
     def _export_csv(self):
         import csv
+
         bookings = get_all_bookings()
         if self.ui.pushButtonPending.isChecked():
             bookings = [b for b in bookings if b["status"] == "Pending"]
@@ -223,7 +462,8 @@ class BookingOverviewController(BaseWindow):
         keyword = self.ui.lineEditSearch.text().strip().lower()
         if keyword:
             bookings = [
-                b for b in bookings
+                b
+                for b in bookings
                 if keyword in b["username"].lower()
                 or keyword in b["room_name"].lower()
                 or keyword in b["session"].lower()
@@ -242,32 +482,55 @@ class BookingOverviewController(BaseWindow):
         try:
             with open(path, "w", newline="", encoding="utf-8-sig") as f:
                 writer = csv.writer(f)
-                writer.writerow(["User", "Room", "Type", "Date", "Start Time", "End Time", "Purpose", "Status", "Locker Password"])
+                writer.writerow(
+                    [
+                        "User",
+                        "Room",
+                        "Type",
+                        "Date",
+                        "Start Time",
+                        "End Time",
+                        "Purpose",
+                        "Status",
+                        "Locker Password",
+                    ]
+                )
                 for b in bookings:
                     date, start, end = _parse_session(b.get("session", ""))
-                    writer.writerow([
-                        b["username"],
-                        b["room_name"],
-                        b["room_type"],
-                        date, start, end,
-                        b["reason"],
-                        b["status"],
-                        b.get("locker_password") or "",
-                    ])
-            QMessageBox.information(self, "Export CSV", f"Exported {len(bookings)} bookings successfully.")
+                    writer.writerow(
+                        [
+                            b["username"],
+                            b["room_name"],
+                            b["room_type"],
+                            date,
+                            start,
+                            end,
+                            b["reason"],
+                            b["status"],
+                            b.get("locker_password") or "",
+                        ]
+                    )
+            QMessageBox.information(
+                self, "Export CSV", f"Exported {len(bookings)} bookings successfully."
+            )
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to export:\n{e}")
 
-    def _build_booking_dialog(self, booking=None):
+    def _build_booking_dialog(self, booking=None, reject_mode=False):
         from models.user_model import get_all_users
+
         dlg = QDialog(self)
-        dlg.setWindowTitle("Add Booking" if not booking else "Edit Booking")
+        if reject_mode:
+            dlg.setWindowTitle("Reject Booking")
+        else:
+            dlg.setWindowTitle("Add Booking" if not booking else "Edit Booking")
         dlg.setMinimumWidth(420)
         dlg.setStyleSheet(
             "QDialog { background: white; }"
             "QLabel { color: #333; font-size: 13px; }"
             "QComboBox, QLineEdit, QDateEdit, QTimeEdit { padding: 6px; border: 1px solid #ddd; border-radius: 6px; color: #333; font-size: 13px; background: white; }"
             "QComboBox:focus, QLineEdit:focus, QDateEdit:focus, QTimeEdit:focus { border: 1px solid #1F4F82; }"
+            "QComboBox:disabled, QLineEdit:disabled, QDateEdit:disabled, QTimeEdit:disabled { background: #f5f5f5; color: #999; }"
         )
 
         layout = QVBoxLayout(dlg)
@@ -322,7 +585,8 @@ class BookingOverviewController(BaseWindow):
                 combo_status.addItem(s)
             combo_status.setCurrentText(booking["status"])
             dlg.comboStatus = combo_status
-            form.addRow("Status:", combo_status)
+            if not reject_mode:
+                form.addRow("Status:", combo_status)
 
             for i in range(combo_user.count()):
                 if combo_user.itemData(i) == booking.get("user_id"):
@@ -333,7 +597,6 @@ class BookingOverviewController(BaseWindow):
                     combo_room.setCurrentIndex(i)
                     break
 
-            # Parse existing session
             session = booking.get("session", "")
             if " | " in session:
                 date_part, time_part = session.split(" | ", 1)
@@ -350,6 +613,19 @@ class BookingOverviewController(BaseWindow):
                         time_end.setTime(parsed_end)
 
             edit_reason.setText(booking["reason"])
+
+            if reject_mode:
+                combo_user.setEnabled(False)
+                combo_room.setEnabled(False)
+                date_edit.setEnabled(False)
+                time_start.setEnabled(False)
+                time_end.setEnabled(False)
+                edit_reason.setEnabled(False)
+                edit_reject = QLineEdit()
+                edit_reject.setPlaceholderText("Enter rejection reason...")
+                edit_reject.setText(booking.get("reject_reason") or "")
+                dlg.editRejectReason = edit_reject
+                form.addRow("Reject Reason:", edit_reject)
         else:
             dlg.comboStatus = None
 

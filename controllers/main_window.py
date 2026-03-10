@@ -18,6 +18,7 @@ IMG_DIR = os.path.join(BASE_DIR, "images")
 
 class _BgWidget:
     """Mixin vẽ background.jpg scale-to-cover (giữ tỉ lệ) cho centralwidget."""
+
     _bg_pixmap = None
 
     def paintEvent(self, event):
@@ -39,8 +40,8 @@ class MainWindowController(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi(os.path.join(UI_DIR, "Login.ui"), self)
-        self.setMinimumSize(800, 600)
-        self.resize(1000, 600)
+        self.setMinimumSize(1000, 600)
+        self.resize(1200, 800)
         init_db()
 
         # F11 toggle fullscreen
@@ -143,7 +144,9 @@ class MainWindowController(QMainWindow):
         selected_role = "admin" if self.radioButtonAdmin.isChecked() else "user"
         if user["role"] != selected_role:
             QMessageBox.warning(
-                self, "Error", f"This account does not have '{selected_role}' permission."
+                self,
+                "Error",
+                f"This account does not have '{selected_role}' permission.",
             )
             self._logging_in = False
             return

@@ -4,11 +4,42 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QHeaderView,
+    QWidget,
+    QHBoxLayout,
+    QVBoxLayout,
+    QFormLayout,
+    QLineEdit,
+    QLabel,
 )
-from PyQt6.QtCore import Qt, QDate, QTime
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import Qt, QDate, QTime, QSize
+from PyQt6.QtGui import QColor, QIcon, QPixmap, QPainter
+from PyQt6.QtSvg import QSvgRenderer
 from PyQt6 import uic
-import os
+import os, re
+
+IMAGES_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "images"
+)
+
+
+def _svg_icon(name, color, size=16):
+    path = os.path.join(IMAGES_DIR, name)
+    if not os.path.exists(path):
+        return QIcon()
+    with open(path, "r", encoding="utf-8") as f:
+        svg = f.read()
+    svg = re.sub(r'fill="#[0-9a-fA-F]+"', f'fill="{color}"', svg)
+    svg = re.sub(r"fill='#[0-9a-fA-F]+'", f"fill='{color}'", svg)
+    if f'fill="{color}"' not in svg:
+        svg = svg.replace("<path ", f'<path fill="{color}" ', 1)
+    renderer = QSvgRenderer(svg.encode("utf-8"))
+    pm = QPixmap(size, size)
+    pm.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(pm)
+    renderer.render(painter)
+    painter.end()
+    return QIcon(pm)
+
 
 from widgets.base_window import BaseWindow
 from widgets.room_card import create_room_card, get_display_status
@@ -25,7 +56,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UI_DIR = os.path.join(BASE_DIR, "ui")
 
 OP_START = QTime(6, 0)
-OP_END   = QTime(22, 0)
+OP_END = QTime(22, 0)
 
 
 def _parse_session(session):
@@ -39,9 +70,9 @@ def _parse_session(session):
 
 
 TIME_RANGES = {
-    "Morning":   (6 * 60,  12 * 60),
+    "Morning": (6 * 60, 12 * 60),
     "Afternoon": (12 * 60, 17 * 60),
-    "Evening":   (17 * 60, 22 * 60),
+    "Evening": (17 * 60, 22 * 60),
 }
 
 
@@ -54,9 +85,9 @@ class OverviewUsersController(BaseWindow):
             show_sidebar=False,
             title="SmartLocker UEL - User",
         )
-        self._current_filter   = "All"
-        self._capacity_filter  = "All"
-        self._time_filter      = "All"
+        self._current_filter = "All"
+        self._capacity_filter = "All"
+        self._time_filter = "All"
 
         self.ui = self.load_content_ui("OverviewUsers.ui")
 
@@ -66,8 +97,12 @@ class OverviewUsersController(BaseWindow):
 
     def _connect_signals(self):
         self.ui.pushButtonAll.clicked.connect(lambda: self._apply_filter("All"))
-        self.ui.pushButtonAvailable.clicked.connect(lambda: self._apply_filter("Available"))
-        self.ui.pushButtonOccupied.clicked.connect(lambda: self._apply_filter("Occupied"))
+        self.ui.pushButtonAvailable.clicked.connect(
+            lambda: self._apply_filter("Available")
+        )
+        self.ui.pushButtonOccupied.clicked.connect(
+            lambda: self._apply_filter("Occupied")
+        )
         self.ui.pushButtonBooked.clicked.connect(lambda: self._apply_filter("Full"))
 
         self.ui.pushButtonCapAll.clicked.connect(lambda: self._apply_capacity("All"))
@@ -76,12 +111,14 @@ class OverviewUsersController(BaseWindow):
 
         self.ui.pushButtonTimeAll.clicked.connect(lambda: self._apply_time("All"))
         self.ui.pushButtonMorning.clicked.connect(lambda: self._apply_time("Morning"))
-        self.ui.pushButtonAfternoon.clicked.connect(lambda: self._apply_time("Afternoon"))
+        self.ui.pushButtonAfternoon.clicked.connect(
+            lambda: self._apply_time("Afternoon")
+        )
         self.ui.pushButtonEvening.clicked.connect(lambda: self._apply_time("Evening"))
 
         self.navbar.lineEditSearch.textChanged.connect(self._on_search)
-        self.navbar.btnRole.clicked.connect(self._show_history)
 
+        self.ui.pushButtonHistory.clicked.connect(self._show_history)
         self.ui.pushButtonBooking.clicked.connect(self._open_booking_dialog)
         self.ui.pushButtonLogout.clicked.connect(self._logout)
         self.ui.pushButtonQuit.clicked.connect(self._quit)
@@ -102,7 +139,12 @@ class OverviewUsersController(BaseWindow):
 
     def _load_rooms(self):
         from datetime import date as _date
-        keyword = self.navbar.lineEditSearch.text().strip() if self.navbar.lineEditSearch else ""
+
+        keyword = (
+            self.navbar.lineEditSearch.text().strip()
+            if self.navbar.lineEditSearch
+            else ""
+        )
 
         if keyword:
             rooms = search_rooms(keyword)
@@ -123,7 +165,9 @@ class OverviewUsersController(BaseWindow):
         if self._time_filter != "All":
             today = _date.today().strftime("%Y-%m-%d")
             r_start, r_end = TIME_RANGES[self._time_filter]
-            rooms = [r for r in rooms if self._has_free_slot(r["id"], today, r_start, r_end)]
+            rooms = [
+                r for r in rooms if self._has_free_slot(r["id"], today, r_start, r_end)
+            ]
 
         self._render_room_cards(rooms)
 
@@ -138,9 +182,11 @@ class OverviewUsersController(BaseWindow):
             if " - " not in tp:
                 continue
             s, e = tp.split(" - ", 1)
+
             def _m(t):
                 hh, mm = map(int, t.strip().split(":"))
                 return hh * 60 + mm
+
             for slot in range(_m(s), _m(e), 30):
                 booked.add(slot)
         return any(slot not in booked for slot in range(range_start, range_end, 30))
@@ -186,6 +232,7 @@ class OverviewUsersController(BaseWindow):
     def _on_card_context(self, room, global_pos):
         from PyQt6.QtWidgets import QMenu
         from PyQt6.QtGui import QAction
+
         menu = QMenu(self)
         act = QAction("Book Room", self)
         act.triggered.connect(lambda: self._open_booking_dialog(room))
@@ -234,27 +281,30 @@ class OverviewUsersController(BaseWindow):
         dlg.timeEditEnd.setTime(QTime(9, 0))
 
         self._refresh_availability(dlg)
-        dlg.comboRoom.currentIndexChanged.connect(lambda _: self._refresh_availability(dlg))
+        dlg.comboRoom.currentIndexChanged.connect(
+            lambda _: self._refresh_availability(dlg)
+        )
         dlg.dateEdit.dateChanged.connect(lambda _: self._refresh_availability(dlg))
 
         dlg.pushButtonCancel.clicked.connect(dlg.reject)
         dlg.pushButtonSubmit.clicked.connect(dlg.accept)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            room_pk   = dlg.comboRoom.currentData()
-            date_str  = dlg.dateEdit.date().toString("yyyy-MM-dd")
-            start_t   = dlg.timeEditStart.time()
-            end_t     = dlg.timeEditEnd.time()
+            room_pk = dlg.comboRoom.currentData()
+            date_str = dlg.dateEdit.date().toString("yyyy-MM-dd")
+            start_t = dlg.timeEditStart.time()
+            end_t = dlg.timeEditEnd.time()
             start_str = start_t.toString("HH:mm")
-            end_str   = end_t.toString("HH:mm")
-            purpose   = dlg.lineEditPurpose.text().strip()
+            end_str = end_t.toString("HH:mm")
+            purpose = dlg.lineEditPurpose.text().strip()
 
             if not purpose:
                 QMessageBox.warning(self, "Loi", "Please enter a purpose.")
                 return
             if start_t < OP_START or end_t > OP_END:
                 QMessageBox.warning(
-                    self, "Loi",
+                    self,
+                    "Loi",
                     f"Booking hours are 06:00 – 22:00 only.",
                 )
                 return
@@ -263,7 +313,8 @@ class OverviewUsersController(BaseWindow):
                 return
             if has_conflict(room_pk, date_str, start_str, end_str):
                 QMessageBox.warning(
-                    self, "Conflict",
+                    self,
+                    "Conflict",
                     "This time slot overlaps an existing booking.\n"
                     "Please choose a different time.",
                 )
@@ -271,13 +322,15 @@ class OverviewUsersController(BaseWindow):
 
             session = f"{date_str} | {start_str} - {end_str}"
             if create_booking(self.current_user["id"], room_pk, session, purpose):
-                QMessageBox.information(self, "Success", "Booking request sent successfully.")
+                QMessageBox.information(
+                    self, "Success", "Booking request sent successfully."
+                )
                 self._load_rooms()
             else:
                 QMessageBox.warning(self, "Error", "Failed to send booking request.")
 
     def _refresh_availability(self, dlg):
-        room_pk  = dlg.comboRoom.currentData()
+        room_pk = dlg.comboRoom.currentData()
         date_str = dlg.dateEdit.date().toString("yyyy-MM-dd")
         if not room_pk:
             return
@@ -293,9 +346,11 @@ class OverviewUsersController(BaseWindow):
             if " - " not in tp:
                 continue
             s, e = tp.split(" - ", 1)
+
             def _m(t):
                 hh, mm = map(int, t.strip().split(":"))
                 return hh * 60 + mm
+
             intervals.append((_m(s), _m(e), b["status"]))
 
         # Build 16-column table (06:00 – 21:00, 1 hour each)
@@ -309,9 +364,9 @@ class OverviewUsersController(BaseWindow):
         table.verticalHeader().setDefaultSectionSize(28)
         table.setShowGrid(True)
 
-        COLOR_APPROVED = QColor("#EF9A9A")   # red-ish
-        COLOR_PENDING  = QColor("#FFE082")   # amber
-        COLOR_FREE     = QColor("#A5D6A7")   # green
+        COLOR_APPROVED = QColor("#EF9A9A")  # red-ish
+        COLOR_PENDING = QColor("#FFE082")  # amber
+        COLOR_FREE = QColor("#A5D6A7")  # green
 
         for col, hour in enumerate(hours):
             slot_s = hour * 60
@@ -337,13 +392,14 @@ class OverviewUsersController(BaseWindow):
                 item.setToolTip("Available")
             table.setItem(0, col, item)
 
-
     # -- Booking history ------------------------------------------
 
     def _show_history(self):
         dlg = QDialog(self)
         uic.loadUi(os.path.join(UI_DIR, "BookingHistory.ui"), dlg)
-        dlg.tableWidgetHistory.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        dlg.tableWidgetHistory.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.Stretch
+        )
         dlg.pushButtonClose.clicked.connect(dlg.accept)
         dlg.comboFilter.currentTextChanged.connect(
             lambda f: self._populate_history(dlg, f)
@@ -357,6 +413,11 @@ class OverviewUsersController(BaseWindow):
             bookings = [b for b in bookings if b["status"] == filter_text]
 
         table = dlg.tableWidgetHistory
+        table.verticalHeader().setDefaultSectionSize(36)
+        table.verticalHeader().setMinimumSectionSize(36)
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        table.horizontalHeader().setSectionResizeMode(9, QHeaderView.ResizeMode.Fixed)
+        table.setColumnWidth(9, 100)
         table.setRowCount(len(bookings))
         for row, b in enumerate(bookings):
             date, start, end = _parse_session(b.get("session", ""))
@@ -368,7 +429,11 @@ class OverviewUsersController(BaseWindow):
             table.setItem(row, 5, QTableWidgetItem(b["reason"]))
 
             status_item = QTableWidgetItem(b["status"])
-            status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
+            status_colors = {
+                "Pending": "#FF9800",
+                "Approved": "#4CAF50",
+                "Rejected": "#F44336",
+            }
             status_item.setForeground(QColor(status_colors.get(b["status"], "#333")))
             table.setItem(row, 6, status_item)
 
@@ -381,24 +446,47 @@ class OverviewUsersController(BaseWindow):
             table.setItem(row, 8, reject_item)
 
             table.setCellWidget(row, 9, None)
-            if b["status"] == "Pending":
-                from PyQt6.QtWidgets import QWidget, QHBoxLayout
-                container = QWidget()
-                btn_layout = QHBoxLayout(container)
-                btn_layout.setContentsMargins(2, 2, 2, 2)
-                btn_layout.setSpacing(4)
+            container = QWidget()
+            btn_layout = QHBoxLayout(container)
+            btn_layout.setContentsMargins(4, 2, 4, 2)
+            btn_layout.setSpacing(4)
 
-                btn_edit = QPushButton("Edit")
+            btn_view = QPushButton()
+            btn_view.setToolTip("View")
+            btn_view.setFixedSize(22, 22)
+            btn_view.setIcon(_svg_icon("view.svg", "#6A1B9A"))
+            btn_view.setIconSize(QSize(14, 14))
+            btn_view.setStyleSheet(
+                "QPushButton{background:#F3E5F5;border:none;border-radius:6px;}"
+                "QPushButton:hover{background:#E1BEE7;}"
+            )
+            btn_view.clicked.connect(
+                lambda _, bid=b["id"]: self._view_booking(bid, dlg)
+            )
+            btn_layout.addWidget(btn_view)
+
+            if b["status"] == "Pending":
+                btn_edit = QPushButton()
+                btn_edit.setToolTip("Edit")
+                btn_edit.setFixedSize(22, 22)
+                btn_edit.setIcon(_svg_icon("edit.svg", "#1565C0"))
+                btn_edit.setIconSize(QSize(14, 14))
                 btn_edit.setStyleSheet(
-                    "background:#1F4F82;color:white;border-radius:4px;padding:3px 8px;font-size:11px;"
+                    "QPushButton{background:#E3F2FD;border:none;border-radius:6px;}"
+                    "QPushButton:hover{background:#BBDEFB;}"
                 )
                 btn_edit.clicked.connect(
                     lambda _, bid=b["id"]: self._edit_booking(bid, dlg)
                 )
 
-                btn_cancel = QPushButton("Cancel")
+                btn_cancel = QPushButton()
+                btn_cancel.setToolTip("Cancel")
+                btn_cancel.setFixedSize(22, 22)
+                btn_cancel.setIcon(_svg_icon("delete.svg", "#C62828"))
+                btn_cancel.setIconSize(QSize(14, 14))
                 btn_cancel.setStyleSheet(
-                    "background:#C62828;color:white;border-radius:4px;padding:3px 8px;font-size:11px;"
+                    "QPushButton{background:#FFEBEE;border:none;border-radius:6px;}"
+                    "QPushButton:hover{background:#FFCDD2;}"
                 )
                 btn_cancel.clicked.connect(
                     lambda _, bid=b["id"]: self._cancel_booking(bid, dlg)
@@ -406,12 +494,101 @@ class OverviewUsersController(BaseWindow):
 
                 btn_layout.addWidget(btn_edit)
                 btn_layout.addWidget(btn_cancel)
-                table.setCellWidget(row, 9, container)
+
+            btn_layout.addStretch()
+            table.setCellWidget(row, 9, container)
 
         dlg.lblCount.setText(f"{len(bookings)} bookings")
 
+    def _view_booking(self, booking_id, parent_dlg):
+        from models.booking_model import get_bookings_by_user
+        from PyQt6.QtWidgets import QFormLayout, QLineEdit
+
+        bookings = get_bookings_by_user(self.current_user["id"])
+        b = next((x for x in bookings if x["id"] == booking_id), None)
+        if not b:
+            return
+
+        date, start, end = _parse_session(b.get("session", ""))
+        status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
+        status_color = status_colors.get(b["status"], "#333")
+
+        dlg = QDialog(parent_dlg)
+        dlg.setWindowTitle("Booking Details")
+        dlg.setMinimumWidth(400)
+        dlg.setStyleSheet("QDialog { background: white; }")
+
+        layout = QVBoxLayout(dlg)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 20)
+
+        header = QLabel(f"Booking #{b['id']}")
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        header.setStyleSheet(
+            "QLabel { background: #1F4F82; color: white; font-size: 16px;"
+            " font-weight: bold; padding: 16px; }"
+        )
+        layout.addWidget(header)
+
+        badge = QLabel(b["status"])
+        badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        badge.setStyleSheet(
+            f"QLabel {{ background: {status_color}; color: white; font-size: 12px;"
+            f" font-weight: bold; padding: 4px 0; }}"
+        )
+        layout.addWidget(badge)
+
+        body = QWidget()
+        body.setStyleSheet("background: white;")
+        form = QFormLayout(body)
+        form.setSpacing(10)
+        form.setContentsMargins(24, 20, 24, 8)
+        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+
+        field_style = (
+            "QLineEdit { border: 1px solid #E0E0E0; border-radius: 6px;"
+            " padding: 6px 10px; font-size: 13px; color: #333; background: #FAFAFA; }"
+        )
+        label_style = "color: #1F4F82; font-weight: 600; font-size: 13px;"
+
+        def _row(label, value):
+            lbl = QLabel(label)
+            lbl.setStyleSheet(label_style)
+            val = QLineEdit(str(value) if value else "—")
+            val.setReadOnly(True)
+            val.setStyleSheet(field_style)
+            form.addRow(lbl, val)
+
+        _row("Room", f"{b['room_name']}  ({b['room_type']})")
+        _row("Date", date)
+        _row("Start Time", start)
+        _row("End Time", end)
+        _row("Purpose", b.get("reason", ""))
+        _row("Locker Password", b.get("locker_password") or "—")
+        if b.get("reject_reason"):
+            _row("Reject Reason", b["reject_reason"])
+
+        layout.addWidget(body)
+
+        btn_row = QHBoxLayout()
+        btn_row.setContentsMargins(24, 0, 24, 0)
+        btn_row.addStretch()
+        btn_close = QPushButton("Close")
+        btn_close.setFlat(True)
+        btn_close.setStyleSheet(
+            "QPushButton { background: #1F4F82; border: none; border-radius: 6px;"
+            " padding: 8px 28px; color: white; font-size: 13px; font-weight: bold; }"
+            "QPushButton:hover { background: #163D66; }"
+        )
+        btn_close.clicked.connect(dlg.accept)
+        btn_row.addWidget(btn_close)
+        layout.addLayout(btn_row)
+
+        dlg.exec()
+
     def _edit_booking(self, booking_id, history_dlg):
         from models.booking_model import update_booking
+
         bookings = get_bookings_by_user(self.current_user["id"])
         b = next((x for x in bookings if x["id"] == booking_id), None)
         if not b:
@@ -466,13 +643,13 @@ class OverviewUsersController(BaseWindow):
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
 
-        room_pk   = dlg.comboRoom.currentData()
-        date_str  = dlg.dateEdit.date().toString("yyyy-MM-dd")
-        start_t   = dlg.timeEditStart.time()
-        end_t     = dlg.timeEditEnd.time()
+        room_pk = dlg.comboRoom.currentData()
+        date_str = dlg.dateEdit.date().toString("yyyy-MM-dd")
+        start_t = dlg.timeEditStart.time()
+        end_t = dlg.timeEditEnd.time()
         start_str = start_t.toString("HH:mm")
-        end_str   = end_t.toString("HH:mm")
-        purpose   = dlg.lineEditPurpose.text().strip()
+        end_str = end_t.toString("HH:mm")
+        purpose = dlg.lineEditPurpose.text().strip()
 
         if not purpose:
             QMessageBox.warning(self, "Error", "Please enter a purpose.")
@@ -482,7 +659,8 @@ class OverviewUsersController(BaseWindow):
             return
         if has_conflict(room_pk, date_str, start_str, end_str, exclude_id=booking_id):
             QMessageBox.warning(
-                self, "Conflict",
+                self,
+                "Conflict",
                 "This time slot overlaps an existing booking.\nPlease choose a different time.",
             )
             return
