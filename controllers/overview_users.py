@@ -138,6 +138,10 @@ class OverviewUsersController(BaseWindow):
         else:
             rooms = get_rooms_by_status(self._current_filter)
 
+        # Loai bo phong Full khi filter Available
+        if self._current_filter == "Available":
+            rooms = [r for r in rooms if get_display_status(r) != "Full"]
+
         # Capacity filter
         if self._capacity_filter == "50":
             rooms = [r for r in rooms if r["capacity"] <= 50]

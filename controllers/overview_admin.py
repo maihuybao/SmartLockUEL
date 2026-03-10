@@ -3,7 +3,7 @@ from PyQt6 import uic
 import os
 
 from widgets.base_window import BaseWindow
-from widgets.room_card import create_room_card
+from widgets.room_card import create_room_card, get_display_status
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
 from models.booking_model import get_dashboard_stats
 
@@ -55,10 +55,15 @@ class OverviewAdminController(BaseWindow):
             keyword = self.navbar.lineEditSearch.text().strip()
         if keyword:
             rooms = search_rooms(keyword)
+        elif self._current_filter == "Full":
+            rooms = [r for r in get_all_rooms() if get_display_status(r) == "Full"]
         elif self._current_filter == "All":
             rooms = get_all_rooms()
         else:
             rooms = get_rooms_by_status(self._current_filter)
+
+        if self._current_filter == "Available":
+            rooms = [r for r in rooms if get_display_status(r) != "Full"]
         self._render_room_cards(rooms)
 
     def _render_room_cards(self, rooms):
