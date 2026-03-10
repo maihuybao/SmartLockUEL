@@ -6,10 +6,76 @@
    <string notr="true">background-color: #F5F8FC;</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>10</number></property>
+   <item>
+    <layout class="QHBoxLayout" name="statsLayout">
+     <property name="spacing"><number>12</number></property>
+     <item>
+      <widget class="QFrame" name="cardTotalRooms">
+       <property name="styleSheet"><string notr="true">QFrame{background:#E3F2FD;border-radius:10px;border:1px solid #BBDEFB;}QLabel{border:none;}</string></property>
+       <property name="frameShape"><enum>QFrame::StyledPanel</enum></property>
+       <layout class="QVBoxLayout">
+        <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>10</number></property>
+        <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>10</number></property>
+        <item><widget class="QLabel" name="lblTotalRoomsVal"><property name="text"><string>0</string></property><property name="styleSheet"><string notr="true">font-size:28px;font-weight:bold;color:#1565C0;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+        <item><widget class="QLabel" name="lblTotalRoomsTitle"><property name="text"><string>Total Rooms</string></property><property name="styleSheet"><string notr="true">font-size:12px;color:#1976D2;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="cardTotalBookings">
+       <property name="styleSheet"><string notr="true">QFrame{background:#F3E5F5;border-radius:10px;border:1px solid #E1BEE7;}QLabel{border:none;}</string></property>
+       <property name="frameShape"><enum>QFrame::StyledPanel</enum></property>
+       <layout class="QVBoxLayout">
+        <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>10</number></property>
+        <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>10</number></property>
+        <item><widget class="QLabel" name="lblTotalBookingsVal"><property name="text"><string>0</string></property><property name="styleSheet"><string notr="true">font-size:28px;font-weight:bold;color:#6A1B9A;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+        <item><widget class="QLabel" name="lblTotalBookingsTitle"><property name="text"><string>Total Bookings</string></property><property name="styleSheet"><string notr="true">font-size:12px;color:#7B1FA2;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="cardPending">
+       <property name="styleSheet"><string notr="true">QFrame{background:#FFF8E1;border-radius:10px;border:1px solid #FFE082;}QLabel{border:none;}</string></property>
+       <property name="frameShape"><enum>QFrame::StyledPanel</enum></property>
+       <layout class="QVBoxLayout">
+        <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>10</number></property>
+        <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>10</number></property>
+        <item><widget class="QLabel" name="lblPendingVal"><property name="text"><string>0</string></property><property name="styleSheet"><string notr="true">font-size:28px;font-weight:bold;color:#F57F17;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+        <item><widget class="QLabel" name="lblPendingTitle"><property name="text"><string>Pending</string></property><property name="styleSheet"><string notr="true">font-size:12px;color:#F9A825;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="cardApproved">
+       <property name="styleSheet"><string notr="true">QFrame{background:#E8F5E9;border-radius:10px;border:1px solid #A5D6A7;}QLabel{border:none;}</string></property>
+       <property name="frameShape"><enum>QFrame::StyledPanel</enum></property>
+       <layout class="QVBoxLayout">
+        <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>10</number></property>
+        <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>10</number></property>
+        <item><widget class="QLabel" name="lblApprovedVal"><property name="text"><string>0</string></property><property name="styleSheet"><string notr="true">font-size:28px;font-weight:bold;color:#2E7D32;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+        <item><widget class="QLabel" name="lblApprovedTitle"><property name="text"><string>Approved</string></property><property name="styleSheet"><string notr="true">font-size:12px;color:#388E3C;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="cardRejected">
+       <property name="styleSheet"><string notr="true">QFrame{background:#FFEBEE;border-radius:10px;border:1px solid #EF9A9A;}QLabel{border:none;}</string></property>
+       <property name="frameShape"><enum>QFrame::StyledPanel</enum></property>
+       <layout class="QVBoxLayout">
+        <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>10</number></property>
+        <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>10</number></property>
+        <item><widget class="QLabel" name="lblRejectedVal"><property name="text"><string>0</string></property><property name="styleSheet"><string notr="true">font-size:28px;font-weight:bold;color:#B71C1C;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+        <item><widget class="QLabel" name="lblRejectedTitle"><property name="text"><string>Rejected</string></property><property name="styleSheet"><string notr="true">font-size:12px;color:#C62828;</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="filterLayout">
      <item>
-      <widget class="QPushButton" name="btnAll">
+      <widget class="QPushButton" name="pushButtonAll">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#E3F2FD;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>All</string></property>
@@ -18,7 +84,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnAvailable">
+      <widget class="QPushButton" name="pushButtonAvailable">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#E8F5E9;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>Available</string></property>
@@ -27,7 +93,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnOccupied">
+      <widget class="QPushButton" name="pushButtonOccupied">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFEBEE;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>Occupied</string></property>
@@ -36,19 +102,10 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnBooked">
+      <widget class="QPushButton" name="pushButtonBooked">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFF8E1;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>Full</string></property>
-       <property name="checkable"><bool>true</bool></property>
-       <property name="autoExclusive"><bool>true</bool></property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnCleaning">
-       <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
-       <property name="styleSheet"><string notr="true">QPushButton{background-color:#E3F2FD;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
-       <property name="text"><string>Cleaning</string></property>
        <property name="checkable"><bool>true</bool></property>
        <property name="autoExclusive"><bool>true</bool></property>
       </widget>

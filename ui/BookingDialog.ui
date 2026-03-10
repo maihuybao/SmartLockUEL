@@ -6,160 +6,179 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
-    <height>520</height>
+    <width>500</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Book Room</string>
+   <string>New Booking</string>
   </property>
   <property name="styleSheet">
    <string notr="true">QDialog { background: white; }
-QLabel { color: #333; }</string>
+QLabel { color: #333; border: none; }
+QLineEdit, QDateEdit, QTimeEdit { padding: 7px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #333; background: white; }
+QLineEdit:focus, QDateEdit:focus, QTimeEdit:focus { border: 1px solid #1F4F82; }
+QComboBox { padding: 7px 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #333; background: white; }
+QComboBox:focus { border: 1px solid #1F4F82; }</string>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <property name="spacing">
-    <number>12</number>
+    <number>8</number>
    </property>
-   <property name="leftMargin"><number>20</number></property>
-   <property name="topMargin"><number>20</number></property>
-   <property name="rightMargin"><number>20</number></property>
-   <property name="bottomMargin"><number>20</number></property>
+   <property name="leftMargin">
+    <number>24</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>24</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
    <item>
     <widget class="QLabel" name="lblTitle">
+     <property name="maximumSize">
+      <size>
+       <width>452</width>
+       <height>130</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 18px; font-weight: bold; color: #1F4F82; padding-bottom: 4px; border-bottom: 2px solid #E0E0E0;</string>
+     </property>
      <property name="text">
-      <string>Book Room</string>
+      <string>New Booking</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
-     <property name="styleSheet">
-      <string notr="true">font-size: 18px; font-weight: bold; color: #1F4F82;</string>
-     </property>
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="separator">
-     <property name="frameShape">
-      <enum>QFrame::HLine</enum>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="labelAlignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
-     <property name="styleSheet">
-      <string notr="true">color: #E3EAF2;</string>
+     <property name="horizontalSpacing">
+      <number>12</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="lblRoom">
-     <property name="text">
-      <string>Select room:</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font-weight: 600; font-size: 13px;</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QComboBox" name="comboRoom">
-     <property name="styleSheet">
-      <string notr="true">QComboBox { padding: 8px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; color: #333; background: white; }
-QComboBox:focus { border: 1px solid #1F4F82; }</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="lblSession">
-     <property name="text">
-      <string>Select sessions (multiple allowed):</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font-weight: 600; font-size: 13px;</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="sessionGrid">
-     <property name="spacing">
+     <property name="verticalSpacing">
       <number>8</number>
      </property>
      <item row="0" column="0">
-      <widget class="QPushButton" name="btnCa1">
+      <widget class="QLabel" name="lblRoom">
+       <property name="styleSheet">
+        <string notr="true">font-weight: 600; font-size: 13px;</string>
+       </property>
        <property name="text">
-        <string>Session 1
-07:00 – 09:30</string>
-       </property>
-       <property name="minimumSize">
-        <size><width>0</width><height>50</height></size>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
+        <string>Room:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="btnCa2">
-       <property name="text">
-        <string>Session 2
-09:45 – 12:15</string>
-       </property>
-       <property name="minimumSize">
-        <size><width>0</width><height>50</height></size>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="comboRoom"/>
      </item>
      <item row="1" column="0">
-      <widget class="QPushButton" name="btnCa3">
+      <widget class="QLabel" name="lblDate">
+       <property name="styleSheet">
+        <string notr="true">font-weight: 600; font-size: 13px;</string>
+       </property>
        <property name="text">
-        <string>Session 3
-12:30 – 15:00</string>
-       </property>
-       <property name="minimumSize">
-        <size><width>0</width><height>50</height></size>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
+        <string>Date:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QPushButton" name="btnCa4">
+      <widget class="QDateEdit" name="dateEdit">
+       <property name="displayFormat">
+        <string>dd/MM/yyyy</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblStartTime">
+       <property name="styleSheet">
+        <string notr="true">font-weight: 600; font-size: 13px;</string>
+       </property>
        <property name="text">
-        <string>Session 4
-15:15 – 17:45</string>
+        <string>Start Time:</string>
        </property>
-       <property name="minimumSize">
-        <size><width>0</width><height>50</height></size>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QTimeEdit" name="timeEditStart">
+       <property name="displayFormat">
+        <string>HH:mm</string>
        </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lblEndTime">
+       <property name="styleSheet">
+        <string notr="true">font-weight: 600; font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>End Time:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QTimeEdit" name="timeEditEnd">
+       <property name="displayFormat">
+        <string>HH:mm</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="lblPurpose">
+       <property name="styleSheet">
+        <string notr="true">font-weight: 600; font-size: 13px;</string>
+       </property>
+       <property name="text">
+        <string>Purpose:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="lineEditPurpose">
+       <property name="placeholderText">
+        <string>Group meeting, self-study, seminar...</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="lblReason">
-     <property name="text">
-      <string>Reason:</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font-weight: 600; font-size: 13px;</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTextEdit" name="txtReason">
-     <property name="placeholderText">
-      <string>Group meeting, club activities, self-study, make-up class, seminar...</string>
+    <widget class="QTableWidget" name="tableAvailability">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>52</height>
+      </size>
      </property>
      <property name="maximumSize">
-      <size><width>16777215</width><height>70</height></size>
+      <size>
+       <width>16777215</width>
+       <height>52</height>
+      </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QTextEdit { border: 1px solid #ddd; border-radius: 8px; padding: 6px; font-size: 13px; color: #333; }
-QTextEdit:focus { border: 1px solid #1F4F82; }</string>
+      <string notr="true">QTableWidget { border: 1px solid #E3EAF2; border-radius: 6px; background: white; gridline-color: #E0E0E0; }
+QHeaderView::section { background: #F0F4F8; color: #555; font-size: 10px; font-weight: 600; padding: 2px; border: none; border-right: 1px solid #E0E0E0; }</string>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="showGrid">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -169,24 +188,55 @@ QTextEdit:focus { border: 1px solid #1F4F82; }</string>
       <number>10</number>
      </property>
      <item>
-      <widget class="QPushButton" name="btnCancel">
-       <property name="text">
-        <string>Cancel</string>
+      <spacer name="btnSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonCancel">
+       <property name="minimumSize">
+        <size>
+         <width>90</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton { background: #F5F5F5; border: 1px solid #ddd; border-radius: 8px; padding: 8px 20px; color: #666; font-size: 13px; }
 QPushButton:hover { background: #E0E0E0; }</string>
        </property>
+       <property name="text">
+        <string>Cancel</string>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnSubmit">
-       <property name="text">
-        <string>Confirm Booking</string>
+      <widget class="QPushButton" name="pushButtonSubmit">
+       <property name="minimumSize">
+        <size>
+         <width>130</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton { background: #1F4F82; border: none; border-radius: 8px; padding: 8px 20px; color: white; font-size: 13px; font-weight: bold; }
 QPushButton:hover { background: #163D66; }</string>
+       </property>
+       <property name="text">
+        <string>Confirm Booking</string>
        </property>
       </widget>
      </item>

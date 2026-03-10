@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>562</width>
+    <height>368</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QFrame" name="frame">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: #1f4f82;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="font">
+              <font>
+               <family>Baskerville Old Face</family>
+               <pointsize>16</pointsize>
+              </font>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color: rgb(255, 255, 255);</string>
+             </property>
+             <property name="text">
+              <string>SmartStock UEL</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit">
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+    background-color: white;
+    border: 1px solid #B0BEC5;
+    border-radius: 15px;
+    padding: 5px 10px;
+}</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonMyBookings">
+           <property name="styleSheet">
+            <string notr="true">QPushButton {    background-color: #1F4F82;
+	color: rgb(255, 255, 255);
+    border: 1px solid #cccccc;
+    border-radius: 12px;
+    padding: 6px 15px; font-weight: 600;
+    font-size: 13px;
+}
+
+QPushButton:hover {
+    background-color: #2E6AA6;
+}
+
+QPushButton:pressed {
+    background-color: #163B63;
+}</string>
+           </property>
+           <property name="text">
+            <string>My Bookings</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton">
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    background-color: white;
+    color: #1F4F82;
+    border: 1.5px solid #1F4F82;
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #1F4F82;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #163B63;
+    color: white;
+}</string>
+           </property>
+           <property name="text">
+            <string>User</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QWidget" name="widget" native="true">
+             <property name="styleSheet">
+              <string notr="true">background-color: #F5F8FC;</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <widget class="QPushButton" name="pushButtonAll">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    background-color: #E3F2FD;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>All</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonAvailable">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    background-color: #E8F5E9;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Available</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonOccupied">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    background-color: #FFEBEE;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Occupied</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonBooked">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    background-color:#FFF8E1;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Booked</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonCleaning">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>35</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QPushButton {
+    background-color: #E3F2FD;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+                  </property>
+                  <property name="text">
+                   <string>Cleaning</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>true</bool>
+                  </property>
+                  <property name="autoExclusive">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QScrollArea" name="scrollArea">
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="widgetRooms">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>510</width>
+                   <height>92</height>
+                  </rect>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_2">
+                  <item row="0" column="0">
+                   <layout class="QGridLayout" name="gridLayout"/>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame_3">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>80</height>
+                 </size>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_7">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_6">
+                   <item>
+                    <widget class="QPushButton" name="pushButtonLogout">
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton{
+    background-color: #1F4F82;
+    color: white;
+    border: none;
+    border-radius: 22px;
+    padding: 8px 24px;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 36px;
+}
+
+QPushButton#pushButtonLogout:hover {
+    background-color: #E53935;
+}
+
+QPushButton:pressed {
+    background-color: #C62828;
+    padding-left: 26px;
+    padding-top: 10px;
+}
+
+QPushButton:disabled {
+    background-color: #FFCDD2;
+    color: #FFFFFF;
+}</string>
+                     </property>
+                     <property name="text">
+                      <string>Log out</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButtonQuit">
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background-color: #C62828;
+    color: white;
+    border: none;
+    border-radius: 22px;
+    padding: 8px 24px;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 36px;
+}
+
+QPushButton:hover {
+    background-color: #B71C1C;
+}
+
+QPushButton#pushButtonQuit:pressed {
+    background-color: #7F0000;
+    padding-left: 26px;
+    padding-top: 10px;
+}
+
+QPushButton:disabled {
+    background-color: #EF9A9A;
+    color: #FFFFFF;
+}</string>
+                     </property>
+                     <property name="text">
+                      <string>Quit</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_2">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButtonBooking">
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 #F8BBD0,
+        stop:1 #EC407A
+    );
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 32px;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 40px;
+}
+
+QPushButton:hover {
+    background: #E91E63;
+}
+
+QPushButton:pressed {
+    background: #C2185B;
+    padding-left: 34px;
+    padding-top: 12px;
+}</string>
+                     </property>
+                     <property name="text">
+                      <string>Booking</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>100</width>
+    <height>120</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QFrame" name="frame">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>80</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>80</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #1f4f82;</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="font">
+            <font>
+             <family>Baskerville Old Face</family>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(255, 255, 255);</string>
+           </property>
+           <property name="text">
+            <string>SmartStock UEL</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    background-color: white;
+    color: #1F4F82;
+    border: 1.5px solid #1F4F82;
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #1F4F82;
+    color: white;
+}
+
+QPushButton:pressed {
+    background-color: #163B63;
+    color: white;
+}</string>
+         </property>
+         <property name="text">
+          <string>Admin</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../img/admin.png</normaloff>../img/admin.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1F4F82;
+    padding: 10px;
+    border-bottom: 2px solid #E0E0E0;
+}</string>
+      </property>
+      <property name="text">
+       <string>Booking Management</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="frame_2">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QPushButton" name="pushButton_4">
+         <property name="font">
+          <font>
+           <weight>62</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    background-color: #E3F2FD;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+         </property>
+         <property name="text">
+          <string>All</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../img/all.png</normaloff>../img/all.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonChoDuyet">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    background-color:#FFF8E1;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+         </property>
+         <property name="text">
+          <string>Pending Approval</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../img/pending approval.png</normaloff>../img/pending approval.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    background-color: #E8F5E9;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+         </property>
+         <property name="text">
+          <string>Approved</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../img/approval.png</normaloff>../img/approval.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_5">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    background-color: #FFEBEE;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+         </property>
+         <property name="text">
+          <string>Rejected</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../img/rejected.png</normaloff>../img/rejected.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>137</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditSearch">
+         <property name="styleSheet">
+          <string notr="true">QLineEdit {
+    background-color: white;
+    border: 1px solid #B0BEC5;
+    border-radius: 15px;
+    padding: 5px 10px;
+}</string>
+         </property>
+         <property name="placeholderText">
+          <string>Search</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTableWidget" name="tableWidgetMyBookings">
+      <property name="styleSheet">
+       <string notr="true">QTableWidget {
+    border: 1px solid #E0E0E0;
+    gridline-color: #E0E0E0;
+    font-size: 13px;
+}
+
+QHeaderView::section {
+    background-color: #1F4F82;
+    color: white;
+    font-weight: bold;
+    padding: 4px;
+}</string>
+      </property>
+      <row>
+       <property name="text">
+        <string/>
+       </property>
+      </row>
+      <column>
+       <property name="text">
+        <string>Full Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>NameID</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Room</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Date</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Start Time</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>End Time</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Purpose</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Status</string>
+       </property>
+      </column>
+      <item row="0" column="0">
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="styleSheet">
+       <string notr="true">QFrame {
+    background-color: #f5f5f5;
+    border-radius: 25px;
+    border: 1px solid #d0d0d0;
+}</string>
+      </property>
+      <property name="title">
+       <string>Details &amp; Request Processing:</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QFrame" name="frame_3">
+         <property name="minimumSize">
+          <size>
+           <width>500</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QFrame {
+    background-color: #e6e6e6;
+    border: 2px solid #6f7c80;
+    border-radius: 12px;
+}</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="styleSheet">
+               <string notr="true">/* TRANG TRÍ Ô NHẬP LIỆU (QLineEdit) */
+QLineEdit {
+    background-color: #FFFFFF; /* Nền trắng sáng */
+    border: 2px solid #CFD8DC; /* Viền xám nhạt, thanh lịch */
+    
+    /* Bo góc 15px (bằng đúng 1/2 chiều cao 30px đã set ở Bước 1) */
+    border-radius: 15px; 
+    
+    /* Đẩy chữ thụt vào trong 15px để không bị dính vào góc bo tròn */
+    padding: 2px 15px; 
+    
+    color: #333333; /* Màu chữ xám đen dễ đọc */
+    font-size: 13px;
+}
+
+/* HIỆU ỨNG KHI CLICK VÀO ĐỂ GÕ CHỮ (Focus) */
+QLineEdit:focus {
+    border: 2px solid #1565C0; /* Đổi viền sang màu xanh dương đậm */
+    background-color: #F8FBFF; /* Nền chuyển sang xanh nhạt rất êm mắt */
+}
+
+/* HIỆU ỨNG KHI Ô NHẬP BỊ KHÓA (ReadOnly / Disabled) */
+QLineEdit:disabled, QLineEdit[readOnly=&quot;true&quot;] {
+    background-color: #F5F5F5; /* Nền xám báo hiệu không được nhập */
+    border: 2px solid #E0E0E0;
+    color: #9E9E9E;
+}</string>
+              </property>
+              <property name="text">
+               <string>Number:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="lineEdit_9">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}
+</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Date:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLineEdit" name="lineEdit_8">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Full name:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="lineEdit_2">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QLabel" name="label_7">
+              <property name="styleSheet">
+               <string notr="true">/* TRANG TRÍ Ô NHẬP LIỆU (QLineEdit) */
+QLineEdit {
+    background-color: #FFFFFF; /* Nền trắng sáng */
+    border: 2px solid #CFD8DC; /* Viền xám nhạt, thanh lịch */
+    
+    /* Bo góc 15px (bằng đúng 1/2 chiều cao 30px đã set ở Bước 1) */
+    border-radius: 15px; 
+    
+    /* Đẩy chữ thụt vào trong 15px để không bị dính vào góc bo tròn */
+    padding: 2px 15px; 
+    
+    color: #333333; /* Màu chữ xám đen dễ đọc */
+    font-size: 13px;
+}
+
+/* HIỆU ỨNG KHI CLICK VÀO ĐỂ GÕ CHỮ (Focus) */
+QLineEdit:focus {
+    border: 2px solid #1565C0; /* Đổi viền sang màu xanh dương đậm */
+    background-color: #F8FBFF; /* Nền chuyển sang xanh nhạt rất êm mắt */
+}
+
+/* HIỆU ỨNG KHI Ô NHẬP BỊ KHÓA (ReadOnly / Disabled) */
+QLineEdit:disabled, QLineEdit[readOnly=&quot;true&quot;] {
+    background-color: #F5F5F5; /* Nền xám báo hiệu không được nhập */
+    border: 2px solid #E0E0E0;
+    color: #9E9E9E;
+}</string>
+              </property>
+              <property name="text">
+               <string>Start time:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QLineEdit" name="lineEdit_7">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>NameID:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="lineEdit_3">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QLabel" name="label_9">
+              <property name="text">
+               <string>End time:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QLineEdit" name="lineEdit_6">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Room:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="lineEdit_4">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>Purpose:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3">
+             <widget class="QLineEdit" name="lineEdit_5">
+              <property name="styleSheet">
+               <string notr="true">QFrame {
+    background-color: #f8f9fb;
+    border-radius: 25px;
+    border: 1px solid #e0e0e0;
+}
+
+QLineEdit {
+    border: 1px solid #dcdcdc;
+    border-radius: 15px;
+    padding: 6px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border: 1px solid #4a90e2;
+}</string>
+              </property>
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QPushButton" name="pushButton_6">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    background-color: #E8F5E9;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+             </property>
+             <property name="text">
+              <string>Approve</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_7">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+    background-color: #FFEBEE;
+    border: 1px solid #1565C0;
+    border-radius: 15px;
+    padding: 6px 15px;
+    color: #0D47A1;
+    font-weight: 500;
+}
+
+QPushButton:checked {
+    background-color: #1565C0;
+    color: white;
+}
+
+QPushButton:hover {
+    background-color: #1E88E5;
+    color: white;
+}</string>
+             </property>
+             <property name="text">
+              <string>Reject</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QTextEdit" name="txtLyDoTuChoi"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>775</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonQuit">
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
+    background-color: #E0E0E0;
+    color: #333333;
+    border-radius: 8px;
+    padding: 6px 18px;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background-color: #CFCFCF;
+}
+
+QPushButton:pressed {
+    background-color: #B8B8B8;
+}</string>
+        </property>
+        <property name="text">
+         <string>Quit</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -147,3 +147,40 @@ def get_bookings_by_room(room_pk):
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+def get_bookings_by_room_date(room_pk, date_str):
+    """Get active bookings for a room on a specific date (YYYY-MM-DD)."""
+    conn = get_connection()
+    rows = conn.execute(
+        """SELECT id, session, status FROM bookings
+           WHERE room_id = ? AND status IN ('Pending', 'Approved')
+           AND session LIKE ?""",
+        (room_pk, f"{date_str} |%"),
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def _to_minutes(t):
+    h, m = map(int, t.strip().split(":"))
+    return h * 60 + m
+
+
+def has_conflict(room_pk, date_str, start_str, end_str, exclude_id=None):
+    """Return True if the slot overlaps any existing Pending/Approved booking."""
+    bookings = get_bookings_by_room_date(room_pk, date_str)
+    ns, ne = _to_minutes(start_str), _to_minutes(end_str)
+    for b in bookings:
+        if exclude_id is not None and b["id"] == exclude_id:
+            continue
+        if " | " not in b["session"]:
+            continue
+        _, tp = b["session"].split(" | ", 1)
+        if " - " not in tp:
+            continue
+        bs_str, be_str = tp.split(" - ", 1)
+        bs, be = _to_minutes(bs_str), _to_minutes(be_str)
+        if ns < be and ne > bs:
+            return True
+    return False

@@ -15,35 +15,35 @@
      <layout class="QVBoxLayout" name="formLayout">
       <item>
        <widget class="QLabel" name="usernameLabel">
-        <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
+        <property name="styleSheet"><string notr="true">color: #003F87; font-weight: 600;</string></property>
         <property name="text"><string>Username</string></property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="editUsername">
-        <property name="styleSheet"><string notr="true">color: black; padding: 6px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+       <widget class="QLineEdit" name="LineEditUsername">
+        <property name="styleSheet"><string notr="true">QLineEdit { border: 1px solid #dcdcdc; border-radius: 10px; padding: 8px; font-size: 13px; color: black; } QLineEdit:focus { border: 1px solid #1f4f82; }</string></property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="passwordLabel">
-        <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
+        <property name="styleSheet"><string notr="true">color: #003F87; font-weight: 600;</string></property>
         <property name="text"><string>Password</string></property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="editPassword">
-        <property name="styleSheet"><string notr="true">color: black; padding: 6px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+       <widget class="QLineEdit" name="LineEditPassword">
+        <property name="styleSheet"><string notr="true">QLineEdit { border: 1px solid #dcdcdc; border-radius: 10px; padding: 8px; font-size: 13px; color: black; } QLineEdit:focus { border: 1px solid #1f4f82; }</string></property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="roleLabel">
-        <property name="styleSheet"><string notr="true">color: #0B2545;</string></property>
+        <property name="styleSheet"><string notr="true">color: #003F87; font-weight: 600;</string></property>
         <property name="text"><string>Role</string></property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="editRole">
-        <property name="styleSheet"><string notr="true">color: black; padding: 6px; border: 1px solid #ddd; border-radius: 6px;</string></property>
+       <widget class="QLineEdit" name="LineEditRole">
+        <property name="styleSheet"><string notr="true">QLineEdit { border: 1px solid #dcdcdc; border-radius: 10px; padding: 8px; font-size: 13px; color: black; } QLineEdit:focus { border: 1px solid #1f4f82; }</string></property>
        </widget>
       </item>
       <item>
@@ -51,20 +51,20 @@
         <property name="styleSheet"><string notr="true">border-radius: 12px; border: 1px solid #E3EAF2;</string></property>
         <layout class="QHBoxLayout" name="btnLayout">
          <item>
-          <widget class="QPushButton" name="btnUpdate">
-           <property name="styleSheet"><string notr="true">QPushButton{background-color:#E8F5E9;border:1px solid #81C784;border-radius:15px;padding:6px 15px;color:#2E7D32;font-weight:500;}QPushButton:hover{background-color:#4CAF50;color:white;}</string></property>
+          <widget class="QPushButton" name="pushButtonUpdate">
+           <property name="styleSheet"><string notr="true">QPushButton { background-color: #E8F5E9; border: 1px solid #81C784; border-radius: 15px; padding: 6px 15px; color: #2E7D32; font-weight: 500; } QPushButton:hover { background-color: #4CAF50; color: white; }</string></property>
            <property name="text"><string>Update</string></property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnCreate">
-           <property name="styleSheet"><string notr="true">QPushButton{background-color:#E3F2FD;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
+          <widget class="QPushButton" name="pushButtonCreate">
+           <property name="styleSheet"><string notr="true">QPushButton { background-color: #E3F2FD; border: 1px solid #1565C0; border-radius: 15px; padding: 6px 15px; color: #0D47A1; font-weight: 500; } QPushButton:hover { background-color: #1E88E5; color: white; }</string></property>
            <property name="text"><string>Create</string></property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnDelete">
-           <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFEBEE;border:1px solid #E57373;border-radius:15px;padding:6px 15px;color:#C62828;font-weight:500;}QPushButton:hover{background-color:#EF5350;color:white;}</string></property>
+          <widget class="QPushButton" name="pushButtonDelete">
+           <property name="styleSheet"><string notr="true">QPushButton { background-color: #FFEBEE; border: 1px solid #E57373; border-radius: 15px; padding: 6px 15px; color: #C62828; font-weight: 500; } QPushButton:hover { background-color: #EF5350; color: white; }</string></property>
            <property name="text"><string>Delete</string></property>
           </widget>
          </item>
@@ -83,19 +83,30 @@
    <item>
     <widget class="QFrame" name="tablePanel">
      <property name="minimumSize"><size><width>300</width><height>0</height></size></property>
-     <property name="maximumSize"><size><width>16777215</width><height>16777215</height></size></property>
-     <property name="styleSheet"><string notr="true">QFrame{background-color:white;border-radius:12px;border:1px solid #E3EAF2;}</string></property>
+     <property name="styleSheet"><string notr="true">QFrame { background-color: white; border-radius: 12px; border: 1px solid #E3EAF2; }</string></property>
      <layout class="QVBoxLayout" name="tableLayout">
       <item>
-       <widget class="QLineEdit" name="lineEditSearch">
-        <property name="styleSheet"><string notr="true">color: black; padding: 5px; border: 1px solid #ddd; border-radius: 6px;</string></property>
-        <property name="placeholderText"><string>Search...</string></property>
-       </widget>
+       <layout class="QHBoxLayout" name="searchLayout">
+        <item>
+         <widget class="QLineEdit" name="lineEditSearch">
+          <property name="styleSheet"><string notr="true">QLineEdit { color: black; padding: 5px 10px; border: 1px solid #dcdcdc; border-radius: 15px; } QLineEdit:focus { border: 1px solid #1f4f82; }</string></property>
+          <property name="placeholderText"><string>Search...</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonReload">
+          <property name="styleSheet"><string notr="true">QPushButton { background-color: #1F4F82; color: white; border: none; border-radius: 15px; padding: 5px 14px; font-weight: 500; } QPushButton:hover { background-color: #163D66; }</string></property>
+          <property name="text"><string>Reload</string></property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QTableWidget" name="tableWidget">
-        <property name="maximumSize"><size><width>16777215</width><height>16777215</height></size></property>
-        <property name="styleSheet"><string notr="true">QTableWidget{background-color:white;color:black;border:1px solid #E3EAF2;}QHeaderView::section{background-color:#1F4F82;color:white;padding:6px;border:none;}</string></property>
+        <property name="styleSheet"><string notr="true">QTableWidget { background-color: white; color: #333; border: 1px solid #E3EAF2; }
+QTableWidget::item { color: #333; padding: 4px; }
+QTableWidget::item:selected { background-color: #BBDEFB; color: #333; }
+QHeaderView::section { background-color: #1F4F82; color: white; padding: 6px; border: none; }</string></property>
         <column><property name="text"><string>Username</string></property></column>
         <column><property name="text"><string>Password</string></property></column>
         <column><property name="text"><string>Role</string></property></column>

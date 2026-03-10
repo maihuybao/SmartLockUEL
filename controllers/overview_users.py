@@ -4,24 +4,45 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QHeaderView,
-    QApplication,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QDate, QTime
+from PyQt6.QtGui import QColor
 from PyQt6 import uic
 import os
 
 from widgets.base_window import BaseWindow
-from widgets.room_card import create_room_card, SESSIONS, get_display_status
+from widgets.room_card import create_room_card, get_display_status
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
 from models.booking_model import (
     create_booking,
     get_bookings_by_user,
+    get_bookings_by_room_date,
+    has_conflict,
     cancel_booking,
-    get_bookings_by_room,
 )
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UI_DIR = os.path.join(BASE_DIR, "ui")
+
+OP_START = QTime(6, 0)
+OP_END   = QTime(22, 0)
+
+
+def _parse_session(session):
+    if " | " in session:
+        date_part, time_part = session.split(" | ", 1)
+        if " - " in time_part:
+            start, end = time_part.split(" - ", 1)
+            return date_part.strip(), start.strip(), end.strip()
+        return date_part.strip(), time_part.strip(), ""
+    return "", session, ""
+
+
+TIME_RANGES = {
+    "Morning":   (6 * 60,  12 * 60),
+    "Afternoon": (12 * 60, 17 * 60),
+    "Evening":   (17 * 60, 22 * 60),
+}
 
 
 class OverviewUsersController(BaseWindow):
@@ -33,51 +54,96 @@ class OverviewUsersController(BaseWindow):
             show_sidebar=False,
             title="SmartLocker UEL - User",
         )
-        self._current_filter = "All"
+        self._current_filter   = "All"
+        self._capacity_filter  = "All"
+        self._time_filter      = "All"
 
-        # Load content from .ui
         self.ui = self.load_content_ui("OverviewUsers.ui")
 
         self._connect_signals()
-        self.ui.btnAll.setChecked(True)
+        self.ui.pushButtonAll.setChecked(True)
         self._load_rooms()
 
     def _connect_signals(self):
-        # Filters
-        self.ui.btnAll.clicked.connect(lambda: self._apply_filter("All"))
-        self.ui.btnAvailable.clicked.connect(lambda: self._apply_filter("Available"))
-        self.ui.btnOccupied.clicked.connect(lambda: self._apply_filter("Occupied"))
-        self.ui.btnBooked.clicked.connect(lambda: self._apply_filter("Full"))
-        self.ui.btnCleaning.clicked.connect(lambda: self._apply_filter("Cleaning"))
+        self.ui.pushButtonAll.clicked.connect(lambda: self._apply_filter("All"))
+        self.ui.pushButtonAvailable.clicked.connect(lambda: self._apply_filter("Available"))
+        self.ui.pushButtonOccupied.clicked.connect(lambda: self._apply_filter("Occupied"))
+        self.ui.pushButtonBooked.clicked.connect(lambda: self._apply_filter("Full"))
 
-        # Search
+        self.ui.pushButtonCapAll.clicked.connect(lambda: self._apply_capacity("All"))
+        self.ui.pushButtonCap50.clicked.connect(lambda: self._apply_capacity("50"))
+        self.ui.pushButtonCap100.clicked.connect(lambda: self._apply_capacity("100"))
+
+        self.ui.pushButtonTimeAll.clicked.connect(lambda: self._apply_time("All"))
+        self.ui.pushButtonMorning.clicked.connect(lambda: self._apply_time("Morning"))
+        self.ui.pushButtonAfternoon.clicked.connect(lambda: self._apply_time("Afternoon"))
+        self.ui.pushButtonEvening.clicked.connect(lambda: self._apply_time("Evening"))
+
         self.navbar.lineEditSearch.textChanged.connect(self._on_search)
-
-        # Navbar role button → history
         self.navbar.btnRole.clicked.connect(self._show_history)
 
-        # Bottom bar
-        self.ui.btnBooking.clicked.connect(self._open_booking_dialog)
-        self.ui.btnLogout.clicked.connect(self._logout)
-        self.ui.btnQuit.clicked.connect(self._quit)
+        self.ui.pushButtonBooking.clicked.connect(self._open_booking_dialog)
+        self.ui.pushButtonLogout.clicked.connect(self._logout)
+        self.ui.pushButtonQuit.clicked.connect(self._quit)
 
-    # ── Room grid ────────────────────────────────────────
+    # -- Room grid ------------------------------------------------
+
+    def _apply_filter(self, status):
+        self._current_filter = status
+        self._load_rooms()
+
+    def _apply_capacity(self, cap):
+        self._capacity_filter = cap
+        self._load_rooms()
+
+    def _apply_time(self, session):
+        self._time_filter = session
+        self._load_rooms()
 
     def _load_rooms(self):
-        keyword = ""
-        if self.navbar.lineEditSearch:
-            keyword = self.navbar.lineEditSearch.text().strip()
+        from datetime import date as _date
+        keyword = self.navbar.lineEditSearch.text().strip() if self.navbar.lineEditSearch else ""
+
         if keyword:
             rooms = search_rooms(keyword)
-        elif self._current_filter == "All":
-            rooms = get_all_rooms()
         elif self._current_filter == "Full":
             rooms = [r for r in get_all_rooms() if get_display_status(r) == "Full"]
+        elif self._current_filter == "All":
+            rooms = get_all_rooms()
         else:
             rooms = get_rooms_by_status(self._current_filter)
-            if self._current_filter == "Available":
-                rooms = [r for r in rooms if get_display_status(r) != "Full"]
+
+        # Capacity filter
+        if self._capacity_filter == "50":
+            rooms = [r for r in rooms if r["capacity"] <= 50]
+        elif self._capacity_filter == "100":
+            rooms = [r for r in rooms if r["capacity"] >= 100]
+
+        # Time filter — rooms with at least one free slot in the session today
+        if self._time_filter != "All":
+            today = _date.today().strftime("%Y-%m-%d")
+            r_start, r_end = TIME_RANGES[self._time_filter]
+            rooms = [r for r in rooms if self._has_free_slot(r["id"], today, r_start, r_end)]
+
         self._render_room_cards(rooms)
+
+    @staticmethod
+    def _has_free_slot(room_pk, date_str, range_start, range_end):
+        bookings = get_bookings_by_room_date(room_pk, date_str)
+        booked = set()
+        for b in bookings:
+            if " | " not in b["session"]:
+                continue
+            _, tp = b["session"].split(" | ", 1)
+            if " - " not in tp:
+                continue
+            s, e = tp.split(" - ", 1)
+            def _m(t):
+                hh, mm = map(int, t.strip().split(":"))
+                return hh * 60 + mm
+            for slot in range(_m(s), _m(e), 30):
+                booked.add(slot)
+        return any(slot not in booked for slot in range(range_start, range_end, 30))
 
     def _render_room_cards(self, rooms):
         self._rooms_data = rooms
@@ -133,132 +199,152 @@ class OverviewUsersController(BaseWindow):
     def _on_search(self):
         self._load_rooms()
 
-    # ── Booking dialog ───────────────────────────────────
+    # -- Booking dialog -------------------------------------------
 
     def _open_booking_dialog(self, preselect_room=None):
-        available = [r for r in get_all_rooms() if r["status"] == "Available"]
+        available = [r for r in get_all_rooms() if r["status"] in ("Available",)]
         if not available:
-            QMessageBox.information(self, "Thông báo", "No available rooms.")
+            QMessageBox.information(self, "Thong bao", "No available rooms.")
             return
 
-        # Load dialog from .ui file
         dlg = QDialog(self)
         uic.loadUi(os.path.join(UI_DIR, "BookingDialog.ui"), dlg)
 
-        # Populate room combo
         for r in available:
             dlg.comboRoom.addItem(
-                f"{r['room_id']} – {r['room_type']} ({r['capacity']} Seats)",
+                f"{r['room_id']} - {r['room_type']} ({r['capacity']} Seats)",
                 r["id"],
             )
 
-        # Pre-select room nếu được truyền vào
         if preselect_room:
             for i in range(dlg.comboRoom.count()):
                 if dlg.comboRoom.itemData(i) == preselect_room["id"]:
                     dlg.comboRoom.setCurrentIndex(i)
                     break
 
-        # Session multi-select toggle logic
-        session_buttons = [dlg.btnCa1, dlg.btnCa2, dlg.btnCa3, dlg.btnCa4]
-        selected_sessions = set()
+        dlg.dateEdit.setDate(QDate.currentDate())
+        dlg.dateEdit.setMinimumDate(QDate.currentDate())
 
-        btn_normal = (
-            "QPushButton { background: #F5F7FA; border: 2px solid #E3EAF2;"
-            " border-radius: 8px; padding: 8px 6px; color: #555; font-size: 12px; font-weight: 500; }"
-            " QPushButton:hover { border-color: #1F4F82; background: #EBF0F7; }"
-        )
-        btn_selected = (
-            "QPushButton { background: #1F4F82; border: 2px solid #1F4F82;"
-            " border-radius: 8px; padding: 8px 6px; color: white; font-size: 12px; font-weight: 500; }"
-        )
-        btn_disabled = (
-            "QPushButton { background: #EEEEEE; border: 2px solid #BDBDBD;"
-            " border-radius: 8px; padding: 8px 6px; color: #BDBDBD; font-size: 12px; font-weight: 500; }"
-        )
+        dlg.timeEditStart.setMinimumTime(QTime(6, 0))
+        dlg.timeEditStart.setMaximumTime(QTime(21, 59))
+        dlg.timeEditStart.setTime(QTime(7, 0))
 
-        for btn in session_buttons:
-            btn.setFixedHeight(50)
-            btn.setFlat(True)
-            btn.setStyleSheet(btn_normal)
-            btn.setAttribute(Qt.WidgetAttribute.WA_AlwaysShowToolTips, True)
+        dlg.timeEditEnd.setMinimumTime(QTime(6, 1))
+        dlg.timeEditEnd.setMaximumTime(QTime(22, 0))
+        dlg.timeEditEnd.setTime(QTime(9, 0))
 
-        def get_booked_sessions(room_pk):
-            bookings = get_bookings_by_room(room_pk)
-            booked = set()
-            for b in bookings:
-                for idx, (name, time) in enumerate(SESSIONS):
-                    if b["session"] == f"{name} ({time})":
-                        booked.add(idx)
-            return booked
+        self._refresh_availability(dlg)
+        dlg.comboRoom.currentIndexChanged.connect(lambda _: self._refresh_availability(dlg))
+        dlg.dateEdit.dateChanged.connect(lambda _: self._refresh_availability(dlg))
 
-        def refresh_session_buttons():
-            room_pk = dlg.comboRoom.currentData()
-            booked = get_booked_sessions(room_pk)
-            # Xóa các session đã book khỏi selected
-            selected_sessions.difference_update(booked)
-            for j, b in enumerate(session_buttons):
-                if j in booked:
-                    b.setEnabled(False)
-                    b.setStyleSheet(btn_disabled)
-                    b.setToolTip("This session is already booked")
-                else:
-                    b.setEnabled(True)
-                    b.setStyleSheet(btn_selected if j in selected_sessions else btn_normal)
-                    b.setToolTip("")
-
-        def on_session_click(idx):
-            if idx in selected_sessions:
-                selected_sessions.discard(idx)
-            else:
-                selected_sessions.add(idx)
-            for j, b in enumerate(session_buttons):
-                if b.isEnabled():
-                    b.setStyleSheet(btn_selected if j in selected_sessions else btn_normal)
-
-        for i, btn in enumerate(session_buttons):
-            btn.clicked.connect(lambda _, idx=i: on_session_click(idx))
-
-        dlg.comboRoom.currentIndexChanged.connect(lambda _: refresh_session_buttons())
-        refresh_session_buttons()
-
-        # Connect action buttons
-        dlg.btnCancel.clicked.connect(dlg.reject)
-        dlg.btnSubmit.clicked.connect(dlg.accept)
+        dlg.pushButtonCancel.clicked.connect(dlg.reject)
+        dlg.pushButtonSubmit.clicked.connect(dlg.accept)
 
         if dlg.exec() == QDialog.DialogCode.Accepted:
-            room_pk = dlg.comboRoom.currentData()
-            if not selected_sessions:
-                QMessageBox.warning(self, "Lỗi", "Please select at least one session.")
-                return
-            reason = dlg.txtReason.toPlainText().strip()
-            if not reason:
-                QMessageBox.warning(self, "Lỗi", "Please enter a reason.")
-                return
+            room_pk   = dlg.comboRoom.currentData()
+            date_str  = dlg.dateEdit.date().toString("yyyy-MM-dd")
+            start_t   = dlg.timeEditStart.time()
+            end_t     = dlg.timeEditEnd.time()
+            start_str = start_t.toString("HH:mm")
+            end_str   = end_t.toString("HH:mm")
+            purpose   = dlg.lineEditPurpose.text().strip()
 
-            success_count = 0
-            for idx in sorted(selected_sessions):
-                session_name, session_time = SESSIONS[idx]
-                session = f"{session_name} ({session_time})"
-                if create_booking(self.current_user["id"], room_pk, session, reason):
-                    success_count += 1
-
-            if success_count > 0:
-                QMessageBox.information(
-                    self, "Success",
-                    f"Successfully sent booking requests for {success_count} sessions.",
+            if not purpose:
+                QMessageBox.warning(self, "Loi", "Please enter a purpose.")
+                return
+            if start_t < OP_START or end_t > OP_END:
+                QMessageBox.warning(
+                    self, "Loi",
+                    f"Booking hours are 06:00 – 22:00 only.",
                 )
+                return
+            if end_t <= start_t:
+                QMessageBox.warning(self, "Loi", "End time must be after start time.")
+                return
+            if has_conflict(room_pk, date_str, start_str, end_str):
+                QMessageBox.warning(
+                    self, "Conflict",
+                    "This time slot overlaps an existing booking.\n"
+                    "Please choose a different time.",
+                )
+                return
+
+            session = f"{date_str} | {start_str} - {end_str}"
+            if create_booking(self.current_user["id"], room_pk, session, purpose):
+                QMessageBox.information(self, "Success", "Booking request sent successfully.")
                 self._load_rooms()
             else:
-                QMessageBox.warning(self, "Error", "Failed to book room.")
+                QMessageBox.warning(self, "Error", "Failed to send booking request.")
 
-    # ── Booking history ──────────────────────────────────
+    def _refresh_availability(self, dlg):
+        room_pk  = dlg.comboRoom.currentData()
+        date_str = dlg.dateEdit.date().toString("yyyy-MM-dd")
+        if not room_pk:
+            return
+
+        bookings = get_bookings_by_room_date(room_pk, date_str)
+
+        # Parse into (start_min, end_min, status)
+        intervals = []
+        for b in bookings:
+            if " | " not in b["session"]:
+                continue
+            _, tp = b["session"].split(" | ", 1)
+            if " - " not in tp:
+                continue
+            s, e = tp.split(" - ", 1)
+            def _m(t):
+                hh, mm = map(int, t.strip().split(":"))
+                return hh * 60 + mm
+            intervals.append((_m(s), _m(e), b["status"]))
+
+        # Build 16-column table (06:00 – 21:00, 1 hour each)
+        table = dlg.tableAvailability
+        hours = list(range(6, 22))
+        table.setColumnCount(len(hours))
+        table.setRowCount(1)
+        table.verticalHeader().setVisible(False)
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        table.setHorizontalHeaderLabels([f"{h:02d}" for h in hours])
+        table.verticalHeader().setDefaultSectionSize(28)
+        table.setShowGrid(True)
+
+        COLOR_APPROVED = QColor("#EF9A9A")   # red-ish
+        COLOR_PENDING  = QColor("#FFE082")   # amber
+        COLOR_FREE     = QColor("#A5D6A7")   # green
+
+        for col, hour in enumerate(hours):
+            slot_s = hour * 60
+            slot_e = (hour + 1) * 60
+            cell_status = None
+            for bs, be, bst in intervals:
+                if bs < slot_e and be > slot_s:
+                    if bst == "Approved":
+                        cell_status = "Approved"
+                        break
+                    cell_status = "Pending"
+
+            item = QTableWidgetItem()
+            item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            if cell_status == "Approved":
+                item.setBackground(COLOR_APPROVED)
+                item.setToolTip("Booked (Approved)")
+            elif cell_status == "Pending":
+                item.setBackground(COLOR_PENDING)
+                item.setToolTip("Pending approval")
+            else:
+                item.setBackground(COLOR_FREE)
+                item.setToolTip("Available")
+            table.setItem(0, col, item)
+
+
+    # -- Booking history ------------------------------------------
 
     def _show_history(self):
         dlg = QDialog(self)
         uic.loadUi(os.path.join(UI_DIR, "BookingHistory.ui"), dlg)
-        dlg.tableHistory.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        dlg.btnClose.clicked.connect(dlg.accept)
+        dlg.tableWidgetHistory.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        dlg.pushButtonClose.clicked.connect(dlg.accept)
         dlg.comboFilter.currentTextChanged.connect(
             lambda f: self._populate_history(dlg, f)
         )
@@ -270,27 +356,142 @@ class OverviewUsersController(BaseWindow):
         if filter_text != "All Status":
             bookings = [b for b in bookings if b["status"] == filter_text]
 
-        table = dlg.tableHistory
+        table = dlg.tableWidgetHistory
         table.setRowCount(len(bookings))
         for row, b in enumerate(bookings):
+            date, start, end = _parse_session(b.get("session", ""))
             table.setItem(row, 0, QTableWidgetItem(b["room_name"]))
             table.setItem(row, 1, QTableWidgetItem(b["room_type"]))
-            table.setItem(row, 2, QTableWidgetItem(b["session"]))
-            table.setItem(row, 3, QTableWidgetItem(b["reason"]))
-            table.setItem(row, 4, QTableWidgetItem(b["status"]))
-            table.setItem(row, 5, QTableWidgetItem(b.get("locker_password") or ""))
-            table.setCellWidget(row, 6, None)
+            table.setItem(row, 2, QTableWidgetItem(date))
+            table.setItem(row, 3, QTableWidgetItem(start))
+            table.setItem(row, 4, QTableWidgetItem(end))
+            table.setItem(row, 5, QTableWidgetItem(b["reason"]))
+
+            status_item = QTableWidgetItem(b["status"])
+            status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
+            status_item.setForeground(QColor(status_colors.get(b["status"], "#333")))
+            table.setItem(row, 6, status_item)
+
+            table.setItem(row, 7, QTableWidgetItem(b.get("locker_password") or ""))
+
+            reject_reason = b.get("reject_reason") or ""
+            reject_item = QTableWidgetItem(reject_reason)
+            if reject_reason:
+                reject_item.setForeground(QColor("#F44336"))
+            table.setItem(row, 8, reject_item)
+
+            table.setCellWidget(row, 9, None)
             if b["status"] == "Pending":
+                from PyQt6.QtWidgets import QWidget, QHBoxLayout
+                container = QWidget()
+                btn_layout = QHBoxLayout(container)
+                btn_layout.setContentsMargins(2, 2, 2, 2)
+                btn_layout.setSpacing(4)
+
+                btn_edit = QPushButton("Edit")
+                btn_edit.setStyleSheet(
+                    "background:#1F4F82;color:white;border-radius:4px;padding:3px 8px;font-size:11px;"
+                )
+                btn_edit.clicked.connect(
+                    lambda _, bid=b["id"]: self._edit_booking(bid, dlg)
+                )
+
                 btn_cancel = QPushButton("Cancel")
                 btn_cancel.setStyleSheet(
-                    "background:#C62828;color:white;border-radius:4px;padding:4px;"
+                    "background:#C62828;color:white;border-radius:4px;padding:3px 8px;font-size:11px;"
                 )
                 btn_cancel.clicked.connect(
                     lambda _, bid=b["id"]: self._cancel_booking(bid, dlg)
                 )
-                table.setCellWidget(row, 6, btn_cancel)
+
+                btn_layout.addWidget(btn_edit)
+                btn_layout.addWidget(btn_cancel)
+                table.setCellWidget(row, 9, container)
 
         dlg.lblCount.setText(f"{len(bookings)} bookings")
+
+    def _edit_booking(self, booking_id, history_dlg):
+        from models.booking_model import update_booking
+        bookings = get_bookings_by_user(self.current_user["id"])
+        b = next((x for x in bookings if x["id"] == booking_id), None)
+        if not b:
+            return
+
+        dlg = QDialog(self)
+        uic.loadUi(os.path.join(UI_DIR, "BookingDialog.ui"), dlg)
+        dlg.setWindowTitle("Edit Booking")
+        dlg.lblTitle.setText("Edit Booking")
+        dlg.pushButtonSubmit.setText("Save Changes")
+
+        # Room combo — pre-select, disable change
+        rooms = get_all_rooms()
+        for r in rooms:
+            dlg.comboRoom.addItem(
+                f"{r['room_id']} - {r['room_type']} ({r['capacity']} Seats)", r["id"]
+            )
+        for i in range(dlg.comboRoom.count()):
+            if dlg.comboRoom.itemData(i) == b["room_id"]:
+                dlg.comboRoom.setCurrentIndex(i)
+                break
+        dlg.comboRoom.setEnabled(False)
+
+        # Pre-fill date/time
+        if " | " in b["session"]:
+            date_part, time_part = b["session"].split(" | ", 1)
+            parsed_date = QDate.fromString(date_part, "yyyy-MM-dd")
+            if parsed_date.isValid():
+                dlg.dateEdit.setDate(parsed_date)
+            if " - " in time_part:
+                s, e = time_part.split(" - ", 1)
+                ps = QTime.fromString(s.strip(), "HH:mm")
+                pe = QTime.fromString(e.strip(), "HH:mm")
+                if ps.isValid():
+                    dlg.timeEditStart.setTime(ps)
+                if pe.isValid():
+                    dlg.timeEditEnd.setTime(pe)
+
+        dlg.lineEditPurpose.setText(b["reason"])
+        dlg.dateEdit.setMinimumDate(QDate.currentDate())
+        dlg.timeEditStart.setMinimumTime(QTime(6, 0))
+        dlg.timeEditStart.setMaximumTime(QTime(21, 59))
+        dlg.timeEditEnd.setMinimumTime(QTime(6, 1))
+        dlg.timeEditEnd.setMaximumTime(QTime(22, 0))
+
+        self._refresh_availability(dlg)
+        dlg.dateEdit.dateChanged.connect(lambda _: self._refresh_availability(dlg))
+
+        dlg.pushButtonCancel.clicked.connect(dlg.reject)
+        dlg.pushButtonSubmit.clicked.connect(dlg.accept)
+
+        if dlg.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        room_pk   = dlg.comboRoom.currentData()
+        date_str  = dlg.dateEdit.date().toString("yyyy-MM-dd")
+        start_t   = dlg.timeEditStart.time()
+        end_t     = dlg.timeEditEnd.time()
+        start_str = start_t.toString("HH:mm")
+        end_str   = end_t.toString("HH:mm")
+        purpose   = dlg.lineEditPurpose.text().strip()
+
+        if not purpose:
+            QMessageBox.warning(self, "Error", "Please enter a purpose.")
+            return
+        if end_t <= start_t:
+            QMessageBox.warning(self, "Error", "End time must be after start time.")
+            return
+        if has_conflict(room_pk, date_str, start_str, end_str, exclude_id=booking_id):
+            QMessageBox.warning(
+                self, "Conflict",
+                "This time slot overlaps an existing booking.\nPlease choose a different time.",
+            )
+            return
+
+        session = f"{date_str} | {start_str} - {end_str}"
+        update_booking(booking_id, session, purpose)
+        QMessageBox.information(self, "Success", "Booking updated successfully.")
+        self._populate_history(history_dlg, history_dlg.comboFilter.currentText())
+        self._load_rooms()
 
     def _cancel_booking(self, booking_id, dlg):
         reply = QMessageBox.question(

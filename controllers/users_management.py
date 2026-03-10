@@ -22,17 +22,19 @@ class UsersManagementController(BaseWindow):
 
     def _connect_sidebar(self):
         """Override: Users is current page."""
-        self.sidebar.btnOverview.clicked.connect(self._go_overview)
-        self.sidebar.btnBookings.clicked.connect(self._go_bookings)
-        self.sidebar.btnEdit.clicked.connect(self._go_edit)
-        self.sidebar.btnUsers.clicked.connect(lambda: None)
-        self.sidebar.btnLogout.clicked.connect(self._logout)
-        self.sidebar.btnQuit.clicked.connect(self._quit)
+        self.sidebar.pushButtonOverview.clicked.connect(self._go_overview)
+        self.sidebar.pushButtonBookings.clicked.connect(self._go_bookings)
+        self.sidebar.pushButtonEdit.clicked.connect(self._go_edit)
+        self.sidebar.pushButtonUsers.clicked.connect(lambda: None)
+        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
+        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
+        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
 
     def _connect_signals(self):
-        self.ui.btnCreate.clicked.connect(self._create)
-        self.ui.btnUpdate.clicked.connect(self._update)
-        self.ui.btnDelete.clicked.connect(self._delete)
+        self.ui.pushButtonCreate.clicked.connect(self._create)
+        self.ui.pushButtonUpdate.clicked.connect(self._update)
+        self.ui.pushButtonDelete.clicked.connect(self._delete)
+        self.ui.pushButtonReload.clicked.connect(self._load_table)
         self.ui.lineEditSearch.returnPressed.connect(self._search)
         self.ui.lineEditSearch.textChanged.connect(self._search)
         self.ui.tableWidget.cellClicked.connect(self._on_row_click)
@@ -64,25 +66,25 @@ class UsersManagementController(BaseWindow):
     def _on_row_click(self, row, _col):
         username = self.ui.tableWidget.item(row, 0).text()
         role = self.ui.tableWidget.item(row, 2).text()
-        self.ui.editUsername.setText(username)
-        self.ui.editPassword.clear()
-        self.ui.editRole.setText(role)
+        self.ui.LineEditUsername.setText(username)
+        self.ui.LineEditPassword.clear()
+        self.ui.LineEditRole.setText(role)
         users = get_all_users()
         match = [u for u in users if u["username"] == username]
         self._selected_pk = match[0]["id"] if match else None
 
     def _clear_form(self):
-        self.ui.editUsername.clear()
-        self.ui.editPassword.clear()
-        self.ui.editRole.clear()
+        self.ui.LineEditUsername.clear()
+        self.ui.LineEditPassword.clear()
+        self.ui.LineEditRole.clear()
         self._selected_pk = None
 
     # ── CRUD ─────────────────────────────────────────────
 
     def _create(self):
-        username = self.ui.editUsername.text().strip()
-        password = self.ui.editPassword.text().strip()
-        role = self.ui.editRole.text().strip().lower()
+        username = self.ui.LineEditUsername.text().strip()
+        password = self.ui.LineEditPassword.text().strip()
+        role = self.ui.LineEditRole.text().strip().lower()
         if not username or not password or role not in ("admin", "user"):
             QMessageBox.warning(self, "Error", "Please enter Username, Password and Role (admin/user).")
             return
@@ -96,9 +98,9 @@ class UsersManagementController(BaseWindow):
         if not self._selected_pk:
             QMessageBox.warning(self, "Error", "Please select a user to update.")
             return
-        username = self.ui.editUsername.text().strip()
-        password = self.ui.editPassword.text().strip()
-        role = self.ui.editRole.text().strip().lower()
+        username = self.ui.LineEditUsername.text().strip()
+        password = self.ui.LineEditPassword.text().strip()
+        role = self.ui.LineEditRole.text().strip().lower()
         if not username or role not in ("admin", "user"):
             QMessageBox.warning(self, "Error", "Please enter full information.")
             return

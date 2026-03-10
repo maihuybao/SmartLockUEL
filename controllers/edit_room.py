@@ -38,18 +38,20 @@ class EditRoomController(BaseWindow):
 
     def _connect_sidebar(self):
         """Override: Edit is current page."""
-        self.sidebar.btnOverview.clicked.connect(self._go_overview)
-        self.sidebar.btnBookings.clicked.connect(self._go_bookings)
-        self.sidebar.btnEdit.clicked.connect(lambda: None)
-        self.sidebar.btnUsers.clicked.connect(self._go_users)
-        self.sidebar.btnLogout.clicked.connect(self._logout)
-        self.sidebar.btnQuit.clicked.connect(self._quit)
+        self.sidebar.pushButtonOverview.clicked.connect(self._go_overview)
+        self.sidebar.pushButtonBookings.clicked.connect(self._go_bookings)
+        self.sidebar.pushButtonEdit.clicked.connect(lambda: None)
+        self.sidebar.pushButtonUsers.clicked.connect(self._go_users)
+        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
+        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
+        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
 
     def _connect_signals(self):
-        self.ui.btnCreate.clicked.connect(self._create)
-        self.ui.btnUpdate.clicked.connect(self._update)
-        self.ui.btnDelete.clicked.connect(self._delete)
-        self.ui.btnImportCSV.clicked.connect(self._import_csv)
+        self.ui.pushButtonCreate.clicked.connect(self._create)
+        self.ui.pushButtonUpdate.clicked.connect(self._update)
+        self.ui.pushButtonDelete.clicked.connect(self._delete)
+        self.ui.pushButtonImportCSV.clicked.connect(self._import_csv)
+        self.ui.pushButtonReload.clicked.connect(self._load_table)
         self.ui.lineEditSearch.returnPressed.connect(self._search)
         self.ui.lineEditSearch.textChanged.connect(self._search)
         self.ui.tableWidget.cellClicked.connect(self._on_row_click)
@@ -83,7 +85,9 @@ class EditRoomController(BaseWindow):
         self.ui.LineEditRoomID.setText(self.ui.tableWidget.item(row, 0).text())
         self.ui.LineEditRoomType.setText(self.ui.tableWidget.item(row, 1).text())
         self.ui.LineEditCapacity.setText(self.ui.tableWidget.item(row, 2).text())
-        self.ui.LineEditStatus.setText(self.ui.tableWidget.item(row, 3).text())
+        status = self.ui.tableWidget.item(row, 3).text()
+        idx = self.ui.comboBoxStatus.findText(status)
+        self.ui.comboBoxStatus.setCurrentIndex(idx if idx >= 0 else 0)
         room_id = self.ui.tableWidget.item(row, 0).text()
         rooms = get_all_rooms()
         match = [r for r in rooms if r["room_id"] == room_id]
@@ -93,7 +97,7 @@ class EditRoomController(BaseWindow):
         self.ui.LineEditRoomID.clear()
         self.ui.LineEditRoomType.clear()
         self.ui.LineEditCapacity.clear()
-        self.ui.LineEditStatus.clear()
+        self.ui.comboBoxStatus.setCurrentIndex(0)
         self._selected_pk = None
 
     def _preselect(self, room):
@@ -101,7 +105,8 @@ class EditRoomController(BaseWindow):
         self.ui.LineEditRoomID.setText(room["room_id"])
         self.ui.LineEditRoomType.setText(room["room_type"])
         self.ui.LineEditCapacity.setText(str(room.get("capacity", "")))
-        self.ui.LineEditStatus.setText(room["status"])
+        idx = self.ui.comboBoxStatus.findText(room["status"])
+        self.ui.comboBoxStatus.setCurrentIndex(idx if idx >= 0 else 0)
         # Highlight row trong table
         table = self.ui.tableWidget
         for row in range(table.rowCount()):
@@ -115,7 +120,7 @@ class EditRoomController(BaseWindow):
         room_id = self.ui.LineEditRoomID.text().strip()
         room_type = self.ui.LineEditRoomType.text().strip()
         capacity_text = self.ui.LineEditCapacity.text().strip()
-        status = self.ui.LineEditStatus.text().strip() or "Available"
+        status = self.ui.comboBoxStatus.currentText()
         if not room_id or not room_type:
             QMessageBox.warning(self, "Error", "Please enter Room ID and Room Type.")
             return
@@ -137,8 +142,8 @@ class EditRoomController(BaseWindow):
         room_id = self.ui.LineEditRoomID.text().strip()
         room_type = self.ui.LineEditRoomType.text().strip()
         capacity_text = self.ui.LineEditCapacity.text().strip()
-        status = self.ui.LineEditStatus.text().strip()
-        if not room_id or not room_type or not status:
+        status = self.ui.comboBoxStatus.currentText()
+        if not room_id or not room_type:
             QMessageBox.warning(self, "Error", "Please fill in all fields.")
             return
         try:

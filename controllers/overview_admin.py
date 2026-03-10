@@ -3,8 +3,9 @@ from PyQt6 import uic
 import os
 
 from widgets.base_window import BaseWindow
-from widgets.room_card import create_room_card, get_display_status
+from widgets.room_card import create_room_card
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
+from models.booking_model import get_dashboard_stats
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UI_DIR = os.path.join(BASE_DIR, "ui")
@@ -22,25 +23,26 @@ class OverviewAdminController(BaseWindow):
         self.ui = self.load_content_ui("OverviewAdmin.ui")
 
         self._connect_signals()
-        self.ui.btnAll.setChecked(True)
+        self.ui.pushButtonAll.setChecked(True)
+        self._load_stats()
         self._load_rooms()
 
     def _connect_sidebar(self):
         """Override: Overview is current page."""
-        self.sidebar.btnOverview.clicked.connect(lambda: None)
-        self.sidebar.btnBookings.clicked.connect(self._go_bookings)
-        self.sidebar.btnEdit.clicked.connect(self._go_edit)
-        self.sidebar.btnUsers.clicked.connect(self._go_users)
-        self.sidebar.btnLogout.clicked.connect(self._logout)
-        self.sidebar.btnQuit.clicked.connect(self._quit)
+        self.sidebar.pushButtonOverview.clicked.connect(lambda: None)
+        self.sidebar.pushButtonBookings.clicked.connect(self._go_bookings)
+        self.sidebar.pushButtonEdit.clicked.connect(self._go_edit)
+        self.sidebar.pushButtonUsers.clicked.connect(self._go_users)
+        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
+        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
+        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
 
     def _connect_signals(self):
         # Filters
-        self.ui.btnAll.clicked.connect(lambda: self._apply_filter("All"))
-        self.ui.btnAvailable.clicked.connect(lambda: self._apply_filter("Available"))
-        self.ui.btnOccupied.clicked.connect(lambda: self._apply_filter("Occupied"))
-        self.ui.btnBooked.clicked.connect(lambda: self._apply_filter("Full"))
-        self.ui.btnCleaning.clicked.connect(lambda: self._apply_filter("Cleaning"))
+        self.ui.pushButtonAll.clicked.connect(lambda: self._apply_filter("All"))
+        self.ui.pushButtonAvailable.clicked.connect(lambda: self._apply_filter("Available"))
+        self.ui.pushButtonOccupied.clicked.connect(lambda: self._apply_filter("Occupied"))
+        self.ui.pushButtonBooked.clicked.connect(lambda: self._apply_filter("Full"))
 
         # Search
         self.navbar.lineEditSearch.textChanged.connect(self._on_search)
@@ -55,12 +57,8 @@ class OverviewAdminController(BaseWindow):
             rooms = search_rooms(keyword)
         elif self._current_filter == "All":
             rooms = get_all_rooms()
-        elif self._current_filter == "Full":
-            rooms = [r for r in get_all_rooms() if get_display_status(r) == "Full"]
         else:
             rooms = get_rooms_by_status(self._current_filter)
-            if self._current_filter == "Available":
-                rooms = [r for r in rooms if get_display_status(r) != "Full"]
         self._render_room_cards(rooms)
 
     def _render_room_cards(self, rooms):
@@ -117,3 +115,11 @@ class OverviewAdminController(BaseWindow):
 
     def _on_search(self):
         self._load_rooms()
+
+    def _load_stats(self):
+        stats = get_dashboard_stats()
+        self.ui.lblTotalRoomsVal.setText(str(stats["total_rooms"]))
+        self.ui.lblTotalBookingsVal.setText(str(stats["total_bookings"]))
+        self.ui.lblPendingVal.setText(str(stats["pending"]))
+        self.ui.lblApprovedVal.setText(str(stats["approved"]))
+        self.ui.lblRejectedVal.setText(str(stats["rejected"]))

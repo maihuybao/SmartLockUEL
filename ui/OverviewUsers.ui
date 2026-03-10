@@ -9,7 +9,7 @@
    <item>
     <layout class="QHBoxLayout" name="filterLayout">
      <item>
-      <widget class="QPushButton" name="btnAll">
+      <widget class="QPushButton" name="pushButtonAll">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#E3F2FD;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>All</string></property>
@@ -18,7 +18,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnAvailable">
+      <widget class="QPushButton" name="pushButtonAvailable">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#E8F5E9;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>Available</string></property>
@@ -27,7 +27,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnOccupied">
+      <widget class="QPushButton" name="pushButtonOccupied">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFEBEE;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>Occupied</string></property>
@@ -36,7 +36,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnBooked">
+      <widget class="QPushButton" name="pushButtonBooked">
        <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
        <property name="styleSheet"><string notr="true">QPushButton{background-color:#FFF8E1;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
        <property name="text"><string>Full</string></property>
@@ -44,14 +44,114 @@
        <property name="autoExclusive"><bool>true</bool></property>
       </widget>
      </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="filterRow2">
+     <property name="spacing"><number>6</number></property>
      <item>
-      <widget class="QPushButton" name="btnCleaning">
-       <property name="minimumSize"><size><width>0</width><height>35</height></size></property>
-       <property name="styleSheet"><string notr="true">QPushButton{background-color:#E3F2FD;border:1px solid #1565C0;border-radius:15px;padding:6px 15px;color:#0D47A1;font-weight:500;}QPushButton:checked{background-color:#1565C0;color:white;}QPushButton:hover{background-color:#1E88E5;color:white;}</string></property>
-       <property name="text"><string>Cleaning</string></property>
-       <property name="checkable"><bool>true</bool></property>
-       <property name="autoExclusive"><bool>true</bool></property>
+      <widget class="QLabel" name="lblCapacity">
+       <property name="text"><string>Capacity:</string></property>
+       <property name="styleSheet"><string notr="true">color:#555;font-size:12px;font-weight:600;</string></property>
       </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="capacityGroup" native="true">
+       <layout class="QHBoxLayout" name="capLayout">
+        <property name="spacing"><number>4</number></property>
+        <property name="leftMargin"><number>0</number></property>
+        <property name="topMargin"><number>0</number></property>
+        <property name="rightMargin"><number>0</number></property>
+        <property name="bottomMargin"><number>0</number></property>
+        <item>
+         <widget class="QPushButton" name="pushButtonCapAll">
+          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#455A64;color:white;border-color:#455A64;}QPushButton:hover{background:#607D8B;color:white;}</string></property>
+          <property name="text"><string>All</string></property>
+          <property name="checkable"><bool>true</bool></property>
+          <property name="checked"><bool>true</bool></property>
+          <property name="autoExclusive"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonCap50">
+          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#455A64;color:white;border-color:#455A64;}QPushButton:hover{background:#607D8B;color:white;}</string></property>
+          <property name="text"><string>≤ 50</string></property>
+          <property name="checkable"><bool>true</bool></property>
+          <property name="autoExclusive"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonCap100">
+          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#455A64;color:white;border-color:#455A64;}QPushButton:hover{background:#607D8B;color:white;}</string></property>
+          <property name="text"><string>100+</string></property>
+          <property name="checkable"><bool>true</bool></property>
+          <property name="autoExclusive"><bool>true</bool></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="filterDivider">
+       <property name="frameShape"><enum>QFrame::VLine</enum></property>
+       <property name="styleSheet"><string notr="true">color:#D0D0D0;</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblSession">
+       <property name="text"><string>Session:</string></property>
+       <property name="styleSheet"><string notr="true">color:#555;font-size:12px;font-weight:600;</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="timeGroup" native="true">
+       <layout class="QHBoxLayout" name="timeLayout">
+        <property name="spacing"><number>4</number></property>
+        <property name="leftMargin"><number>0</number></property>
+        <property name="topMargin"><number>0</number></property>
+        <property name="rightMargin"><number>0</number></property>
+        <property name="bottomMargin"><number>0</number></property>
+        <item>
+         <widget class="QPushButton" name="pushButtonTimeAll">
+          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
+          <property name="text"><string>All</string></property>
+          <property name="checkable"><bool>true</bool></property>
+          <property name="checked"><bool>true</bool></property>
+          <property name="autoExclusive"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonMorning">
+          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
+          <property name="text"><string>Morning (06-12)</string></property>
+          <property name="checkable"><bool>true</bool></property>
+          <property name="autoExclusive"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonAfternoon">
+          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
+          <property name="text"><string>Afternoon (12-17)</string></property>
+          <property name="checkable"><bool>true</bool></property>
+          <property name="autoExclusive"><bool>true</bool></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonEvening">
+          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
+          <property name="text"><string>Evening (17-22)</string></property>
+          <property name="checkable"><bool>true</bool></property>
+          <property name="autoExclusive"><bool>true</bool></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -68,13 +168,13 @@
      <property name="minimumSize"><size><width>0</width><height>80</height></size></property>
      <layout class="QHBoxLayout" name="bottomLayout">
       <item>
-       <widget class="QPushButton" name="btnLogout">
+       <widget class="QPushButton" name="pushButtonLogout">
         <property name="styleSheet"><string notr="true">QPushButton{background-color:#1F4F82;color:white;border:none;border-radius:22px;padding:8px 24px;font-size:14px;font-weight:600;min-height:36px;}QPushButton:hover{background-color:#E53935;}</string></property>
         <property name="text"><string>Log out</string></property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnQuit">
+       <widget class="QPushButton" name="pushButtonQuit">
         <property name="styleSheet"><string notr="true">QPushButton{background-color:#C62828;color:white;border:none;border-radius:22px;padding:8px 24px;font-size:14px;font-weight:600;min-height:36px;}QPushButton:hover{background-color:#B71C1C;}</string></property>
         <property name="text"><string>Quit</string></property>
        </widget>
@@ -86,7 +186,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btnBooking">
+       <widget class="QPushButton" name="pushButtonBooking">
         <property name="styleSheet"><string notr="true">QPushButton{background:qlineargradient(x1:0,y1:0,x2:0,y2:1,stop:0 #F8BBD0,stop:1 #EC407A);color:white;border:none;border-radius:24px;padding:10px 32px;font-size:15px;font-weight:700;min-height:40px;}QPushButton:hover{background:#E91E63;}</string></property>
         <property name="text"><string>Booking</string></property>
        </widget>

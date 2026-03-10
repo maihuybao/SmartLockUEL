@@ -83,7 +83,7 @@ QComboBox:focus { border: 1px solid #1F4F82; }</string>
     </widget>
    </item>
    <item>
-    <widget class="QTableWidget" name="tableHistory">
+    <widget class="QTableWidget" name="tableWidgetHistory">
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
@@ -106,16 +106,25 @@ QComboBox:focus { border: 1px solid #1F4F82; }</string>
       <property name="text"><string>Type</string></property>
      </column>
      <column>
-      <property name="text"><string>Session</string></property>
+      <property name="text"><string>Date</string></property>
      </column>
      <column>
-      <property name="text"><string>Reason</string></property>
+      <property name="text"><string>Start Time</string></property>
+     </column>
+     <column>
+      <property name="text"><string>End Time</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Purpose</string></property>
      </column>
      <column>
       <property name="text"><string>Status</string></property>
      </column>
      <column>
       <property name="text"><string>Locker Password</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Reject Reason</string></property>
      </column>
      <column>
       <property name="text"><string>Action</string></property>
@@ -148,7 +157,7 @@ QComboBox:focus { border: 1px solid #1F4F82; }</string>
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnClose">
+      <widget class="QPushButton" name="pushButtonClose">
        <property name="text">
         <string>Close</string>
        </property>

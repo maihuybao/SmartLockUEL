@@ -55,30 +55,37 @@ QPushButton:hover {
     <number>8</number>
    </property>
    <item>
-    <widget class="QPushButton" name="btnOverview">
+    <widget class="QPushButton" name="pushButtonOverview">
      <property name="text">
       <string>Room Overview</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnBookings">
+    <widget class="QPushButton" name="pushButtonBookings">
      <property name="text">
       <string>Booking Overview</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnEdit">
+    <widget class="QPushButton" name="pushButtonEdit">
      <property name="text">
       <string>Room Management</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnUsers">
+    <widget class="QPushButton" name="pushButtonUsers">
      <property name="text">
       <string>Users</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButtonDevices">
+     <property name="text">
+      <string>Devices</string>
      </property>
     </widget>
    </item>
@@ -96,14 +103,14 @@ QPushButton:hover {
     </spacer>
    </item>
    <item>
-    <widget class="QPushButton" name="btnLogout">
+    <widget class="QPushButton" name="pushButtonLogOut">
      <property name="text">
       <string>Log out</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnQuit">
+    <widget class="QPushButton" name="pushButtonQuit">
      <property name="text">
       <string>Quit</string>
      </property>

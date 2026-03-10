@@ -32,7 +32,7 @@ def init_db():
             room_type TEXT NOT NULL,
             capacity INTEGER NOT NULL DEFAULT 50,
             status TEXT NOT NULL DEFAULT 'Available'
-                CHECK(status IN ('Available', 'Occupied', 'Full', 'Cleaning'))
+                CHECK(status IN ('Available', 'Occupied', 'Full'))
         )
     """)
 
@@ -49,6 +49,18 @@ def init_db():
             locker_password TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (room_id) REFERENCES rooms(id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS devices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            room_id INTEGER NOT NULL,
+            device_name TEXT NOT NULL,
+            cabinet_password TEXT,
+            status TEXT NOT NULL DEFAULT 'Active'
+                CHECK(status IN ('Active', 'Inactive', 'Maintenance')),
             FOREIGN KEY (room_id) REFERENCES rooms(id)
         )
     """)
