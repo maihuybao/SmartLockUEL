@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AdminBookingDialog</class>
+ <widget class="QDialog" name="AdminBookingDialog">
+  <property name="minimumSize">
+   <size>
+    <width>420</width>
+    <height>480</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Add Booking</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog { background: white; }
+QLabel { color: #333; font-size: 13px; }
+QComboBox, QLineEdit, QDateEdit, QTimeEdit { padding: 6px; border: 1px solid #ddd; border-radius: 6px; color: #333; font-size: 13px; background: white; }
+QComboBox:focus, QLineEdit:focus, QDateEdit:focus, QTimeEdit:focus { border: 1px solid #1F4F82; }
+QComboBox:disabled, QLineEdit:disabled, QDateEdit:disabled, QTimeEdit:disabled { background: #f5f5f5; color: #999; }
+QPushButton#pushButtonCancel { background:#F5F5F5; border:1px solid #ddd; border-radius:6px; padding:7px 20px; color:#555; font-size:13px; }
+QPushButton#pushButtonCancel:hover { background:#E0E0E0; }
+QPushButton#pushButtonSave { background:#1F4F82; border:none; border-radius:6px; padding:7px 20px; color:white; font-size:13px; font-weight:bold; }
+QPushButton#pushButtonSave:hover { background:#163D66; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>12</number></property>
+   <property name="leftMargin"><number>20</number></property>
+   <property name="topMargin"><number>20</number></property>
+   <property name="rightMargin"><number>20</number></property>
+   <property name="bottomMargin"><number>20</number></property>
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text"><string>Add Booking</string></property>
+     <property name="styleSheet">
+      <string notr="true">font-size:16px; font-weight:bold; color:#1F4F82; border-bottom:1px solid #E0E0E0; padding-bottom:8px;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="labelAlignment">
+      <set>Qt::AlignRight|Qt::AlignVCenter</set>
+     </property>
+     <property name="verticalSpacing"><number>10</number></property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelUser"><property name="text"><string>User:</string></property></widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="comboUser"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelRoom"><property name="text"><string>Room:</string></property></widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="comboRoom"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelDate"><property name="text"><string>Date:</string></property></widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDateEdit" name="dateEdit">
+       <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+       <property name="calendarPopup"><bool>true</bool></property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelStart"><property name="text"><string>Start Time:</string></property></widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QTimeEdit" name="timeEditStart">
+       <property name="displayFormat"><string>HH:mm</string></property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelEnd"><property name="text"><string>End Time:</string></property></widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QTimeEdit" name="timeEditEnd">
+       <property name="displayFormat"><string>HH:mm</string></property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="labelReason"><property name="text"><string>Purpose:</string></property></widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="editReason">
+       <property name="placeholderText"><string>Enter purpose...</string></property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="labelStatus"><property name="text"><string>Status:</string></property></widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="comboStatus">
+       <item><property name="text"><string>Pending</string></property></item>
+       <item><property name="text"><string>Approved</string></property></item>
+       <item><property name="text"><string>Rejected</string></property></item>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="labelRejectReason"><property name="text"><string>Reject Reason:</string></property></widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLineEdit" name="editRejectReason">
+       <property name="placeholderText"><string>Enter rejection reason...</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonCancel">
+       <property name="text"><string>Cancel</string></property>
+       <property name="flat"><bool>true</bool></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonSave">
+       <property name="text"><string>Save</string></property>
+       <property name="flat"><bool>true</bool></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

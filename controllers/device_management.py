@@ -1,14 +1,16 @@
 from PyQt6.QtWidgets import (
     QTableWidgetItem, QMessageBox, QPushButton, QHeaderView,
-    QDialog, QVBoxLayout, QFormLayout, QHBoxLayout, QLineEdit,
-    QComboBox, QFileDialog, QWidget, QLabel,
+    QDialog, QHBoxLayout, QLineEdit,
+    QFileDialog, QWidget,
 )
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QColor, QIcon
+from PyQt6 import uic
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
+UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
@@ -152,96 +154,28 @@ class DeviceManagementController(BaseWindow):
     def _build_device_dialog(self, device=None):
         rooms = get_all_rooms()
         dlg = QDialog(self)
-        dlg.setWindowTitle("Add Device" if not device else "Edit Device")
-        dlg.setMinimumWidth(380)
-        dlg.setStyleSheet(
-            "QDialog { background: white; }"
-            "QLabel { color: #333; font-size: 13px; }"
-            "QComboBox, QLineEdit { padding: 6px; border: 1px solid #ddd; border-radius: 6px;"
-            " color: #333; font-size: 13px; background: white; }"
-            "QComboBox:focus, QLineEdit:focus { border: 1px solid #1F4F82; }"
-        )
-        layout = QVBoxLayout(dlg)
-        layout.setSpacing(12)
-        layout.setContentsMargins(20, 20, 20, 20)
+        uic.loadUi(os.path.join(UI_DIR, "DeviceDialog.ui"), dlg)
 
-        form = QFormLayout()
-        form.setSpacing(10)
-        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
-
-        combo_room = QComboBox()
         for r in rooms:
-            combo_room.addItem(f"{r['room_id']} – {r['room_type']}", r["id"])
-
-        edit_name = QLineEdit()
-        edit_name.setPlaceholderText("e.g. Smart Lock A1")
-
-        combo_status = QComboBox()
-        combo_status.addItems(["Active", "Inactive", "Maintenance"])
-
-        edit_pw = QLineEdit()
-        edit_pw.setPlaceholderText("Leave blank to keep current")
+            dlg.comboRoom.addItem(f"{r['room_id']} – {r['room_type']}", r["id"])
 
         if device:
-            for i in range(combo_room.count()):
-                if combo_room.itemData(i) == device.get("room_id"):
-                    combo_room.setCurrentIndex(i)
+            dlg.setWindowTitle("Edit Device")
+            dlg.lblTitle.setText("Edit Device")
+            for i in range(dlg.comboRoom.count()):
+                if dlg.comboRoom.itemData(i) == device.get("room_id"):
+                    dlg.comboRoom.setCurrentIndex(i)
                     break
-            edit_name.setText(device["device_name"])
-            combo_status.setCurrentText(device["status"])
+            dlg.editName.setText(device["device_name"])
+            dlg.comboStatus.setCurrentText(device["status"])
+            dlg.btnGenPw.setIcon(_png_icon("refresh.png"))
+            dlg.btnGenPw.clicked.connect(lambda: dlg.editPw.setText(generate_password()))
+        else:
+            dlg.labelPw.setVisible(False)
+            dlg.pwWidget.setVisible(False)
 
-        form.addRow("Room:", combo_room)
-        form.addRow("Device Name:", edit_name)
-        form.addRow("Status:", combo_status)
-        if device:
-            pw_widget = QWidget()
-            pw_row = QHBoxLayout(pw_widget)
-            pw_row.setContentsMargins(0, 0, 0, 0)
-            pw_row.setSpacing(4)
-            pw_row.addWidget(edit_pw)
-
-            btn_gen = QPushButton()
-            btn_gen.setFixedSize(28, 28)
-            btn_gen.setIcon(_png_icon("refresh.png"))
-            btn_gen.setIconSize(QSize(16, 16))
-            btn_gen.setToolTip("Generate password")
-            btn_gen.setStyleSheet(
-                "QPushButton{background:#FFF8E1;border:1px solid #F9A825;border-radius:6px;}"
-                "QPushButton:hover{background:#FBC02D;}"
-            )
-            btn_gen.clicked.connect(lambda: edit_pw.setText(generate_password()))
-            pw_row.addWidget(btn_gen)
-
-            form.addRow("New Password:", pw_widget)
-
-        layout.addLayout(form)
-
-        btn_row = QHBoxLayout()
-        btn_row.addStretch()
-        btn_cancel = QPushButton("Cancel")
-        btn_cancel.setFlat(True)
-        btn_cancel.setStyleSheet(
-            "QPushButton{background:#F5F5F5;border:1px solid #ddd;border-radius:6px;"
-            "padding:7px 20px;color:#555;font-size:13px;}"
-            "QPushButton:hover{background:#E0E0E0;}"
-        )
-        btn_ok = QPushButton("Save")
-        btn_ok.setFlat(True)
-        btn_ok.setStyleSheet(
-            "QPushButton{background:#1F4F82;border:none;border-radius:6px;"
-            "padding:7px 20px;color:white;font-size:13px;font-weight:bold;}"
-            "QPushButton:hover{background:#163D66;}"
-        )
-        btn_cancel.clicked.connect(dlg.reject)
-        btn_ok.clicked.connect(dlg.accept)
-        btn_row.addWidget(btn_cancel)
-        btn_row.addWidget(btn_ok)
-        layout.addLayout(btn_row)
-
-        dlg.comboRoom = combo_room
-        dlg.editName = edit_name
-        dlg.comboStatus = combo_status
-        dlg.editPw = edit_pw if device else None
+        dlg.pushButtonCancel.clicked.connect(dlg.reject)
+        dlg.pushButtonSave.clicked.connect(dlg.accept)
         return dlg
 
     def _add_device(self):
@@ -265,7 +199,7 @@ class DeviceManagementController(BaseWindow):
             return
         device_name = dlg.editName.text().strip()
         status = dlg.comboStatus.currentText()
-        new_pw = dlg.editPw.text().strip() if dlg.editPw else ""
+        new_pw = dlg.editPw.text().strip()
         if not device_name:
             QMessageBox.warning(self, "Error", "Please enter a device name.")
             return

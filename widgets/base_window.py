@@ -29,7 +29,7 @@ class BaseWindow(QMainWindow):
         self.current_user = user
         self.setWindowTitle(title)
         self.setMinimumSize(800, 500)
-        self.resize(1000, 600)
+        self.resize(1200, 800)
 
         # F11 toggle fullscreen
         shortcut = QShortcut(QKeySequence(Qt.Key.Key_F11), self)

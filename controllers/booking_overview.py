@@ -6,22 +6,17 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QHeaderView,
-    QVBoxLayout,
     QHBoxLayout,
-    QFormLayout,
-    QLineEdit,
-    QComboBox,
-    QLabel,
     QWidget,
-    QDateEdit,
-    QTimeEdit,
 )
 from PyQt6.QtCore import Qt, QDate, QTime, QSize
 from PyQt6.QtGui import QColor, QIcon
+from PyQt6 import uic
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
+UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
@@ -220,85 +215,34 @@ class BookingOverviewController(BaseWindow):
             return
 
         date, start, end = _parse_session(b.get("session", ""))
-
         status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
         status_color = status_colors.get(b["status"], "#333")
 
         dlg = QDialog(self)
-        dlg.setWindowTitle("Booking Details")
-        dlg.setMinimumWidth(420)
-        dlg.setStyleSheet("QDialog { background: white; }")
+        uic.loadUi(os.path.join(UI_DIR, "BookingDetails.ui"), dlg)
 
-        layout = QVBoxLayout(dlg)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 20)
-
-        # Header strip
-        header = QLabel(f"Booking #{b['id']}")
-        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header.setStyleSheet(
-            "QLabel { background: #1F4F82; color: white; font-size: 16px;"
-            " font-weight: bold; padding: 16px; }"
-        )
-        layout.addWidget(header)
-
-        # Status badge
-        badge = QLabel(b["status"])
-        badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        badge.setStyleSheet(
+        dlg.lblHeader.setText(f"Booking #{b['id']}")
+        dlg.lblBadge.setText(b["status"])
+        dlg.lblBadge.setStyleSheet(
             f"QLabel {{ background: {status_color}; color: white; font-size: 12px;"
             f" font-weight: bold; padding: 4px 0; }}"
         )
-        layout.addWidget(badge)
 
-        # Fields
-        body = QWidget()
-        body.setStyleSheet("background: white;")
-        form = QFormLayout(body)
-        form.setSpacing(10)
-        form.setContentsMargins(24, 20, 24, 8)
-        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+        dlg.editUser.setText(b["username"])
+        dlg.editRoom.setText(f"{b['room_name']}  ({b['room_type']})")
+        dlg.editDate.setText(date)
+        dlg.editStart.setText(start)
+        dlg.editEnd.setText(end)
+        dlg.editPurpose.setText(b.get("reason", "") or "")
+        dlg.editLockPw.setText(b.get("locker_password") or "—")
 
-        field_style = (
-            "QLineEdit { border: 1px solid #E0E0E0; border-radius: 6px;"
-            " padding: 6px 10px; font-size: 13px; color: #333; background: #FAFAFA; }"
-        )
-        label_style = "color: #1F4F82; font-weight: 600; font-size: 13px;"
-
-        def _row(label, value):
-            lbl = QLabel(label)
-            lbl.setStyleSheet(label_style)
-            val = QLineEdit(str(value) if value else "—")
-            val.setReadOnly(True)
-            val.setStyleSheet(field_style)
-            form.addRow(lbl, val)
-
-        _row("User", b["username"])
-        _row("Room", f"{b['room_name']}  ({b['room_type']})")
-        _row("Date", date)
-        _row("Start Time", start)
-        _row("End Time", end)
-        _row("Purpose", b.get("reason", ""))
-        _row("Locker Password", b.get("locker_password") or "—")
         if b.get("reject_reason"):
-            _row("Reject Reason", b["reject_reason"])
+            dlg.editRejectReason.setText(b["reject_reason"])
+        else:
+            dlg.labelRejectReason.setVisible(False)
+            dlg.editRejectReason.setVisible(False)
 
-        layout.addWidget(body)
-
-        btn_row = QHBoxLayout()
-        btn_row.setContentsMargins(24, 0, 24, 0)
-        btn_row.addStretch()
-        btn_close = QPushButton("Close")
-        btn_close.setFlat(True)
-        btn_close.setStyleSheet(
-            "QPushButton { background: #1F4F82; border: none; border-radius: 6px;"
-            " padding: 8px 28px; color: white; font-size: 13px; font-weight: bold; }"
-            "QPushButton:hover { background: #163D66; }"
-        )
-        btn_close.clicked.connect(dlg.accept)
-        btn_row.addWidget(btn_close)
-        layout.addLayout(btn_row)
-
+        dlg.pushButtonClose.clicked.connect(dlg.accept)
         dlg.exec()
 
     def _approve_booking_inline(self, booking_id):
@@ -500,81 +444,35 @@ class BookingOverviewController(BaseWindow):
         from models.user_model import get_all_users
 
         dlg = QDialog(self)
+        uic.loadUi(os.path.join(UI_DIR, "AdminBookingDialog.ui"), dlg)
+
         if reject_mode:
             dlg.setWindowTitle("Reject Booking")
-        else:
-            dlg.setWindowTitle("Add Booking" if not booking else "Edit Booking")
-        dlg.setMinimumWidth(420)
-        dlg.setStyleSheet(
-            "QDialog { background: white; }"
-            "QLabel { color: #333; font-size: 13px; }"
-            "QComboBox, QLineEdit, QDateEdit, QTimeEdit { padding: 6px; border: 1px solid #ddd; border-radius: 6px; color: #333; font-size: 13px; background: white; }"
-            "QComboBox:focus, QLineEdit:focus, QDateEdit:focus, QTimeEdit:focus { border: 1px solid #1F4F82; }"
-            "QComboBox:disabled, QLineEdit:disabled, QDateEdit:disabled, QTimeEdit:disabled { background: #f5f5f5; color: #999; }"
-        )
+            dlg.lblTitle.setText("Reject Booking")
+        elif booking:
+            dlg.setWindowTitle("Edit Booking")
+            dlg.lblTitle.setText("Edit Booking")
 
-        layout = QVBoxLayout(dlg)
-        layout.setSpacing(12)
-        layout.setContentsMargins(20, 20, 20, 20)
-        form = QFormLayout()
-        form.setSpacing(10)
-        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
-
-        combo_user = QComboBox()
         users = get_all_users()
         for u in users:
-            combo_user.addItem(u["username"], u["id"])
-        dlg.comboUser = combo_user
+            dlg.comboUser.addItem(u["username"], u["id"])
 
-        combo_room = QComboBox()
         rooms = get_all_rooms()
         for r in rooms:
-            combo_room.addItem(f"{r['room_id']} - {r['room_type']}", r["id"])
-        dlg.comboRoom = combo_room
+            dlg.comboRoom.addItem(f"{r['room_id']} - {r['room_type']}", r["id"])
 
-        date_edit = QDateEdit()
-        date_edit.setCalendarPopup(True)
-        date_edit.setDisplayFormat("dd/MM/yyyy")
-        date_edit.setDate(QDate.currentDate())
-        dlg.dateEdit = date_edit
-
-        time_start = QTimeEdit()
-        time_start.setDisplayFormat("HH:mm")
-        time_start.setTime(QTime(7, 0))
-        dlg.timeEditStart = time_start
-
-        time_end = QTimeEdit()
-        time_end.setDisplayFormat("HH:mm")
-        time_end.setTime(QTime(9, 0))
-        dlg.timeEditEnd = time_end
-
-        edit_reason = QLineEdit()
-        edit_reason.setPlaceholderText("Enter purpose...")
-        dlg.editReason = edit_reason
-
-        form.addRow("User:", combo_user)
-        form.addRow("Room:", combo_room)
-        form.addRow("Date:", date_edit)
-        form.addRow("Start Time:", time_start)
-        form.addRow("End Time:", time_end)
-        form.addRow("Purpose:", edit_reason)
+        dlg.dateEdit.setDate(QDate.currentDate())
+        dlg.timeEditStart.setTime(QTime(7, 0))
+        dlg.timeEditEnd.setTime(QTime(9, 0))
 
         if booking:
-            combo_status = QComboBox()
-            for s in ("Pending", "Approved", "Rejected"):
-                combo_status.addItem(s)
-            combo_status.setCurrentText(booking["status"])
-            dlg.comboStatus = combo_status
-            if not reject_mode:
-                form.addRow("Status:", combo_status)
-
-            for i in range(combo_user.count()):
-                if combo_user.itemData(i) == booking.get("user_id"):
-                    combo_user.setCurrentIndex(i)
+            for i in range(dlg.comboUser.count()):
+                if dlg.comboUser.itemData(i) == booking.get("user_id"):
+                    dlg.comboUser.setCurrentIndex(i)
                     break
-            for i in range(combo_room.count()):
-                if combo_room.itemText(i).startswith(booking["room_name"]):
-                    combo_room.setCurrentIndex(i)
+            for i in range(dlg.comboRoom.count()):
+                if dlg.comboRoom.itemText(i).startswith(booking["room_name"]):
+                    dlg.comboRoom.setCurrentIndex(i)
                     break
 
             session = booking.get("session", "")
@@ -582,53 +480,38 @@ class BookingOverviewController(BaseWindow):
                 date_part, time_part = session.split(" | ", 1)
                 parsed_date = QDate.fromString(date_part, "yyyy-MM-dd")
                 if parsed_date.isValid():
-                    date_edit.setDate(parsed_date)
+                    dlg.dateEdit.setDate(parsed_date)
                 if " - " in time_part:
                     s_str, e_str = time_part.split(" - ", 1)
                     parsed_start = QTime.fromString(s_str.strip(), "HH:mm")
                     parsed_end = QTime.fromString(e_str.strip(), "HH:mm")
                     if parsed_start.isValid():
-                        time_start.setTime(parsed_start)
+                        dlg.timeEditStart.setTime(parsed_start)
                     if parsed_end.isValid():
-                        time_end.setTime(parsed_end)
+                        dlg.timeEditEnd.setTime(parsed_end)
 
-            edit_reason.setText(booking["reason"])
+            dlg.editReason.setText(booking["reason"])
+            dlg.comboStatus.setCurrentText(booking["status"])
 
             if reject_mode:
-                combo_user.setEnabled(False)
-                combo_room.setEnabled(False)
-                date_edit.setEnabled(False)
-                time_start.setEnabled(False)
-                time_end.setEnabled(False)
-                edit_reason.setEnabled(False)
-                edit_reject = QLineEdit()
-                edit_reject.setPlaceholderText("Enter rejection reason...")
-                edit_reject.setText(booking.get("reject_reason") or "")
-                dlg.editRejectReason = edit_reject
-                form.addRow("Reject Reason:", edit_reject)
+                dlg.comboUser.setEnabled(False)
+                dlg.comboRoom.setEnabled(False)
+                dlg.dateEdit.setEnabled(False)
+                dlg.timeEditStart.setEnabled(False)
+                dlg.timeEditEnd.setEnabled(False)
+                dlg.editReason.setEnabled(False)
+                dlg.labelStatus.setVisible(False)
+                dlg.comboStatus.setVisible(False)
+                dlg.editRejectReason.setText(booking.get("reject_reason") or "")
+            else:
+                dlg.labelRejectReason.setVisible(False)
+                dlg.editRejectReason.setVisible(False)
         else:
-            dlg.comboStatus = None
+            dlg.labelStatus.setVisible(False)
+            dlg.comboStatus.setVisible(False)
+            dlg.labelRejectReason.setVisible(False)
+            dlg.editRejectReason.setVisible(False)
 
-        layout.addLayout(form)
-
-        btn_row = QHBoxLayout()
-        btn_row.addStretch()
-        btn_cancel = QPushButton("Cancel")
-        btn_cancel.setFlat(True)
-        btn_cancel.setStyleSheet(
-            "QPushButton{background:#F5F5F5;border:1px solid #ddd;border-radius:6px;padding:7px 20px;color:#555;font-size:13px;}"
-            "QPushButton:hover{background:#E0E0E0;}"
-        )
-        btn_ok = QPushButton("Save")
-        btn_ok.setFlat(True)
-        btn_ok.setStyleSheet(
-            "QPushButton{background:#1F4F82;border:none;border-radius:6px;padding:7px 20px;color:white;font-size:13px;font-weight:bold;}"
-            "QPushButton:hover{background:#163D66;}"
-        )
-        btn_cancel.clicked.connect(dlg.reject)
-        btn_ok.clicked.connect(dlg.accept)
-        btn_row.addWidget(btn_cancel)
-        btn_row.addWidget(btn_ok)
-        layout.addLayout(btn_row)
-
+        dlg.pushButtonCancel.clicked.connect(dlg.reject)
+        dlg.pushButtonSave.clicked.connect(dlg.accept)
         return dlg

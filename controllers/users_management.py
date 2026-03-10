@@ -1,14 +1,15 @@
 from PyQt6.QtWidgets import (
     QTableWidgetItem, QMessageBox, QHeaderView, QFileDialog,
-    QPushButton, QHBoxLayout, QWidget, QDialog, QVBoxLayout,
-    QFormLayout, QLineEdit, QComboBox, QLabel,
+    QPushButton, QHBoxLayout, QWidget, QDialog,
 )
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QColor, QIcon
+from PyQt6 import uic
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
+UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
@@ -142,65 +143,14 @@ class UsersManagementController(BaseWindow):
 
     def _build_user_dialog(self, user=None):
         dlg = QDialog(self)
-        dlg.setWindowTitle("Add User" if not user else "Edit User")
-        dlg.setMinimumWidth(360)
-        dlg.setStyleSheet(
-            "QDialog { background: white; }"
-            "QLabel { color: #333; font-size: 13px; }"
-            "QComboBox, QLineEdit { padding: 6px; border: 1px solid #ddd; border-radius: 6px;"
-            " color: #333; font-size: 13px; background: white; }"
-            "QComboBox:focus, QLineEdit:focus { border: 1px solid #1F4F82; }"
-        )
-        layout = QVBoxLayout(dlg)
-        layout.setSpacing(12)
-        layout.setContentsMargins(20, 20, 20, 20)
-
-        form = QFormLayout()
-        form.setSpacing(10)
-        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
-
-        edit_username = QLineEdit()
-        edit_username.setPlaceholderText("Username")
-        edit_password = QLineEdit()
-        edit_password.setPlaceholderText("Password (leave blank to keep)")
-        edit_password.setEchoMode(QLineEdit.EchoMode.Password)
-        combo_role = QComboBox()
-        combo_role.addItems(["user", "admin"])
-
+        uic.loadUi(os.path.join(UI_DIR, "UserDialog.ui"), dlg)
         if user:
-            edit_username.setText(user["username"])
-            combo_role.setCurrentText(user["role"])
-
-        form.addRow("Username:", edit_username)
-        form.addRow("Password:", edit_password)
-        form.addRow("Role:", combo_role)
-        layout.addLayout(form)
-
-        btn_row = QHBoxLayout()
-        btn_row.addStretch()
-        btn_cancel = QPushButton("Cancel")
-        btn_cancel.setFlat(True)
-        btn_cancel.setStyleSheet(
-            "QPushButton{background:#F5F5F5;border:1px solid #ddd;border-radius:6px;"
-            "padding:7px 20px;color:#555;font-size:13px;}"
-            "QPushButton:hover{background:#E0E0E0;}"
-        )
-        btn_ok = QPushButton("Save")
-        btn_ok.setFlat(True)
-        btn_ok.setStyleSheet(
-            "QPushButton{background:#1F4F82;border:none;border-radius:6px;"
-            "padding:7px 20px;color:white;font-size:13px;font-weight:bold;}"
-            "QPushButton:hover{background:#163D66;}"
-        )
-        btn_cancel.clicked.connect(dlg.reject)
-        btn_ok.clicked.connect(dlg.accept)
-        btn_row.addWidget(btn_cancel)
-        btn_row.addWidget(btn_ok)
-        layout.addLayout(btn_row)
-
-        dlg.editUsername = edit_username
-        dlg.editPassword = edit_password
-        dlg.comboRole = combo_role
+            dlg.setWindowTitle("Edit User")
+            dlg.lblTitle.setText("Edit User")
+            dlg.editUsername.setText(user["username"])
+            dlg.comboRole.setCurrentText(user["role"])
+        dlg.pushButtonCancel.clicked.connect(dlg.reject)
+        dlg.pushButtonSave.clicked.connect(dlg.accept)
         return dlg
 
     def _add_user(self):
@@ -248,41 +198,13 @@ class UsersManagementController(BaseWindow):
         bookings = get_bookings_by_user(user["id"])
 
         dlg = QDialog(self)
+        uic.loadUi(os.path.join(UI_DIR, "UserBookingsView.ui"), dlg)
         dlg.setWindowTitle(f"Bookings — {user['username']}")
-        dlg.setMinimumSize(700, 420)
-        dlg.setStyleSheet("QDialog { background: white; }")
+        dlg.lblHeader.setText(f"Booking history: {user['username']}")
 
-        layout = QVBoxLayout(dlg)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 16)
-
-        header = QLabel(f"Booking history: {user['username']}")
-        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header.setStyleSheet(
-            "QLabel { background: #1F4F82; color: white; font-size: 15px;"
-            " font-weight: bold; padding: 14px; }"
-        )
-        layout.addWidget(header)
-
-        from PyQt6.QtWidgets import QTableWidget, QTableWidgetItem
-        table = QTableWidget()
-        table.setColumnCount(7)
-        table.setHorizontalHeaderLabels(
-            ["Room", "Type", "Date", "Start", "End", "Purpose", "Status"]
-        )
+        table = dlg.tableBookings
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         table.verticalHeader().setDefaultSectionSize(30)
-        table.setEditTriggers(table.EditTrigger.NoEditTriggers)
-        table.setSelectionBehavior(table.SelectionBehavior.SelectRows)
-        table.setAlternatingRowColors(True)
-        table.setShowGrid(False)
-        table.setStyleSheet(
-            "QTableWidget { background: white; color: #333; border: none; font-size: 13px; }"
-            "QTableWidget::item { padding: 4px; }"
-            "QTableWidget::item:selected { background: #BBDEFB; color: #333; }"
-            "QHeaderView::section { background: #1F4F82; color: white; font-weight: bold;"
-            " padding: 6px; border: none; }"
-        )
 
         status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
 
@@ -304,26 +226,8 @@ class UsersManagementController(BaseWindow):
             status_item.setForeground(QColor(status_colors.get(b["status"], "#333")))
             table.setItem(row, 6, status_item)
 
-        layout.addWidget(table)
-
-        lbl_count = QLabel(f"{len(bookings)} bookings")
-        lbl_count.setStyleSheet("color: #888; font-size: 12px; padding: 6px 16px 0;")
-        layout.addWidget(lbl_count)
-
-        btn_row = QHBoxLayout()
-        btn_row.setContentsMargins(16, 8, 16, 0)
-        btn_row.addStretch()
-        btn_close = QPushButton("Close")
-        btn_close.setFlat(True)
-        btn_close.setStyleSheet(
-            "QPushButton { background: #1F4F82; border: none; border-radius: 6px;"
-            " padding: 8px 28px; color: white; font-size: 13px; font-weight: bold; }"
-            "QPushButton:hover { background: #163D66; }"
-        )
-        btn_close.clicked.connect(dlg.accept)
-        btn_row.addWidget(btn_close)
-        layout.addLayout(btn_row)
-
+        dlg.lblCount.setText(f"{len(bookings)} bookings")
+        dlg.pushButtonClose.clicked.connect(dlg.accept)
         dlg.exec()
 
     # -- CSV ------------------------------------------------------

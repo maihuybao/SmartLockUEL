@@ -177,7 +177,7 @@ QLineEdit::placeholder { color: #9aa0a6;}
 </string>
            </property>
            <property name="text">
-            <string>admin</string>
+            <string>devadmin</string>
            </property>
            <property name="placeholderText">
             <string>example@st.uel.edu.vn/example@uel.edu.vn  </string>
@@ -249,7 +249,7 @@ QFrame:focus-within {
 }</string>
               </property>
               <property name="text">
-               <string>admin123</string>
+               <string>devadmin</string>
               </property>
               <property name="maxLength">
                <number>32772</number>

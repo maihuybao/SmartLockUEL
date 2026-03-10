@@ -6,10 +6,6 @@ from PyQt6.QtWidgets import (
     QHeaderView,
     QWidget,
     QHBoxLayout,
-    QVBoxLayout,
-    QFormLayout,
-    QLineEdit,
-    QLabel,
 )
 from PyQt6.QtCore import Qt, QDate, QTime, QSize
 from PyQt6.QtGui import QColor, QIcon
@@ -489,7 +485,6 @@ class OverviewUsersController(BaseWindow):
 
     def _view_booking(self, booking_id, parent_dlg):
         from models.booking_model import get_bookings_by_user
-        from PyQt6.QtWidgets import QFormLayout, QLineEdit
 
         bookings = get_bookings_by_user(self.current_user["id"])
         b = next((x for x in bookings if x["id"] == booking_id), None)
@@ -501,76 +496,31 @@ class OverviewUsersController(BaseWindow):
         status_color = status_colors.get(b["status"], "#333")
 
         dlg = QDialog(parent_dlg)
-        dlg.setWindowTitle("Booking Details")
-        dlg.setMinimumWidth(400)
-        dlg.setStyleSheet("QDialog { background: white; }")
+        uic.loadUi(os.path.join(UI_DIR, "BookingDetails.ui"), dlg)
 
-        layout = QVBoxLayout(dlg)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 20)
-
-        header = QLabel(f"Booking #{b['id']}")
-        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header.setStyleSheet(
-            "QLabel { background: #1F4F82; color: white; font-size: 16px;"
-            " font-weight: bold; padding: 16px; }"
-        )
-        layout.addWidget(header)
-
-        badge = QLabel(b["status"])
-        badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        badge.setStyleSheet(
+        dlg.lblHeader.setText(f"Booking #{b['id']}")
+        dlg.lblBadge.setText(b["status"])
+        dlg.lblBadge.setStyleSheet(
             f"QLabel {{ background: {status_color}; color: white; font-size: 12px;"
             f" font-weight: bold; padding: 4px 0; }}"
         )
-        layout.addWidget(badge)
 
-        body = QWidget()
-        body.setStyleSheet("background: white;")
-        form = QFormLayout(body)
-        form.setSpacing(10)
-        form.setContentsMargins(24, 20, 24, 8)
-        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+        dlg.labelUser.setVisible(False)
+        dlg.editUser.setVisible(False)
+        dlg.editRoom.setText(f"{b['room_name']}  ({b['room_type']})")
+        dlg.editDate.setText(date)
+        dlg.editStart.setText(start)
+        dlg.editEnd.setText(end)
+        dlg.editPurpose.setText(b.get("reason", "") or "")
+        dlg.editLockPw.setText(b.get("locker_password") or "—")
 
-        field_style = (
-            "QLineEdit { border: 1px solid #E0E0E0; border-radius: 6px;"
-            " padding: 6px 10px; font-size: 13px; color: #333; background: #FAFAFA; }"
-        )
-        label_style = "color: #1F4F82; font-weight: 600; font-size: 13px;"
-
-        def _row(label, value):
-            lbl = QLabel(label)
-            lbl.setStyleSheet(label_style)
-            val = QLineEdit(str(value) if value else "—")
-            val.setReadOnly(True)
-            val.setStyleSheet(field_style)
-            form.addRow(lbl, val)
-
-        _row("Room", f"{b['room_name']}  ({b['room_type']})")
-        _row("Date", date)
-        _row("Start Time", start)
-        _row("End Time", end)
-        _row("Purpose", b.get("reason", ""))
-        _row("Locker Password", b.get("locker_password") or "—")
         if b.get("reject_reason"):
-            _row("Reject Reason", b["reject_reason"])
+            dlg.editRejectReason.setText(b["reject_reason"])
+        else:
+            dlg.labelRejectReason.setVisible(False)
+            dlg.editRejectReason.setVisible(False)
 
-        layout.addWidget(body)
-
-        btn_row = QHBoxLayout()
-        btn_row.setContentsMargins(24, 0, 24, 0)
-        btn_row.addStretch()
-        btn_close = QPushButton("Close")
-        btn_close.setFlat(True)
-        btn_close.setStyleSheet(
-            "QPushButton { background: #1F4F82; border: none; border-radius: 6px;"
-            " padding: 8px 28px; color: white; font-size: 13px; font-weight: bold; }"
-            "QPushButton:hover { background: #163D66; }"
-        )
-        btn_close.clicked.connect(dlg.accept)
-        btn_row.addWidget(btn_close)
-        layout.addLayout(btn_row)
-
+        dlg.pushButtonClose.clicked.connect(dlg.accept)
         dlg.exec()
 
     def _edit_booking(self, booking_id, history_dlg):

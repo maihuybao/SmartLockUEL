@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RoomDialog</class>
+ <widget class="QDialog" name="RoomDialog">
+  <property name="minimumSize">
+   <size>
+    <width>360</width>
+    <height>280</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Add Room</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog { background: white; }
+QLabel { color: #333; font-size: 13px; }
+QComboBox, QLineEdit { padding: 6px; border: 1px solid #ddd; border-radius: 6px; color: #333; font-size: 13px; background: white; }
+QComboBox:focus, QLineEdit:focus { border: 1px solid #1F4F82; }
+QComboBox:disabled, QLineEdit:disabled { background: #f5f5f5; color: #999; }
+QPushButton#pushButtonCancel { background:#F5F5F5; border:1px solid #ddd; border-radius:6px; padding:7px 20px; color:#555; font-size:13px; }
+QPushButton#pushButtonCancel:hover { background:#E0E0E0; }
+QPushButton#pushButtonSave { background:#1F4F82; border:none; border-radius:6px; padding:7px 20px; color:white; font-size:13px; font-weight:bold; }
+QPushButton#pushButtonSave:hover { background:#163D66; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text">
+      <string>Add Room</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size:16px; font-weight:bold; color:#1F4F82; border-bottom:1px solid #E0E0E0; padding-bottom:8px;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="labelAlignment">
+      <set>Qt::AlignRight|Qt::AlignVCenter</set>
+     </property>
+     <property name="formAlignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="verticalSpacing">
+      <number>10</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelId">
+       <property name="text">
+        <string>Room ID:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="editId">
+       <property name="placeholderText">
+        <string>e.g. P101</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelType">
+       <property name="text">
+        <string>Room Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="editType">
+       <property name="placeholderText">
+        <string>e.g. Study Room</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelCap">
+       <property name="text">
+        <string>Capacity:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="editCap">
+       <property name="placeholderText">
+        <string>e.g. 10</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelStatus">
+       <property name="text">
+        <string>Status:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="comboStatus">
+       <item>
+        <property name="text">
+         <string>Available</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Occupied</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Cleaning</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="buttonLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonCancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonSave">
+       <property name="text">
+        <string>Save</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

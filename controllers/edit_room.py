@@ -7,17 +7,15 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QWidget,
     QDialog,
-    QVBoxLayout,
-    QFormLayout,
-    QLineEdit,
-    QComboBox,
 )
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QColor, QIcon
+from PyQt6 import uic
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
+UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
@@ -171,69 +169,17 @@ class EditRoomController(BaseWindow):
 
     def _build_room_dialog(self, room=None):
         dlg = QDialog(self)
-        dlg.setWindowTitle("Add Room" if not room else "Edit Room")
-        dlg.setMinimumWidth(360)
-        dlg.setStyleSheet(
-            "QDialog { background: white; }"
-            "QLabel { color: #333; font-size: 13px; }"
-            "QComboBox, QLineEdit { padding: 6px; border: 1px solid #ddd; border-radius: 6px; color: #333; font-size: 13px; background: white; }"
-            "QComboBox:focus, QLineEdit:focus { border: 1px solid #1F4F82; }"
-        )
-        layout = QVBoxLayout(dlg)
-        layout.setSpacing(12)
-        layout.setContentsMargins(20, 20, 20, 20)
-
-        form = QFormLayout()
-        form.setSpacing(10)
-        form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
-
-        edit_id = QLineEdit()
-        edit_id.setPlaceholderText("e.g. P101")
-        edit_type = QLineEdit()
-        edit_type.setPlaceholderText("e.g. Study Room")
-        edit_cap = QLineEdit()
-        edit_cap.setPlaceholderText("e.g. 10")
-        combo_status = QComboBox()
-        for s in ("Available", "Occupied", "Cleaning"):
-            combo_status.addItem(s)
-
+        uic.loadUi(os.path.join(UI_DIR, "RoomDialog.ui"), dlg)
         if room:
-            edit_id.setText(room["room_id"])
-            edit_type.setText(room["room_type"])
-            edit_cap.setText(str(room["capacity"]))
-            idx = combo_status.findText(room["status"])
-            combo_status.setCurrentIndex(idx if idx >= 0 else 0)
-
-        form.addRow("Room ID:", edit_id)
-        form.addRow("Room Type:", edit_type)
-        form.addRow("Capacity:", edit_cap)
-        form.addRow("Status:", combo_status)
-        layout.addLayout(form)
-
-        btn_row = QHBoxLayout()
-        btn_row.addStretch()
-        btn_cancel = QPushButton("Cancel")
-        btn_cancel.setFlat(True)
-        btn_cancel.setStyleSheet(
-            "QPushButton{background:#F5F5F5;border:1px solid #ddd;border-radius:6px;padding:7px 20px;color:#555;font-size:13px;}"
-            "QPushButton:hover{background:#E0E0E0;}"
-        )
-        btn_ok = QPushButton("Save")
-        btn_ok.setFlat(True)
-        btn_ok.setStyleSheet(
-            "QPushButton{background:#1F4F82;border:none;border-radius:6px;padding:7px 20px;color:white;font-size:13px;font-weight:bold;}"
-            "QPushButton:hover{background:#163D66;}"
-        )
-        btn_cancel.clicked.connect(dlg.reject)
-        btn_ok.clicked.connect(dlg.accept)
-        btn_row.addWidget(btn_cancel)
-        btn_row.addWidget(btn_ok)
-        layout.addLayout(btn_row)
-
-        dlg.editId = edit_id
-        dlg.editType = edit_type
-        dlg.editCap = edit_cap
-        dlg.comboStatus = combo_status
+            dlg.setWindowTitle("Edit Room")
+            dlg.lblTitle.setText("Edit Room")
+            dlg.editId.setText(room["room_id"])
+            dlg.editType.setText(room["room_type"])
+            dlg.editCap.setText(str(room["capacity"]))
+            idx = dlg.comboStatus.findText(room["status"])
+            dlg.comboStatus.setCurrentIndex(idx if idx >= 0 else 0)
+        dlg.pushButtonCancel.clicked.connect(dlg.reject)
+        dlg.pushButtonSave.clicked.connect(dlg.accept)
         return dlg
 
     def _add_room(self):

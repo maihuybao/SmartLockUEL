@@ -26,8 +26,8 @@ def seed():
     # ── Users ────────────────────────────────────────────────────
     users = [
         ("admin", "admin123", "admin"),
-        ("devadmin", "meomatcang", "admin"),
-        ("devuser", "meomatcang", "user"),
+        ("devadmin", "devadmin", "admin"),
+        ("devuser", "devuser", "user"),
         ("sv001@st.uel.edu.vn", "123456", "user"),
         ("sv002@st.uel.edu.vn", "123456", "user"),
         ("sv003@st.uel.edu.vn", "123456", "user"),
