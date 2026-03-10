@@ -146,22 +146,6 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEditSearch">
-            <property name="minimumSize">
-             <size>
-              <width>160</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLineEdit { color: black; padding: 5px 10px; border: 1px solid #dcdcdc; border-radius: 15px; font-size: 12px; } QLineEdit:focus { border: 1px solid #1f4f82; }</string>
-            </property>
-            <property name="placeholderText">
-             <string>Search...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="lblCount">
             <property name="styleSheet">
              <string notr="true">color: #888; font-size: 12px; padding: 0 4px;</string>
@@ -198,6 +182,30 @@
             </property>
             <property name="text">
              <string>Export CSV</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="searchLayout">
+          <property name="spacing"><number>6</number></property>
+          <item>
+           <widget class="QLabel" name="lblSearchIcon">
+            <property name="minimumSize"><size><width>16</width><height>16</height></size></property>
+            <property name="maximumSize"><size><width>16</width><height>16</height></size></property>
+            <property name="pixmap"><pixmap>../images/search.png</pixmap></property>
+            <property name="scaledContents"><bool>true</bool></property>
+            <property name="styleSheet"><string notr="true">background: transparent; border: none;</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditSearch">
+            <property name="styleSheet">
+             <string notr="true">QLineEdit { color: black; padding: 6px 10px; border: 1px solid #dcdcdc; border-radius: 15px; font-size: 13px; } QLineEdit:focus { border: 1px solid #1f4f82; }</string>
+            </property>
+            <property name="placeholderText">
+             <string>Search...</string>
             </property>
            </widget>
           </item>

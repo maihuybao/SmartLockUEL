@@ -266,7 +266,7 @@ padding:8px 0px;</string>
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap>../../../../../../../KIM YEN/Downloads/UEL_Logo final-09.png</pixmap>
+                 <pixmap>../images/UEL_Logo.png</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
