@@ -118,4 +118,11 @@ SQLite với 4 bảng:
 
 - Python 3.10+ · PyQt6 · SQLite 3 · Qt Designer (.ui)
 - Mật khẩu: SHA-256 (hashlib)
-- Icons: SVG với color injection runtime
+- Icons: PNG
+- AI Assistant: Claude (Anthropic) — hỗ trợ phát triển qua Claude Code
+
+---
+
+## Vai trò trong dự án
+
+Tôi tham gia dự án với vai trò hỗ trợ kỹ thuật cho nhóm sinh viên. Công việc bao gồm hướng dẫn kiến trúc ứng dụng, review code, hỗ trợ xử lý lỗi và tối ưu giao diện trong quá trình nhóm phát triển phần mềm.
