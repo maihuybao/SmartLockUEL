@@ -34,14 +34,8 @@ def _is_full_today(room_pk):
 
     booked = set()
     for b in bookings:
-        if " | " not in b["session"]:
-            continue
-        _, tp = b["session"].split(" | ", 1)
-        if " - " not in tp:
-            continue
-        s, e = tp.split(" - ", 1)
-        start = max(_to_minutes(s), OP_START)
-        end   = min(_to_minutes(e), OP_END)
+        start = max(_to_minutes(b["time_start"]), OP_START)
+        end   = min(_to_minutes(b["time_end"]), OP_END)
         for slot in range(start, end, 30):
             booked.add(slot)
 

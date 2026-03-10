@@ -210,17 +210,11 @@ class UsersManagementController(BaseWindow):
 
         table.setRowCount(len(bookings))
         for row, b in enumerate(bookings):
-            session = b.get("session", "")
-            date, start, end = ("", "", "")
-            if " | " in session:
-                date, tp = session.split(" | ", 1)
-                if " - " in tp:
-                    start, end = tp.split(" - ", 1)
             table.setItem(row, 0, QTableWidgetItem(b["room_name"]))
             table.setItem(row, 1, QTableWidgetItem(b["room_type"]))
-            table.setItem(row, 2, QTableWidgetItem(date.strip()))
-            table.setItem(row, 3, QTableWidgetItem(start.strip()))
-            table.setItem(row, 4, QTableWidgetItem(end.strip()))
+            table.setItem(row, 2, QTableWidgetItem(b.get("date", "")))
+            table.setItem(row, 3, QTableWidgetItem(b.get("time_start", "")))
+            table.setItem(row, 4, QTableWidgetItem(b.get("time_end", "")))
             table.setItem(row, 5, QTableWidgetItem(b.get("reason", "")))
             status_item = QTableWidgetItem(b["status"])
             status_item.setForeground(QColor(status_colors.get(b["status"], "#333")))

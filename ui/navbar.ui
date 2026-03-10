@@ -41,7 +41,7 @@
       <string notr="true">color: white; font-size: 16pt; font-weight: bold;</string>
      </property>
      <property name="text">
-      <string>SmartStock UEL</string>
+      <string>SmartLocker UEL</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

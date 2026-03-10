@@ -38,17 +38,6 @@ from models.booking_model import (
 from models.room_model import get_all_rooms
 
 
-def _parse_session(session):
-    """Parse 'YYYY-MM-DD | HH:mm - HH:mm' into (date, start, end)."""
-    if " | " in session:
-        date_part, time_part = session.split(" | ", 1)
-        if " - " in time_part:
-            start, end = time_part.split(" - ", 1)
-            return date_part.strip(), start.strip(), end.strip()
-        return date_part.strip(), time_part.strip(), ""
-    return "", session, ""
-
-
 class BookingOverviewController(BaseWindow):
     def __init__(self, user):
         super().__init__(
@@ -106,7 +95,7 @@ class BookingOverviewController(BaseWindow):
                 for b in bookings
                 if keyword in b["username"].lower()
                 or keyword in b["room_name"].lower()
-                or keyword in b["session"].lower()
+                or keyword in b.get("date", "").lower()
             ]
 
         self.ui.lblCount.setText(f"{len(bookings)} bookings")
@@ -119,14 +108,13 @@ class BookingOverviewController(BaseWindow):
         table.verticalHeader().setDefaultSectionSize(32)
 
         for row, b in enumerate(bookings):
-            date, start, end = _parse_session(b.get("session", ""))
             table.insertRow(row)
             table.setItem(row, 0, QTableWidgetItem(b["username"]))
             table.setItem(row, 1, QTableWidgetItem(b["room_name"]))
             table.setItem(row, 2, QTableWidgetItem(b["room_type"]))
-            table.setItem(row, 3, QTableWidgetItem(date))
-            table.setItem(row, 4, QTableWidgetItem(start))
-            table.setItem(row, 5, QTableWidgetItem(end))
+            table.setItem(row, 3, QTableWidgetItem(b.get("date", "")))
+            table.setItem(row, 4, QTableWidgetItem(b.get("time_start", "")))
+            table.setItem(row, 5, QTableWidgetItem(b.get("time_end", "")))
             table.setItem(row, 6, QTableWidgetItem(b["reason"]))
 
             status_item = QTableWidgetItem(b["status"])
@@ -214,7 +202,6 @@ class BookingOverviewController(BaseWindow):
         if not b:
             return
 
-        date, start, end = _parse_session(b.get("session", ""))
         status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
         status_color = status_colors.get(b["status"], "#333")
 
@@ -230,10 +217,10 @@ class BookingOverviewController(BaseWindow):
 
         dlg.editUser.setText(b["username"])
         dlg.editRoom.setText(f"{b['room_name']}  ({b['room_type']})")
-        dlg.editDate.setText(date)
-        dlg.editStart.setText(start)
-        dlg.editEnd.setText(end)
-        dlg.editPurpose.setText(b.get("reason", "") or "")
+        dlg.editDate.setText(b.get("date", ""))
+        dlg.editStart.setText(b.get("time_start", ""))
+        dlg.editEnd.setText(b.get("time_end", ""))
+        dlg.editPurpose.setPlainText(b.get("reason", "") or "")
         dlg.editLockPw.setText(b.get("locker_password") or "—")
 
         if b.get("reject_reason"):
@@ -276,12 +263,11 @@ class BookingOverviewController(BaseWindow):
             date_str = dlg.dateEdit.date().toString("yyyy-MM-dd")
             start_str = dlg.timeEditStart.time().toString("HH:mm")
             end_str = dlg.timeEditEnd.time().toString("HH:mm")
-            session = f"{date_str} | {start_str} - {end_str}"
-            reason = dlg.editReason.text().strip()
+            reason = dlg.editReason.toPlainText().strip()
             if not reason:
                 QMessageBox.warning(self, "Error", "Please enter a reason.")
                 return
-            if create_booking(user_id, room_id, session, reason):
+            if create_booking(user_id, room_id, date_str, start_str, end_str, reason):
                 self._load_table()
             else:
                 QMessageBox.warning(self, "Error", "Failed to create booking.")
@@ -296,13 +282,12 @@ class BookingOverviewController(BaseWindow):
             date_str = dlg.dateEdit.date().toString("yyyy-MM-dd")
             start_str = dlg.timeEditStart.time().toString("HH:mm")
             end_str = dlg.timeEditEnd.time().toString("HH:mm")
-            session = f"{date_str} | {start_str} - {end_str}"
-            reason = dlg.editReason.text().strip()
+            reason = dlg.editReason.toPlainText().strip()
             status = dlg.comboStatus.currentText()
             if not reason:
                 QMessageBox.warning(self, "Error", "Please enter a reason.")
                 return
-            admin_update_booking(booking_id, session, reason, status)
+            admin_update_booking(booking_id, date_str, start_str, end_str, reason, status)
             self._load_table()
 
     def _delete_booking(self, booking_id):
@@ -353,8 +338,7 @@ class BookingOverviewController(BaseWindow):
                         skipped += 1
                         continue
 
-                    session = f"{date_str} | {start_str} - {end_str}"
-                    if create_booking(user_pk, room_pk, session, reason):
+                    if create_booking(user_pk, room_pk, date_str, start_str, end_str, reason):
                         imported += 1
                     else:
                         errors.append(
@@ -390,7 +374,7 @@ class BookingOverviewController(BaseWindow):
                 for b in bookings
                 if keyword in b["username"].lower()
                 or keyword in b["room_name"].lower()
-                or keyword in b["session"].lower()
+                or keyword in b.get("date", "").lower()
             ]
 
         if not bookings:
@@ -420,15 +404,14 @@ class BookingOverviewController(BaseWindow):
                     ]
                 )
                 for b in bookings:
-                    date, start, end = _parse_session(b.get("session", ""))
                     writer.writerow(
                         [
                             b["username"],
                             b["room_name"],
                             b["room_type"],
-                            date,
-                            start,
-                            end,
+                            b.get("date", ""),
+                            b.get("time_start", ""),
+                            b.get("time_end", ""),
                             b["reason"],
                             b["status"],
                             b.get("locker_password") or "",
@@ -475,22 +458,17 @@ class BookingOverviewController(BaseWindow):
                     dlg.comboRoom.setCurrentIndex(i)
                     break
 
-            session = booking.get("session", "")
-            if " | " in session:
-                date_part, time_part = session.split(" | ", 1)
-                parsed_date = QDate.fromString(date_part, "yyyy-MM-dd")
-                if parsed_date.isValid():
-                    dlg.dateEdit.setDate(parsed_date)
-                if " - " in time_part:
-                    s_str, e_str = time_part.split(" - ", 1)
-                    parsed_start = QTime.fromString(s_str.strip(), "HH:mm")
-                    parsed_end = QTime.fromString(e_str.strip(), "HH:mm")
-                    if parsed_start.isValid():
-                        dlg.timeEditStart.setTime(parsed_start)
-                    if parsed_end.isValid():
-                        dlg.timeEditEnd.setTime(parsed_end)
+            parsed_date = QDate.fromString(booking.get("date", ""), "yyyy-MM-dd")
+            if parsed_date.isValid():
+                dlg.dateEdit.setDate(parsed_date)
+            parsed_start = QTime.fromString(booking.get("time_start", ""), "HH:mm")
+            parsed_end = QTime.fromString(booking.get("time_end", ""), "HH:mm")
+            if parsed_start.isValid():
+                dlg.timeEditStart.setTime(parsed_start)
+            if parsed_end.isValid():
+                dlg.timeEditEnd.setTime(parsed_end)
 
-            dlg.editReason.setText(booking["reason"])
+            dlg.editReason.setPlainText(booking["reason"])
             dlg.comboStatus.setCurrentText(booking["status"])
 
             if reject_mode:

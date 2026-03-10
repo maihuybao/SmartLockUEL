@@ -41,7 +41,9 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             room_id INTEGER NOT NULL,
-            session TEXT NOT NULL,
+            date TEXT NOT NULL,
+            time_start TEXT NOT NULL,
+            time_end TEXT NOT NULL,
             reason TEXT NOT NULL,
             status TEXT NOT NULL DEFAULT 'Pending'
                 CHECK(status IN ('Pending', 'Approved', 'Rejected')),

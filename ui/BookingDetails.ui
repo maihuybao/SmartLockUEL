@@ -44,6 +44,9 @@
       <string notr="true">background: white;</string>
      </property>
      <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
       <property name="leftMargin"><number>24</number></property>
       <property name="topMargin"><number>20</number></property>
       <property name="rightMargin"><number>24</number></property>
@@ -119,9 +122,21 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QLineEdit" name="editPurpose">
+       <widget class="QPlainTextEdit" name="editPurpose">
         <property name="readOnly"><bool>true</bool></property>
-        <property name="styleSheet"><string notr="true">QLineEdit { border: 1px solid #E0E0E0; border-radius: 6px; padding: 6px 10px; font-size: 13px; color: #333; background: #FAFAFA; }</string></property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>120</height>
+         </size>
+        </property>
+        <property name="styleSheet"><string notr="true">QPlainTextEdit { border: 1px solid #E0E0E0; border-radius: 6px; padding: 6px 10px; font-size: 13px; color: #333; background: #FAFAFA; }</string></property>
        </widget>
       </item>
       <item row="6" column="0">

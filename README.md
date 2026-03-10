@@ -5,6 +5,10 @@ Xây dựng bằng Python + PyQt6, lưu trữ dữ liệu SQLite.
 
 ---
 
+## Vai trò trong dự án
+
+[Tôi](https://github.com/maihuybao) tham gia dự án với vai trò hỗ trợ kỹ thuật cho một nhóm sinh viên UEL làm bài tập lớn cho môn KTLT. Công việc bao gồm hướng dẫn kiến trúc ứng dụng, review code, hỗ trợ xử lý lỗi và tối ưu giao diện trong quá trình nhóm phát triển phần mềm.
+
 ## Yêu cầu
 
 - Python 3.10+
@@ -32,11 +36,15 @@ python3 main.py
 
 ## Tài khoản mặc định
 
-| Vai trò | Username | Password |
-|---|---|---|
-| Admin | `admin` | `admin123` |
-| User | `sv001@st.uel.edu.vn` | `123456` |
-| User | `sv002@st.uel.edu.vn` | `123456` |
+| Vai trò | Username              | Password   |
+| ------- | --------------------- | ---------- |
+| Admin   | `admin`               | `admin123` |
+| Admin   | `devadmin`            | `devadmin` |
+| User    | `devuser`             | `devuser`  |
+| User    | `sv001@st.uel.edu.vn` | `123456`   |
+| User    | `gv001@uel.edu.vn`    | `123456`   |
+
+> Tổng cộng 10 tài khoản (2 admin + 8 user). Xem đầy đủ trong `TECHNICAL_DOCS.md`.
 
 ---
 
@@ -44,13 +52,13 @@ python3 main.py
 
 ### Admin (5 tab)
 
-| Tab | Chức năng |
-|---|---|
-| Overview | Dashboard thống kê (tổng phòng, booking, Pending/Approved/Rejected) + grid phòng responsive |
-| Bookings | Xem danh sách booking, duyệt (tự động sinh mật khẩu tủ 6 số), từ chối (kèm lý do), xem chi tiết, export CSV |
-| Rooms | CRUD phòng, filter theo trạng thái (All/Available/Occupied), tìm kiếm, import/export CSV |
-| Users | CRUD tài khoản, filter theo role (All/Admin/User), xem lịch sử booking của từng user, import/export CSV |
-| Devices | Quản lý thiết bị theo phòng, filter theo trạng thái, cấp/reset mật khẩu tủ khóa, import/export CSV |
+| Tab      | Chức năng                                                                                                                       |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Overview | Dashboard thống kê (tổng phòng, booking, Pending/Approved/Rejected) + grid phòng responsive, filter All/Available/Occupied/Full |
+| Bookings | Xem/thêm/sửa/xóa booking, duyệt (tự sinh mật khẩu tủ 6 số), từ chối (kèm lý do), xem chi tiết, import/export CSV                |
+| Rooms    | CRUD phòng, filter theo trạng thái (All/Available/Occupied), tìm kiếm, import/export CSV                                        |
+| Users    | CRUD tài khoản, filter theo role (All/Admin/User), xem lịch sử booking của từng user, import/export CSV                         |
+| Devices  | Quản lý thiết bị theo phòng, filter theo trạng thái (All/Active/Inactive/Maintenance), cấp/reset mật khẩu tủ, import/export CSV |
 
 ### User (Sinh viên / Giảng viên)
 
@@ -88,8 +96,8 @@ SmartLockUEL/
 │   ├── navbar.py               # Thanh điều hướng trên
 │   ├── sidebar.py              # Sidebar Admin
 │   └── room_card.py            # Card hiển thị phòng, tính trạng thái Full động
-├── ui/                         # File giao diện Qt Designer (.ui)
-├── images/                     # SVG icons
+├── ui/                         # 18 file giao diện Qt Designer (.ui)
+├── images/                     # 15 file ảnh PNG/JPG
 └── datasets/
     └── smartlocker.db          # Cơ sở dữ liệu SQLite
 ```
@@ -100,16 +108,17 @@ SmartLockUEL/
 
 SQLite với 4 bảng:
 
-| Bảng | Các cột chính |
-|---|---|
-| `users` | `id`, `username`, `password` (SHA-256), `role` (admin/user) |
-| `rooms` | `id`, `room_id`, `room_type`, `capacity`, `status` (Available/Occupied) |
-| `bookings` | `id`, `user_id`, `room_id`, `session`, `reason`, `status`, `locker_password`, `reject_reason`, `created_at` |
-| `devices` | `id`, `room_id`, `device_name`, `cabinet_password`, `status` (Active/Inactive/Maintenance) |
+| Bảng       | Các cột chính                                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `users`    | `id`, `username`, `password` (SHA-256), `role` (admin/user)                                                                        |
+| `rooms`    | `id`, `room_id`, `room_type`, `capacity`, `status` (Available/Occupied/Full)                                                       |
+| `bookings` | `id`, `user_id`, `room_id`, `date`, `time_start`, `time_end`, `reason`, `status`, `locker_password`, `reject_reason`, `created_at` |
+| `devices`  | `id`, `room_id`, `device_name`, `cabinet_password`, `status` (Active/Inactive/Maintenance)                                         |
 
 **Ghi chú:**
+
 - Trạng thái `Full` được tính **động** tại runtime — không lưu vào DB
-- `session` lưu dạng `"YYYY-MM-DD | HH:mm - HH:mm"`
+- Thời gian đặt phòng lưu bằng 3 cột riêng: `date` (`YYYY-MM-DD`), `time_start` (`HH:mm`), `time_end` (`HH:mm`)
 - Mật khẩu tủ (`locker_password`) được sinh tự động 6 chữ số khi Admin duyệt booking
 
 ---
@@ -118,11 +127,9 @@ SQLite với 4 bảng:
 
 - Python 3.10+ · PyQt6 · SQLite 3 · Qt Designer (.ui)
 - Mật khẩu: SHA-256 (hashlib)
-- Icons: PNG
+- Icons: PNG (15 files)
 - AI Assistant: Claude (Anthropic) — hỗ trợ phát triển qua Claude Code
 
+> Chi tiết kiến trúc, database schema, algorithms: xem `TECHNICAL_DOCS.md`
+
 ---
-
-## Vai trò trong dự án
-
-Tôi tham gia dự án với vai trò hỗ trợ kỹ thuật cho nhóm sinh viên. Công việc bao gồm hướng dẫn kiến trúc ứng dụng, review code, hỗ trợ xử lý lỗi và tối ưu giao diện trong quá trình nhóm phát triển phần mềm.

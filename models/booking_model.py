@@ -29,12 +29,12 @@ def get_all_bookings():
     return [dict(r) for r in rows]
 
 
-def create_booking(user_id, room_id, session, reason):
+def create_booking(user_id, room_id, date, time_start, time_end, reason):
     conn = get_connection()
     try:
         conn.execute(
-            "INSERT INTO bookings (user_id, room_id, session, reason) VALUES (?, ?, ?, ?)",
-            (user_id, room_id, session, reason),
+            "INSERT INTO bookings (user_id, room_id, date, time_start, time_end, reason) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, room_id, date, time_start, time_end, reason),
         )
         conn.commit()
         return True
@@ -44,11 +44,11 @@ def create_booking(user_id, room_id, session, reason):
         conn.close()
 
 
-def update_booking(booking_id, session, reason):
+def update_booking(booking_id, date, time_start, time_end, reason):
     conn = get_connection()
     conn.execute(
-        "UPDATE bookings SET session=?, reason=? WHERE id=? AND status='Pending'",
-        (session, reason, booking_id),
+        "UPDATE bookings SET date=?, time_start=?, time_end=?, reason=? WHERE id=? AND status='Pending'",
+        (date, time_start, time_end, reason, booking_id),
     )
     conn.commit()
     conn.close()
@@ -120,11 +120,11 @@ def delete_booking(booking_id):
     conn.close()
 
 
-def admin_update_booking(booking_id, session, reason, status):
+def admin_update_booking(booking_id, date, time_start, time_end, reason, status):
     conn = get_connection()
     conn.execute(
-        "UPDATE bookings SET session=?, reason=?, status=? WHERE id=?",
-        (session, reason, status, booking_id),
+        "UPDATE bookings SET date=?, time_start=?, time_end=?, reason=?, status=? WHERE id=?",
+        (date, time_start, time_end, reason, status, booking_id),
     )
     conn.commit()
     conn.close()
@@ -141,7 +141,7 @@ def get_bookings_by_room(room_pk):
     """Get active bookings (Pending/Approved) for a specific room."""
     conn = get_connection()
     rows = conn.execute(
-        """SELECT session, status FROM bookings
+        """SELECT date, time_start, time_end, status FROM bookings
            WHERE room_id = ? AND status IN ('Pending', 'Approved')""",
         (room_pk,),
     ).fetchall()
@@ -153,10 +153,10 @@ def get_bookings_by_room_date(room_pk, date_str):
     """Get active bookings for a room on a specific date (YYYY-MM-DD)."""
     conn = get_connection()
     rows = conn.execute(
-        """SELECT id, session, status FROM bookings
+        """SELECT id, date, time_start, time_end, status FROM bookings
            WHERE room_id = ? AND status IN ('Pending', 'Approved')
-           AND session LIKE ?""",
-        (room_pk, f"{date_str} |%"),
+           AND date = ?""",
+        (room_pk, date_str),
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -174,13 +174,7 @@ def has_conflict(room_pk, date_str, start_str, end_str, exclude_id=None):
     for b in bookings:
         if exclude_id is not None and b["id"] == exclude_id:
             continue
-        if " | " not in b["session"]:
-            continue
-        _, tp = b["session"].split(" | ", 1)
-        if " - " not in tp:
-            continue
-        bs_str, be_str = tp.split(" - ", 1)
-        bs, be = _to_minutes(bs_str), _to_minutes(be_str)
+        bs, be = _to_minutes(b["time_start"]), _to_minutes(b["time_end"])
         if ns < be and ne > bs:
             return True
     return False

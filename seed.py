@@ -97,11 +97,11 @@ def seed():
         ).fetchone()[0]
 
     bookings = [
-        # (user, room, session, reason, status, reject_reason, locker_password)
+        # (user, room, date, time_start, time_end, reason, status, reject_reason, locker_password)
         (
             user_pk("sv001@st.uel.edu.vn"),
             room_pk("A101"),
-            "2026-03-10 | 07:00 - 09:30",
+            "2026-03-10", "07:00", "09:30",
             "Group study for final exam",
             "Approved",
             None,
@@ -110,7 +110,7 @@ def seed():
         (
             user_pk("sv002@st.uel.edu.vn"),
             room_pk("A101"),
-            "2026-03-10 | 09:45 - 12:15",
+            "2026-03-10", "09:45", "12:15",
             "Project presentation practice",
             "Approved",
             None,
@@ -119,7 +119,7 @@ def seed():
         (
             user_pk("sv003@st.uel.edu.vn"),
             room_pk("B101"),
-            "2026-03-10 | 12:30 - 15:00",
+            "2026-03-10", "12:30", "15:00",
             "Team meeting for capstone",
             "Pending",
             None,
@@ -128,7 +128,7 @@ def seed():
         (
             user_pk("sv004@st.uel.edu.vn"),
             room_pk("C101"),
-            "2026-03-10 | 15:15 - 17:45",
+            "2026-03-10", "15:15", "17:45",
             "Self-study session",
             "Pending",
             None,
@@ -137,7 +137,7 @@ def seed():
         (
             user_pk("sv005@st.uel.edu.vn"),
             room_pk("A102"),
-            "2026-03-11 | 07:00 - 09:30",
+            "2026-03-11", "07:00", "09:30",
             "Thesis discussion",
             "Rejected",
             "Room reserved for faculty use",
@@ -146,7 +146,7 @@ def seed():
         (
             user_pk("gv001@uel.edu.vn"),
             room_pk("B101"),
-            "2026-03-11 | 09:45 - 12:15",
+            "2026-03-11", "09:45", "12:15",
             "Department meeting",
             "Approved",
             None,
@@ -155,7 +155,7 @@ def seed():
         (
             user_pk("sv001@st.uel.edu.vn"),
             room_pk("D101"),
-            "2026-03-11 | 12:30 - 15:00",
+            "2026-03-11", "12:30", "15:00",
             "Lab practice session",
             "Pending",
             None,
@@ -164,7 +164,7 @@ def seed():
         (
             user_pk("sv002@st.uel.edu.vn"),
             room_pk("E101"),
-            "2026-03-12 | 07:00 - 09:30",
+            "2026-03-12", "07:00", "09:30",
             "Exam preparation",
             "Approved",
             None,
@@ -173,7 +173,7 @@ def seed():
         (
             user_pk("sv003@st.uel.edu.vn"),
             room_pk("C102"),
-            "2026-03-12 | 09:45 - 12:15",
+            "2026-03-12", "09:45", "12:15",
             "Research group meeting",
             "Pending",
             None,
@@ -182,19 +182,19 @@ def seed():
         (
             user_pk("gv002@uel.edu.vn"),
             room_pk("A201"),
-            "2026-03-12 | 15:15 - 17:45",
+            "2026-03-12", "15:15", "17:45",
             "Lecture preparation",
             "Rejected",
             "Overlapping with scheduled class",
             None,
         ),
     ]
-    for u_id, r_id, session, reason, status, reject_reason, locker_pw in bookings:
+    for u_id, r_id, date, time_start, time_end, reason, status, reject_reason, locker_pw in bookings:
         conn.execute(
             """INSERT INTO bookings
-               (user_id, room_id, session, reason, status, reject_reason, locker_password)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (u_id, r_id, session, reason, status, reject_reason, locker_pw),
+               (user_id, room_id, date, time_start, time_end, reason, status, reject_reason, locker_password)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (u_id, r_id, date, time_start, time_end, reason, status, reject_reason, locker_pw),
         )
 
     conn.commit()

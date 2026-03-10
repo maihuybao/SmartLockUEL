@@ -147,7 +147,7 @@ padding:8px 0px;</string>
           <string notr="true">color: rgb(255, 255, 255);</string>
          </property>
          <property name="text">
-          <string>SmartStock UEL</string>
+          <string>SmartLocker UEL</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

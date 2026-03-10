@@ -42,16 +42,6 @@ OP_START = QTime(6, 0)
 OP_END = QTime(22, 0)
 
 
-def _parse_session(session):
-    if " | " in session:
-        date_part, time_part = session.split(" | ", 1)
-        if " - " in time_part:
-            start, end = time_part.split(" - ", 1)
-            return date_part.strip(), start.strip(), end.strip()
-        return date_part.strip(), time_part.strip(), ""
-    return "", session, ""
-
-
 TIME_RANGES = {
     "Morning": (6 * 60, 12 * 60),
     "Afternoon": (12 * 60, 17 * 60),
@@ -163,18 +153,11 @@ class OverviewUsersController(BaseWindow):
         bookings = get_bookings_by_room_date(room_pk, date_str)
         booked = set()
         for b in bookings:
-            if " | " not in b["session"]:
-                continue
-            _, tp = b["session"].split(" | ", 1)
-            if " - " not in tp:
-                continue
-            s, e = tp.split(" - ", 1)
-
             def _m(t):
                 hh, mm = map(int, t.strip().split(":"))
                 return hh * 60 + mm
 
-            for slot in range(_m(s), _m(e), 30):
+            for slot in range(_m(b["time_start"]), _m(b["time_end"]), 30):
                 booked.add(slot)
         return any(slot not in booked for slot in range(range_start, range_end, 30))
 
@@ -283,7 +266,7 @@ class OverviewUsersController(BaseWindow):
             end_t = dlg.timeEditEnd.time()
             start_str = start_t.toString("HH:mm")
             end_str = end_t.toString("HH:mm")
-            purpose = dlg.lineEditPurpose.text().strip()
+            purpose = dlg.lineEditPurpose.toPlainText().strip()
 
             if not purpose:
                 QMessageBox.warning(self, "Loi", "Please enter a purpose.")
@@ -307,8 +290,7 @@ class OverviewUsersController(BaseWindow):
                 )
                 return
 
-            session = f"{date_str} | {start_str} - {end_str}"
-            if create_booking(self.current_user["id"], room_pk, session, purpose):
+            if create_booking(self.current_user["id"], room_pk, date_str, start_str, end_str, purpose):
                 QMessageBox.information(
                     self, "Success", "Booking request sent successfully."
                 )
@@ -327,18 +309,11 @@ class OverviewUsersController(BaseWindow):
         # Parse into (start_min, end_min, status)
         intervals = []
         for b in bookings:
-            if " | " not in b["session"]:
-                continue
-            _, tp = b["session"].split(" | ", 1)
-            if " - " not in tp:
-                continue
-            s, e = tp.split(" - ", 1)
-
             def _m(t):
                 hh, mm = map(int, t.strip().split(":"))
                 return hh * 60 + mm
 
-            intervals.append((_m(s), _m(e), b["status"]))
+            intervals.append((_m(b["time_start"]), _m(b["time_end"]), b["status"]))
 
         # Build 16-column table (06:00 – 21:00, 1 hour each)
         table = dlg.tableAvailability
@@ -407,12 +382,11 @@ class OverviewUsersController(BaseWindow):
         table.setColumnWidth(9, 100)
         table.setRowCount(len(bookings))
         for row, b in enumerate(bookings):
-            date, start, end = _parse_session(b.get("session", ""))
             table.setItem(row, 0, QTableWidgetItem(b["room_name"]))
             table.setItem(row, 1, QTableWidgetItem(b["room_type"]))
-            table.setItem(row, 2, QTableWidgetItem(date))
-            table.setItem(row, 3, QTableWidgetItem(start))
-            table.setItem(row, 4, QTableWidgetItem(end))
+            table.setItem(row, 2, QTableWidgetItem(b.get("date", "")))
+            table.setItem(row, 3, QTableWidgetItem(b.get("time_start", "")))
+            table.setItem(row, 4, QTableWidgetItem(b.get("time_end", "")))
             table.setItem(row, 5, QTableWidgetItem(b["reason"]))
 
             status_item = QTableWidgetItem(b["status"])
@@ -495,7 +469,6 @@ class OverviewUsersController(BaseWindow):
         if not b:
             return
 
-        date, start, end = _parse_session(b.get("session", ""))
         status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
         status_color = status_colors.get(b["status"], "#333")
 
@@ -512,10 +485,10 @@ class OverviewUsersController(BaseWindow):
         dlg.labelUser.setVisible(False)
         dlg.editUser.setVisible(False)
         dlg.editRoom.setText(f"{b['room_name']}  ({b['room_type']})")
-        dlg.editDate.setText(date)
-        dlg.editStart.setText(start)
-        dlg.editEnd.setText(end)
-        dlg.editPurpose.setText(b.get("reason", "") or "")
+        dlg.editDate.setText(b.get("date", ""))
+        dlg.editStart.setText(b.get("time_start", ""))
+        dlg.editEnd.setText(b.get("time_end", ""))
+        dlg.editPurpose.setPlainText(b.get("reason", "") or "")
         dlg.editLockPw.setText(b.get("locker_password") or "—")
 
         if b.get("reject_reason"):
@@ -554,21 +527,17 @@ class OverviewUsersController(BaseWindow):
         dlg.comboRoom.setEnabled(False)
 
         # Pre-fill date/time
-        if " | " in b["session"]:
-            date_part, time_part = b["session"].split(" | ", 1)
-            parsed_date = QDate.fromString(date_part, "yyyy-MM-dd")
-            if parsed_date.isValid():
-                dlg.dateEdit.setDate(parsed_date)
-            if " - " in time_part:
-                s, e = time_part.split(" - ", 1)
-                ps = QTime.fromString(s.strip(), "HH:mm")
-                pe = QTime.fromString(e.strip(), "HH:mm")
-                if ps.isValid():
-                    dlg.timeEditStart.setTime(ps)
-                if pe.isValid():
-                    dlg.timeEditEnd.setTime(pe)
+        parsed_date = QDate.fromString(b.get("date", ""), "yyyy-MM-dd")
+        if parsed_date.isValid():
+            dlg.dateEdit.setDate(parsed_date)
+        ps = QTime.fromString(b.get("time_start", ""), "HH:mm")
+        pe = QTime.fromString(b.get("time_end", ""), "HH:mm")
+        if ps.isValid():
+            dlg.timeEditStart.setTime(ps)
+        if pe.isValid():
+            dlg.timeEditEnd.setTime(pe)
 
-        dlg.lineEditPurpose.setText(b["reason"])
+        dlg.lineEditPurpose.setPlainText(b["reason"])
         dlg.dateEdit.setMinimumDate(QDate.currentDate())
         dlg.timeEditStart.setMinimumTime(QTime(6, 0))
         dlg.timeEditStart.setMaximumTime(QTime(21, 59))
@@ -590,7 +559,7 @@ class OverviewUsersController(BaseWindow):
         end_t = dlg.timeEditEnd.time()
         start_str = start_t.toString("HH:mm")
         end_str = end_t.toString("HH:mm")
-        purpose = dlg.lineEditPurpose.text().strip()
+        purpose = dlg.lineEditPurpose.toPlainText().strip()
 
         if not purpose:
             QMessageBox.warning(self, "Error", "Please enter a purpose.")
@@ -606,8 +575,7 @@ class OverviewUsersController(BaseWindow):
             )
             return
 
-        session = f"{date_str} | {start_str} - {end_str}"
-        update_booking(booking_id, session, purpose)
+        update_booking(booking_id, date_str, start_str, end_str, purpose)
         QMessageBox.information(self, "Success", "Booking updated successfully.")
         self._populate_history(history_dlg, history_dlg.comboFilter.currentText())
         self._load_rooms()
