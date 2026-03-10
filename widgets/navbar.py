@@ -18,7 +18,7 @@ class NavBar(QFrame):
 
         # Set role button text + icon
         self.btnRole.setText(role_text)
-        icon_file = "admin.png" if role_text == "Admin" else "users.png"
+        icon_file = "admin.png" if role_text == "Admin" else "user.png"
         icon_path = os.path.join(IMG_DIR, icon_file)
         if os.path.exists(icon_path):
             self.btnRole.setIcon(QIcon(icon_path))
