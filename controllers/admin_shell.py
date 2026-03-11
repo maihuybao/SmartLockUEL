@@ -1,4 +1,4 @@
-"""AdminShellController — cua so admin duy nhat, chua 5 page trong QStackedWidget."""
+"""AdminShellController -- the single admin window containing 5 pages in a QStackedWidget."""
 
 from widgets.base_window import BaseWindow
 from controllers.overview_admin import OverviewAdminPage
@@ -9,6 +9,15 @@ from controllers.device_management import DeviceManagementPage
 
 
 class AdminShellController(BaseWindow):
+    """Main admin window that hosts all management pages in a QStackedWidget.
+
+    Provides navigation between Overview, Bookings, Rooms, Users, and Devices
+    pages via the sidebar. Each page is refreshed upon activation.
+
+    Args:
+        user (dict): The authenticated admin user record.
+    """
+
     PAGE_OVERVIEW = 0
     PAGE_BOOKINGS = 1
     PAGE_ROOMS = 2
@@ -16,6 +25,7 @@ class AdminShellController(BaseWindow):
     PAGE_DEVICES = 4
 
     def __init__(self, user):
+        """Initialize the admin shell with all management pages and sidebar navigation."""
         super().__init__(
             user,
             role_text="Admin",
@@ -62,7 +72,12 @@ class AdminShellController(BaseWindow):
         self.switch_page(self.PAGE_OVERVIEW)
 
     def _activate_page(self, index):
-        """Chuyen page va refresh du lieu cua page do."""
+        """Switch to the page at the given index and refresh its data.
+
+        Args:
+            index (int): The zero-based page index corresponding to one of
+                the PAGE_* class constants.
+        """
         self.switch_page(index)
         pages = [
             self._overview_page,
@@ -76,7 +91,12 @@ class AdminShellController(BaseWindow):
             page.refresh()
 
     def go_to_rooms(self, preselect_room=None):
-        """Chuyen sang tab Rooms, co the preselect 1 room."""
+        """Navigate to the Rooms management page, optionally pre-selecting a room.
+
+        Args:
+            preselect_room (dict or None): An optional room dictionary to
+                highlight in the rooms table after switching. Defaults to None.
+        """
         self.switch_page(self.PAGE_ROOMS)
         if preselect_room:
             self._rooms_page._preselect(preselect_room)

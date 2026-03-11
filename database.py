@@ -9,6 +9,15 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 
 def get_connection():
+    """Create and return a new SQLite database connection.
+
+    The connection is configured with ``sqlite3.Row`` as the row factory for
+    dictionary-like row access, and enables foreign key enforcement.
+
+    Returns:
+        sqlite3.Connection: An open SQLite connection to the SmartLocker
+            database.
+    """
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
@@ -16,6 +25,17 @@ def get_connection():
 
 
 def init_db():
+    """Initialize the database schema by creating all required tables.
+
+    Creates the following tables if they do not already exist:
+        - ``users``: Stores user accounts with role-based access control.
+        - ``rooms``: Stores room definitions with capacity and status.
+        - ``bookings``: Stores room booking records with approval workflow.
+        - ``devices``: Stores device/cabinet records with password management.
+
+    Raises:
+        sqlite3.Error: If a database error occurs during table creation.
+    """
     conn = get_connection()
     cursor = conn.cursor()
 

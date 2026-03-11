@@ -23,12 +23,34 @@ STATUS_BG = {
 
 
 def _to_minutes(t):
+    """Convert a time string in 'HH:mm' format to total minutes since midnight.
+
+    Args:
+        t (str): A time string in 'HH:mm' format (e.g., '14:30').
+
+    Returns:
+        int: The number of minutes since midnight.
+
+    Raises:
+        ValueError: If the time string is not in valid 'HH:mm' format.
+    """
     h, m = map(int, t.strip().split(":"))
     return h * 60 + m
 
 
 def _is_full_today(room_pk):
-    """Return True if every 30-min slot in 06:00-22:00 is covered today."""
+    """Determine whether every 30-minute slot in the operating hours is booked today.
+
+    Checks all 30-minute time slots between 06:00 and 22:00 for the current
+    date. If every slot is covered by at least one active booking, the room
+    is considered full.
+
+    Args:
+        room_pk (int): The primary key of the room to check.
+
+    Returns:
+        bool: True if all time slots are booked for today, False otherwise.
+    """
     today = _date.today().strftime("%Y-%m-%d")
     bookings = get_bookings_by_room_date(room_pk, today)
 
@@ -44,12 +66,39 @@ def _is_full_today(room_pk):
 
 
 def get_display_status(room):
+    """Calculate the display status for a room, accounting for dynamic fullness.
+
+    If a room has a database status of 'Available' but all time slots for
+    today are booked, the display status is overridden to 'Full'.
+
+    Args:
+        room (dict): A room dictionary containing at least 'id' and 'status' keys.
+
+    Returns:
+        str: The display status string, one of 'Available', 'Occupied', or 'Full'.
+    """
     if room["status"] == "Available" and _is_full_today(room["id"]):
         return "Full"
     return room["status"]
 
 
 def create_room_card(room, on_context=None):
+    """Create a styled QWidget card displaying room information and booking count.
+
+    The card shows the room ID, display status badge, room type with capacity,
+    and the count of active bookings. An optional context menu callback can be
+    attached for right-click interactions.
+
+    Args:
+        room (dict): A room dictionary containing 'id', 'room_id', 'room_type',
+            'capacity', and 'status' keys.
+        on_context (callable or None): An optional callback function invoked on
+            right-click. It receives ``(room, global_pos)`` as arguments, where
+            ``global_pos`` is a QPoint in global coordinates. Defaults to None.
+
+    Returns:
+        QWidget: A fixed-size (200x110) widget representing the room card.
+    """
     display_status = get_display_status(room)
     border_color = STATUS_COLORS.get(display_status, "#9E9E9E")
     badge_bg     = STATUS_BG.get(display_status, "#F5F5F5")

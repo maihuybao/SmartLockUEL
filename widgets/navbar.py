@@ -11,9 +11,21 @@ IMG_DIR = os.path.join(BASE_DIR, "images")
 
 
 class NavBar(QFrame):
-    """Header chung cho mọi màn hình (trừ Login). Load từ navbar.ui."""
+    """Top navigation bar displayed on all screens except the Login page.
+
+    Loads its layout from navbar.ui and configures the role icon and
+    optional search field visibility.
+
+    Args:
+        role_text (str): The text label for the user role button
+            (e.g., 'Admin' or 'User'). Defaults to 'Admin'.
+        show_search (bool): Whether to display the search input field.
+            Defaults to False.
+        parent (QWidget or None): The parent widget. Defaults to None.
+    """
 
     def __init__(self, role_text="Admin", show_search=False, parent=None):
+        """Initialize the navigation bar from its UI file and configure widgets."""
         super().__init__(parent)
         uic.loadUi(os.path.join(UI_DIR, "navbar.ui"), self)
 

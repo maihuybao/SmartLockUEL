@@ -21,6 +21,14 @@ UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
+    """Load a PNG icon from the images directory.
+
+    Args:
+        name (str): The filename of the icon (e.g., 'edit.png').
+
+    Returns:
+        QIcon: The loaded icon, or an empty QIcon if the file does not exist.
+    """
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
@@ -31,9 +39,18 @@ from models.user_model import get_all_users, create_user, update_user, delete_us
 
 
 class UsersManagementPage(QWidget):
-    """Page Users Management cho Admin."""
+    """Admin page for managing user accounts with CRUD, filtering, and CSV support.
+
+    Provides a table view of users with inline actions for viewing bookings,
+    editing, and deleting. Supports role-based filtering, search, and CSV
+    import/export.
+
+    Args:
+        shell (AdminShellController): The parent admin shell controller.
+    """
 
     def __init__(self, shell):
+        """Initialize the user management page, load UI, and display users."""
         super().__init__()
         self._shell = shell
 
@@ -48,6 +65,7 @@ class UsersManagementPage(QWidget):
         self._load_table()
 
     def _connect_signals(self):
+        """Connect filter buttons, search field, and action buttons to handlers."""
         self.ui.pushButtonAll.clicked.connect(self._apply_filter)
         self.ui.pushButtonAdmin.clicked.connect(self._apply_filter)
         self.ui.pushButtonUser.clicked.connect(self._apply_filter)
@@ -57,12 +75,15 @@ class UsersManagementPage(QWidget):
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
 
     def refresh(self):
+        """Reload the users table data from the database."""
         self._load_table()
 
     def _load_table(self):
+        """Load the users table by applying current filters."""
         self._apply_filter()
 
     def _apply_filter(self):
+        """Filter and display users based on role filter and search keyword."""
         users = get_all_users()
         if self.ui.pushButtonAdmin.isChecked():
             users = [u for u in users if u["role"] == "admin"]
@@ -74,6 +95,11 @@ class UsersManagementPage(QWidget):
         self._populate_table(users)
 
     def _populate_table(self, users):
+        """Populate the users table widget with user data and action buttons.
+
+        Args:
+            users (list[dict]): The list of user dictionaries to display.
+        """
         table = self.ui.tableWidget
         table.setRowCount(0)
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -91,6 +117,14 @@ class UsersManagementPage(QWidget):
             table.setCellWidget(row, 2, self._make_actions_widget(u))
 
     def _make_actions_widget(self, user):
+        """Build a widget with View Bookings, Edit, and Delete buttons for a user row.
+
+        Args:
+            user (dict): The user dictionary for the table row.
+
+        Returns:
+            QWidget: A container widget with horizontally laid out action buttons.
+        """
         container = QWidget()
         lay = QHBoxLayout(container)
         lay.setContentsMargins(4, 2, 4, 2)
@@ -136,6 +170,16 @@ class UsersManagementPage(QWidget):
         return container
 
     def _build_user_dialog(self, user=None):
+        """Build and configure a dialog for creating or editing a user.
+
+        Args:
+            user (dict or None): An existing user record to pre-fill the
+                dialog fields. If None, the dialog is configured for creating
+                a new user. Defaults to None.
+
+        Returns:
+            QDialog: The configured user dialog.
+        """
         dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "UserDialog.ui"), dlg)
         if user:
@@ -148,6 +192,7 @@ class UsersManagementPage(QWidget):
         return dlg
 
     def _add_user(self):
+        """Open a dialog to create a new user and save it to the database."""
         dlg = self._build_user_dialog()
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
@@ -165,6 +210,11 @@ class UsersManagementPage(QWidget):
             QMessageBox.warning(self._shell, "Error", "Username already exists.")
 
     def _edit_user(self, user):
+        """Open a dialog to edit an existing user.
+
+        Args:
+            user (dict): The user dictionary to edit.
+        """
         dlg = self._build_user_dialog(user)
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
@@ -180,6 +230,11 @@ class UsersManagementPage(QWidget):
             QMessageBox.warning(self._shell, "Error", "Failed to update user.")
 
     def _delete_user(self, user_id):
+        """Delete a user after confirmation, preventing self-deletion.
+
+        Args:
+            user_id (int): The primary key of the user to delete.
+        """
         if user_id == self._shell.current_user["id"]:
             QMessageBox.warning(
                 self._shell, "Error", "You cannot delete your own account."
@@ -191,6 +246,11 @@ class UsersManagementPage(QWidget):
             self._load_table()
 
     def _view_user_bookings(self, user):
+        """Display a dialog showing the booking history for a specific user.
+
+        Args:
+            user (dict): The user dictionary containing 'id' and 'username'.
+        """
         from models.booking_model import get_bookings_by_user
 
         bookings = get_bookings_by_user(user["id"])
@@ -222,6 +282,11 @@ class UsersManagementPage(QWidget):
         dlg.exec()
 
     def _import_csv(self):
+        """Import users from a CSV file into the database.
+
+        Expected CSV columns: username, password, role. Displays a summary
+        of imported and skipped rows upon completion.
+        """
         import csv
 
         path, _ = QFileDialog.getOpenFileName(
@@ -257,6 +322,7 @@ class UsersManagementPage(QWidget):
         QMessageBox.information(self._shell, "Import Complete", msg)
 
     def _export_csv(self):
+        """Export all users to a CSV file chosen by the user."""
         import csv
 
         path, _ = QFileDialog.getSaveFileName(
