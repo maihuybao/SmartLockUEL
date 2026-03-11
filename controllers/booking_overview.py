@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import (
-    QApplication,
+    QWidget,
+    QVBoxLayout,
     QMessageBox,
     QDialog,
     QFileDialog,
@@ -7,7 +8,6 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QHeaderView,
     QHBoxLayout,
-    QWidget,
 )
 from PyQt6.QtCore import Qt, QDate, QTime, QSize
 from PyQt6.QtGui import QColor, QIcon
@@ -27,7 +27,6 @@ def _png_icon(name):
     return QIcon(path)
 
 
-from widgets.base_window import BaseWindow
 from models.booking_model import (
     get_all_bookings,
     delete_booking,
@@ -39,29 +38,23 @@ from models.booking_model import (
 from models.room_model import get_all_rooms
 
 
-class BookingOverviewController(BaseWindow):
-    def __init__(self, user):
-        super().__init__(
-            user,
-            role_text="Admin",
-            show_search=False,
-            show_sidebar=True,
-            title="SmartLocker UEL - Booking Management",
-        )
-        self.ui = self.load_content_ui("BookingManagement.ui")
+class BookingOverviewPage(QWidget):
+    """Page Booking Management cho Admin."""
+
+    def __init__(self, shell):
+        super().__init__()
+        self._shell = shell
         self._current_bookings = []
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.ui = QWidget()
+        uic.loadUi(os.path.join(UI_DIR, "BookingManagement.ui"), self.ui)
+        layout.addWidget(self.ui)
+
         self._connect_signals()
         self._load_table()
-
-    def _connect_sidebar(self):
-        self.sidebar.pushButtonOverview.clicked.connect(self._go_overview)
-        self.sidebar.pushButtonBookings.clicked.connect(lambda: None)
-        self.sidebar.pushButtonEdit.clicked.connect(self._go_edit)
-        self.sidebar.pushButtonUsers.clicked.connect(self._go_users)
-        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
-        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
-        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
-        self._highlight_sidebar("pushButtonBookings")
 
     def _connect_signals(self):
         self.ui.pushButtonAll.clicked.connect(self._load_table)
@@ -72,6 +65,9 @@ class BookingOverviewController(BaseWindow):
         self.ui.pushButtonAdd.clicked.connect(self._add_booking)
         self.ui.pushButtonImportCSV.clicked.connect(self._import_csv)
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
+
+    def refresh(self):
+        self._load_table()
 
     # -- Table ----------------------------------------------------
 
@@ -204,10 +200,14 @@ class BookingOverviewController(BaseWindow):
         if not b:
             return
 
-        status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
+        status_colors = {
+            "Pending": "#FF9800",
+            "Approved": "#4CAF50",
+            "Rejected": "#F44336",
+        }
         status_color = status_colors.get(b["status"], "#333")
 
-        dlg = QDialog(self)
+        dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "BookingDetails.ui"), dlg)
 
         dlg.lblHeader.setText(f"Booking #{b['id']}")
@@ -223,7 +223,7 @@ class BookingOverviewController(BaseWindow):
         dlg.editStart.setText(b.get("time_start", ""))
         dlg.editEnd.setText(b.get("time_end", ""))
         dlg.editPurpose.setPlainText(b.get("reason", "") or "")
-        dlg.editLockPw.setText(b.get("locker_password") or "—")
+        dlg.editLockPw.setText(b.get("locker_password") or "---")
 
         if b.get("reject_reason"):
             dlg.editRejectReason.setText(b["reject_reason"])
@@ -237,7 +237,9 @@ class BookingOverviewController(BaseWindow):
     def _approve_booking_inline(self, booking_id):
         password = approve_booking(booking_id)
         QMessageBox.information(
-            self, "Approved", f"Booking approved.\nLocker password: {password}"
+            self._shell,
+            "Approved",
+            f"Booking approved.\nLocker password: {password}",
         )
         self._load_table()
 
@@ -250,7 +252,9 @@ class BookingOverviewController(BaseWindow):
         if dlg.exec() == QDialog.DialogCode.Accepted:
             reason = dlg.editRejectReason.text().strip()
             if not reason:
-                QMessageBox.warning(self, "Error", "Please enter a rejection reason.")
+                QMessageBox.warning(
+                    self._shell, "Error", "Please enter a rejection reason."
+                )
                 return
             reject_booking(booking_id, reason)
             self._load_table()
@@ -267,12 +271,12 @@ class BookingOverviewController(BaseWindow):
             end_str = dlg.timeEditEnd.time().toString("HH:mm")
             reason = dlg.editReason.toPlainText().strip()
             if not reason:
-                QMessageBox.warning(self, "Error", "Please enter a reason.")
+                QMessageBox.warning(self._shell, "Error", "Please enter a reason.")
                 return
             if create_booking(user_id, room_id, date_str, start_str, end_str, reason):
                 self._load_table()
             else:
-                QMessageBox.warning(self, "Error", "Failed to create booking.")
+                QMessageBox.warning(self._shell, "Error", "Failed to create booking.")
 
     def _edit_booking(self, booking_id):
         bookings = get_all_bookings()
@@ -287,13 +291,15 @@ class BookingOverviewController(BaseWindow):
             reason = dlg.editReason.toPlainText().strip()
             status = dlg.comboStatus.currentText()
             if not reason:
-                QMessageBox.warning(self, "Error", "Please enter a reason.")
+                QMessageBox.warning(self._shell, "Error", "Please enter a reason.")
                 return
-            admin_update_booking(booking_id, date_str, start_str, end_str, reason, status)
+            admin_update_booking(
+                booking_id, date_str, start_str, end_str, reason, status
+            )
             self._load_table()
 
     def _delete_booking(self, booking_id):
-        reply = QMessageBox.question(self, "Confirm", "Delete this booking?")
+        reply = QMessageBox.question(self._shell, "Confirm", "Delete this booking?")
         if reply == QMessageBox.StandardButton.Yes:
             delete_booking(booking_id)
             self._load_table()
@@ -302,7 +308,9 @@ class BookingOverviewController(BaseWindow):
         import csv
         from models.user_model import get_all_users
 
-        path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv)")
+        path, _ = QFileDialog.getOpenFileName(
+            self._shell, "Open CSV", "", "CSV Files (*.csv)"
+        )
         if not path:
             return
 
@@ -340,7 +348,9 @@ class BookingOverviewController(BaseWindow):
                         skipped += 1
                         continue
 
-                    if create_booking(user_pk, room_pk, date_str, start_str, end_str, reason):
+                    if create_booking(
+                        user_pk, room_pk, date_str, start_str, end_str, reason
+                    ):
                         imported += 1
                     else:
                         errors.append(
@@ -348,7 +358,7 @@ class BookingOverviewController(BaseWindow):
                         )
                         skipped += 1
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to read file:\n{e}")
+            QMessageBox.critical(self._shell, "Error", f"Failed to read file:\n{e}")
             return
 
         self._load_table()
@@ -357,7 +367,7 @@ class BookingOverviewController(BaseWindow):
             msg += "\n\nDetails:\n" + "\n".join(errors[:10])
             if len(errors) > 10:
                 msg += f"\n... and {len(errors) - 10} more"
-        QMessageBox.information(self, "Import Complete", msg)
+        QMessageBox.information(self._shell, "Import Complete", msg)
 
     def _export_csv(self):
         import csv
@@ -380,11 +390,14 @@ class BookingOverviewController(BaseWindow):
             ]
 
         if not bookings:
-            QMessageBox.information(self, "Export CSV", "No data to export.")
+            QMessageBox.information(self._shell, "Export CSV", "No data to export.")
             return
 
         path, _ = QFileDialog.getSaveFileName(
-            self, "Save CSV", "bookings.csv", "CSV Files (*.csv)"
+            self._shell,
+            "Save CSV",
+            "bookings.csv",
+            "CSV Files (*.csv)",
         )
         if not path:
             return
@@ -420,15 +433,17 @@ class BookingOverviewController(BaseWindow):
                         ]
                     )
             QMessageBox.information(
-                self, "Export CSV", f"Exported {len(bookings)} bookings successfully."
+                self._shell,
+                "Export CSV",
+                f"Exported {len(bookings)} bookings successfully.",
             )
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to export:\n{e}")
+            QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")
 
     def _build_booking_dialog(self, booking=None, reject_mode=False):
         from models.user_model import get_all_users
 
-        dlg = QDialog(self)
+        dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "AdminBookingDialog.ui"), dlg)
 
         if reject_mode:

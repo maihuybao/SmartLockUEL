@@ -162,9 +162,9 @@ class MainWindowController(QMainWindow):
 
     def _open_dashboard(self, user):
         if user["role"] == "admin":
-            from controllers.overview_admin import OverviewAdminController
+            from controllers.admin_shell import AdminShellController
 
-            self._dashboard = OverviewAdminController(user)
+            self._dashboard = AdminShellController(user)
         else:
             from controllers.overview_users import OverviewUsersController
 

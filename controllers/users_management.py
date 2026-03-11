@@ -1,6 +1,13 @@
 from PyQt6.QtWidgets import (
-    QTableWidgetItem, QMessageBox, QHeaderView, QFileDialog,
-    QPushButton, QHBoxLayout, QWidget, QDialog,
+    QWidget,
+    QVBoxLayout,
+    QTableWidgetItem,
+    QMessageBox,
+    QHeaderView,
+    QFileDialog,
+    QPushButton,
+    QHBoxLayout,
+    QDialog,
 )
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QColor, QIcon
@@ -20,29 +27,25 @@ def _png_icon(name):
     return QIcon(path)
 
 
-from widgets.base_window import BaseWindow
 from models.user_model import get_all_users, create_user, update_user, delete_user
 
 
-class UsersManagementController(BaseWindow):
-    def __init__(self, user):
-        super().__init__(
-            user, role_text="Admin", show_search=False,
-            show_sidebar=True, title="SmartLocker UEL - Users Management",
-        )
-        self.ui = self.load_content_ui("Users.ui")
+class UsersManagementPage(QWidget):
+    """Page Users Management cho Admin."""
+
+    def __init__(self, shell):
+        super().__init__()
+        self._shell = shell
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.ui = QWidget()
+        uic.loadUi(os.path.join(UI_DIR, "Users.ui"), self.ui)
+        layout.addWidget(self.ui)
+
         self._connect_signals()
         self._load_table()
-
-    def _connect_sidebar(self):
-        self.sidebar.pushButtonOverview.clicked.connect(self._go_overview)
-        self.sidebar.pushButtonBookings.clicked.connect(self._go_bookings)
-        self.sidebar.pushButtonEdit.clicked.connect(self._go_edit)
-        self.sidebar.pushButtonUsers.clicked.connect(lambda: None)
-        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
-        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
-        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
-        self._highlight_sidebar("pushButtonUsers")
 
     def _connect_signals(self):
         self.ui.pushButtonAll.clicked.connect(self._apply_filter)
@@ -53,23 +56,21 @@ class UsersManagementController(BaseWindow):
         self.ui.pushButtonImportCSV.clicked.connect(self._import_csv)
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
 
-    # -- Table ----------------------------------------------------
+    def refresh(self):
+        self._load_table()
 
     def _load_table(self):
         self._apply_filter()
 
     def _apply_filter(self):
         users = get_all_users()
-
         if self.ui.pushButtonAdmin.isChecked():
             users = [u for u in users if u["role"] == "admin"]
         elif self.ui.pushButtonUser.isChecked():
             users = [u for u in users if u["role"] == "user"]
-
         keyword = self.ui.lineEditSearch.text().strip().lower()
         if keyword:
             users = [u for u in users if keyword in u["username"].lower()]
-
         self._populate_table(users)
 
     def _populate_table(self, users):
@@ -79,28 +80,21 @@ class UsersManagementController(BaseWindow):
         table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
         table.setColumnWidth(2, 100)
         table.verticalHeader().setDefaultSectionSize(32)
-
         self.ui.lblCount.setText(f"{len(users)} users")
-
         role_colors = {"admin": "#E91E63", "user": "#4CAF50"}
-
         for row, u in enumerate(users):
             table.insertRow(row)
             table.setItem(row, 0, QTableWidgetItem(u["username"]))
-
             role_item = QTableWidgetItem(u["role"])
             role_item.setForeground(QColor(role_colors.get(u["role"], "#333")))
             table.setItem(row, 1, role_item)
-
             table.setCellWidget(row, 2, self._make_actions_widget(u))
-
-        self._users_data = users
 
     def _make_actions_widget(self, user):
         container = QWidget()
-        layout = QHBoxLayout(container)
-        layout.setContentsMargins(4, 2, 4, 2)
-        layout.setSpacing(4)
+        lay = QHBoxLayout(container)
+        lay.setContentsMargins(4, 2, 4, 2)
+        lay.setSpacing(4)
 
         btn_view = QPushButton()
         btn_view.setToolTip("View Bookings")
@@ -135,16 +129,14 @@ class UsersManagementController(BaseWindow):
         )
         btn_del.clicked.connect(lambda _, u=user: self._delete_user(u["id"]))
 
-        layout.addWidget(btn_view)
-        layout.addWidget(btn_edit)
-        layout.addWidget(btn_del)
-        layout.addStretch()
+        lay.addWidget(btn_view)
+        lay.addWidget(btn_edit)
+        lay.addWidget(btn_del)
+        lay.addStretch()
         return container
 
-    # -- Dialogs --------------------------------------------------
-
     def _build_user_dialog(self, user=None):
-        dlg = QDialog(self)
+        dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "UserDialog.ui"), dlg)
         if user:
             dlg.setWindowTitle("Edit User")
@@ -163,12 +155,14 @@ class UsersManagementController(BaseWindow):
         password = dlg.editPassword.text().strip()
         role = dlg.comboRole.currentText()
         if not username or not password:
-            QMessageBox.warning(self, "Error", "Please enter username and password.")
+            QMessageBox.warning(
+                self._shell, "Error", "Please enter username and password."
+            )
             return
         if create_user(username, password, role):
             self._load_table()
         else:
-            QMessageBox.warning(self, "Error", "Username already exists.")
+            QMessageBox.warning(self._shell, "Error", "Username already exists.")
 
     def _edit_user(self, user):
         dlg = self._build_user_dialog(user)
@@ -178,18 +172,20 @@ class UsersManagementController(BaseWindow):
         password = dlg.editPassword.text().strip()
         role = dlg.comboRole.currentText()
         if not username:
-            QMessageBox.warning(self, "Error", "Please enter a username.")
+            QMessageBox.warning(self._shell, "Error", "Please enter a username.")
             return
         if update_user(user["id"], username, password, role):
             self._load_table()
         else:
-            QMessageBox.warning(self, "Error", "Failed to update user.")
+            QMessageBox.warning(self._shell, "Error", "Failed to update user.")
 
     def _delete_user(self, user_id):
-        if user_id == self.current_user["id"]:
-            QMessageBox.warning(self, "Error", "You cannot delete your own account.")
+        if user_id == self._shell.current_user["id"]:
+            QMessageBox.warning(
+                self._shell, "Error", "You cannot delete your own account."
+            )
             return
-        reply = QMessageBox.question(self, "Confirm", "Delete this user?")
+        reply = QMessageBox.question(self._shell, "Confirm", "Delete this user?")
         if reply == QMessageBox.StandardButton.Yes:
             delete_user(user_id)
             self._load_table()
@@ -198,18 +194,18 @@ class UsersManagementController(BaseWindow):
         from models.booking_model import get_bookings_by_user
 
         bookings = get_bookings_by_user(user["id"])
-
-        dlg = QDialog(self)
+        dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "UserBookingsView.ui"), dlg)
-        dlg.setWindowTitle(f"Bookings — {user['username']}")
+        dlg.setWindowTitle(f"Bookings -- {user['username']}")
         dlg.lblHeader.setText(f"Booking history: {user['username']}")
-
         table = dlg.tableBookings
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         table.verticalHeader().setDefaultSectionSize(30)
-
-        status_colors = {"Pending": "#FF9800", "Approved": "#4CAF50", "Rejected": "#F44336"}
-
+        status_colors = {
+            "Pending": "#FF9800",
+            "Approved": "#4CAF50",
+            "Rejected": "#F44336",
+        }
         table.setRowCount(len(bookings))
         for row, b in enumerate(bookings):
             table.setItem(row, 0, QTableWidgetItem(b["room_name"]))
@@ -221,26 +217,22 @@ class UsersManagementController(BaseWindow):
             status_item = QTableWidgetItem(b["status"])
             status_item.setForeground(QColor(status_colors.get(b["status"], "#333")))
             table.setItem(row, 6, status_item)
-
         dlg.lblCount.setText(f"{len(bookings)} bookings")
         dlg.pushButtonClose.clicked.connect(dlg.accept)
         dlg.exec()
 
-    # -- CSV ------------------------------------------------------
-
     def _import_csv(self):
         import csv
 
-        path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv)")
+        path, _ = QFileDialog.getOpenFileName(
+            self._shell, "Open CSV", "", "CSV Files (*.csv)"
+        )
         if not path:
             return
-        imported = 0
-        skipped = 0
-        errors = []
+        imported, skipped, errors = 0, 0, []
         try:
             with open(path, newline="", encoding="utf-8-sig") as f:
-                reader = csv.DictReader(f)
-                for i, row in enumerate(reader, start=2):
+                for i, row in enumerate(csv.DictReader(f), start=2):
                     username = (row.get("username") or "").strip()
                     password = (row.get("password") or "").strip()
                     role = (row.get("role") or "").strip().lower()
@@ -254,21 +246,22 @@ class UsersManagementController(BaseWindow):
                         errors.append(f"Row {i}: username '{username}' already exists")
                         skipped += 1
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to read file:\n{e}")
+            QMessageBox.critical(self._shell, "Error", f"Failed to read file:\n{e}")
             return
-
         self._load_table()
         msg = f"Imported: {imported}  |  Skipped: {skipped}"
         if errors:
             msg += "\n\nDetails:\n" + "\n".join(errors[:10])
             if len(errors) > 10:
                 msg += f"\n... and {len(errors) - 10} more"
-        QMessageBox.information(self, "Import Complete", msg)
+        QMessageBox.information(self._shell, "Import Complete", msg)
 
     def _export_csv(self):
         import csv
 
-        path, _ = QFileDialog.getSaveFileName(self, "Save CSV", "users.csv", "CSV Files (*.csv)")
+        path, _ = QFileDialog.getSaveFileName(
+            self._shell, "Save CSV", "users.csv", "CSV Files (*.csv)"
+        )
         if not path:
             return
         users = get_all_users()
@@ -278,6 +271,10 @@ class UsersManagementController(BaseWindow):
                 writer.writeheader()
                 for u in users:
                     writer.writerow({"username": u["username"], "role": u["role"]})
-            QMessageBox.information(self, "Export Complete", f"Exported {len(users)} users to:\n{path}")
+            QMessageBox.information(
+                self._shell,
+                "Export Complete",
+                f"Exported {len(users)} users to:\n{path}",
+            )
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to export:\n{e}")
+            QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")

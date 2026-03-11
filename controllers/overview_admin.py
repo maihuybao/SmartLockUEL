@@ -1,8 +1,7 @@
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QWidget, QVBoxLayout
 from PyQt6 import uic
 import os
 
-from widgets.base_window import BaseWindow
 from widgets.room_card import create_room_card, get_display_status
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
 from models.booking_model import get_dashboard_stats
@@ -12,49 +11,49 @@ BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
-class OverviewAdminController(BaseWindow):
-    def __init__(self, user):
-        super().__init__(
-            user, role_text="Admin", show_search=True,
-            show_sidebar=True, title="SmartLocker UEL - Admin",
-        )
+class OverviewAdminPage(QWidget):
+    """Page Overview cho Admin — hien thi trong QStackedWidget."""
+
+    def __init__(self, shell):
+        super().__init__()
+        self._shell = shell
         self._current_filter = "All"
 
-        # Load content from .ui
-        self.ui = self.load_content_ui("OverviewAdmin.ui")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.ui = QWidget()
+        uic.loadUi(os.path.join(UI_DIR, "OverviewAdmin.ui"), self.ui)
+        layout.addWidget(self.ui)
 
         self._connect_signals()
         self.ui.pushButtonAll.setChecked(True)
         self._load_stats()
         self._load_rooms()
 
-    def _connect_sidebar(self):
-        """Override: Overview is current page."""
-        self.sidebar.pushButtonOverview.clicked.connect(lambda: None)
-        self.sidebar.pushButtonBookings.clicked.connect(self._go_bookings)
-        self.sidebar.pushButtonEdit.clicked.connect(self._go_edit)
-        self.sidebar.pushButtonUsers.clicked.connect(self._go_users)
-        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
-        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
-        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
-        self._highlight_sidebar("pushButtonOverview")
-
     def _connect_signals(self):
-        # Filters
         self.ui.pushButtonAll.clicked.connect(lambda: self._apply_filter("All"))
-        self.ui.pushButtonAvailable.clicked.connect(lambda: self._apply_filter("Available"))
-        self.ui.pushButtonOccupied.clicked.connect(lambda: self._apply_filter("Occupied"))
+        self.ui.pushButtonAvailable.clicked.connect(
+            lambda: self._apply_filter("Available")
+        )
+        self.ui.pushButtonOccupied.clicked.connect(
+            lambda: self._apply_filter("Occupied")
+        )
         self.ui.pushButtonBooked.clicked.connect(lambda: self._apply_filter("Full"))
 
-        # Search
-        self.navbar.lineEditSearch.textChanged.connect(self._on_search)
+        # Search tu navbar cua shell
+        self._shell.navbar.lineEditSearch.textChanged.connect(self._on_search)
 
-    # ── Room grid ────────────────────────────────────────
+    # -- Room grid ------------------------------------------------
+
+    def refresh(self):
+        self._load_stats()
+        self._load_rooms()
 
     def _load_rooms(self):
         keyword = ""
-        if self.navbar.lineEditSearch:
-            keyword = self.navbar.lineEditSearch.text().strip()
+        if self._shell.navbar.lineEditSearch:
+            keyword = self._shell.navbar.lineEditSearch.text().strip()
         if keyword:
             rooms = search_rooms(keyword)
         elif self._current_filter == "Full":
@@ -73,7 +72,7 @@ class OverviewAdminController(BaseWindow):
         self._reflow_grid()
 
     def _reflow_grid(self):
-        if not hasattr(self, '_rooms_data'):
+        if not hasattr(self, "_rooms_data"):
             return
         layout = self.ui.gridLayout
         while layout.count():
@@ -84,14 +83,13 @@ class OverviewAdminController(BaseWindow):
 
         card_w = 200
         spacing = layout.horizontalSpacing() or 10
-        available = self.content_area.width() - 20
+        available = self.width() - 20
         cols = max(1, available // (card_w + spacing))
 
         for i, room in enumerate(self._rooms_data):
             card = self._create_room_card(room)
             layout.addWidget(card, i // cols, i % cols)
 
-        # Stretch cuối để đẩy card về góc trên-trái
         last_row = (len(self._rooms_data) - 1) // cols if self._rooms_data else 0
         layout.setRowStretch(last_row + 1, 1)
         layout.setColumnStretch(cols, 1)
@@ -110,9 +108,10 @@ class OverviewAdminController(BaseWindow):
     def _on_card_context(self, room, global_pos):
         from PyQt6.QtWidgets import QMenu
         from PyQt6.QtGui import QAction
+
         menu = QMenu(self)
         act = QAction("Edit Room", self)
-        act.triggered.connect(lambda: self._go_edit(preselect_room=room))
+        act.triggered.connect(lambda: self._shell.go_to_rooms(preselect_room=room))
         menu.addAction(act)
         menu.exec(global_pos)
 

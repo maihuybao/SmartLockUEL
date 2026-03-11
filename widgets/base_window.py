@@ -1,7 +1,14 @@
 import os
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QApplication,
-    QMessageBox, QScrollArea, QFrame,
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QApplication,
+    QMessageBox,
+    QScrollArea,
+    QFrame,
+    QStackedWidget,
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QKeySequence, QShortcut
@@ -18,16 +25,23 @@ UI_DIR = os.path.join(BASE_DIR, "ui")
 class BaseWindow(QMainWindow):
     """
     Window mac dinh chua san NavBar + SideBar.
-    Cac controller ke thua class nay, chi can:
-      1. Goi super().__init__(...)
-      2. Load .ui content vao self.content_area
-         hoac tu build content bang code roi add vao self.content_layout
+    Ho tro 2 che do:
+      - Che do cu: dung content_area + content_layout (cho User page)
+      - Che do stack: dung QStackedWidget (cho Admin shell)
     """
 
-    def __init__(self, user, role_text="Admin", show_search=False,
-                 show_sidebar=True, title="SmartLocker UEL"):
+    def __init__(
+        self,
+        user,
+        role_text="Admin",
+        show_search=False,
+        show_sidebar=True,
+        title="SmartLocker UEL",
+        use_stack=False,
+    ):
         super().__init__()
         self.current_user = user
+        self._use_stack = use_stack
         self.setWindowTitle(title)
         self.setMinimumSize(800, 500)
         self.resize(1200, 800)
@@ -56,38 +70,69 @@ class BaseWindow(QMainWindow):
         if show_sidebar:
             self.sidebar = SideBar()
             body.addWidget(self.sidebar)
-            self._connect_sidebar()
 
-        # Content area — wrapped in scroll area
-        self._scroll = QScrollArea()
-        self._scroll.setWidgetResizable(True)
-        self._scroll.setFrameShape(QFrame.Shape.NoFrame)
-        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self._scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        if use_stack:
+            # Che do stack: QStackedWidget thay cho scroll area
+            self._stack = QStackedWidget()
+            body.addWidget(self._stack, 1)
+            self._page_buttons = []
+        else:
+            # Che do cu: scroll area (cho User page)
+            self._scroll = QScrollArea()
+            self._scroll.setWidgetResizable(True)
+            self._scroll.setFrameShape(QFrame.Shape.NoFrame)
+            self._scroll.setHorizontalScrollBarPolicy(
+                Qt.ScrollBarPolicy.ScrollBarAsNeeded
+            )
+            self._scroll.setVerticalScrollBarPolicy(
+                Qt.ScrollBarPolicy.ScrollBarAsNeeded
+            )
 
-        self.content_area = QWidget()
-        self.content_layout = QVBoxLayout(self.content_area)
-        self.content_layout.setContentsMargins(0, 0, 0, 0)
-        self._scroll.setWidget(self.content_area)
-        body.addWidget(self._scroll, 1)
+            self.content_area = QWidget()
+            self.content_layout = QVBoxLayout(self.content_area)
+            self.content_layout.setContentsMargins(0, 0, 0, 0)
+            self._scroll.setWidget(self.content_area)
+            body.addWidget(self._scroll, 1)
 
         main_layout.addLayout(body)
 
-    def _connect_sidebar(self):
-        """Ket noi sidebar navigation mac dinh. Override neu can."""
-        self.sidebar.pushButtonOverview.clicked.connect(self._go_overview)
-        self.sidebar.pushButtonBookings.clicked.connect(self._go_bookings)
-        self.sidebar.pushButtonEdit.clicked.connect(self._go_edit)
-        self.sidebar.pushButtonUsers.clicked.connect(self._go_users)
-        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
-        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
-        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
+    # -- Stack page management (Admin shell) -----------------------
+
+    def add_page(self, page_widget, sidebar_button_name=None):
+        """Them page vao stack. Tra ve index cua page."""
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        scroll.setWidget(page_widget)
+
+        idx = self._stack.addWidget(scroll)
+        self._page_buttons.append(sidebar_button_name)
+        return idx
+
+    def switch_page(self, index):
+        """Chuyen sang page tai index, highlight sidebar button tuong ung."""
+        self._stack.setCurrentIndex(index)
+        if self.sidebar and index < len(self._page_buttons):
+            self._highlight_sidebar(self._page_buttons[index])
+
+    def get_current_scroll_area(self):
+        """Tra ve scroll area hien tai (de page tinh layout)."""
+        if self._use_stack:
+            return self._stack.currentWidget()
+        return self._scroll
+
+    # -- Sidebar ---------------------------------------------------
 
     def _highlight_sidebar(self, active_button_name):
         """Highlight button dang active tren sidebar."""
         nav_buttons = [
-            "pushButtonOverview", "pushButtonBookings", "pushButtonEdit",
-            "pushButtonUsers", "pushButtonDevices",
+            "pushButtonOverview",
+            "pushButtonBookings",
+            "pushButtonEdit",
+            "pushButtonUsers",
+            "pushButtonDevices",
         ]
         for name in nav_buttons:
             btn = getattr(self.sidebar, name, None)
@@ -96,58 +141,16 @@ class BaseWindow(QMainWindow):
                 btn.style().unpolish(btn)
                 btn.style().polish(btn)
 
+    # -- Content loading (che do cu, cho User page) ----------------
+
     def load_content_ui(self, ui_filename):
-        """Load file .ui vao content_area."""
+        """Load file .ui vao content_area (che do cu)."""
         content_widget = QWidget()
         uic.loadUi(os.path.join(UI_DIR, ui_filename), content_widget)
         self.content_layout.addWidget(content_widget)
         return content_widget
 
-    # -- Navigation -------------------------------------------
-
-    def _go_overview(self):
-        from controllers.overview_admin import OverviewAdminController
-        self._win = OverviewAdminController(self.current_user)
-        self._transfer_window_state(self._win)
-        self._win.show()
-        self.close()
-
-    def _go_bookings(self):
-        from controllers.booking_overview import BookingOverviewController
-        self._win = BookingOverviewController(self.current_user)
-        self._transfer_window_state(self._win)
-        self._win.show()
-        self.close()
-
-    def _go_edit(self, preselect_room=None):
-        from controllers.edit_room import EditRoomController
-        self._win = EditRoomController(self.current_user, preselect_room=preselect_room)
-        self._transfer_window_state(self._win)
-        self._win.show()
-        self.close()
-
-    def _go_users(self):
-        from controllers.users_management import UsersManagementController
-        self._win = UsersManagementController(self.current_user)
-        self._transfer_window_state(self._win)
-        self._win.show()
-        self.close()
-
-    def _go_devices(self):
-        from controllers.device_management import DeviceManagementController
-        self._win = DeviceManagementController(self.current_user)
-        self._transfer_window_state(self._win)
-        self._win.show()
-        self.close()
-
-    def _transfer_window_state(self, target):
-        if self.isFullScreen():
-            target.showFullScreen()
-        elif self.isMaximized():
-            target.showMaximized()
-        else:
-            target.resize(self.size())
-            target.move(self.pos())
+    # -- Common actions --------------------------------------------
 
     def _toggle_fullscreen(self):
         if self.isFullScreen():
@@ -156,10 +159,15 @@ class BaseWindow(QMainWindow):
             self.showFullScreen()
 
     def _logout(self):
-        reply = QMessageBox.question(self, "Log out", "Are you sure you want to log out?")
+        reply = QMessageBox.question(
+            self,
+            "Log out",
+            "Are you sure you want to log out?",
+        )
         if reply != QMessageBox.StandardButton.Yes:
             return
         from controllers.main_window import MainWindowController
+
         self._login = MainWindowController()
         self._login.show()
         self.close()
@@ -167,7 +175,9 @@ class BaseWindow(QMainWindow):
     @staticmethod
     def _quit():
         reply = QMessageBox.question(
-            None, "Quit", "Are you sure you want to quit?",
+            None,
+            "Quit",
+            "Are you sure you want to quit?",
         )
         if reply == QMessageBox.StandardButton.Yes:
             QApplication.quit()

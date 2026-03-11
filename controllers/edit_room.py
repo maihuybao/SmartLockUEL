@@ -1,11 +1,12 @@
 from PyQt6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
     QTableWidgetItem,
     QMessageBox,
     QHeaderView,
     QFileDialog,
     QPushButton,
     QHBoxLayout,
-    QWidget,
     QDialog,
 )
 from PyQt6.QtCore import QSize
@@ -26,7 +27,6 @@ def _png_icon(name):
     return QIcon(path)
 
 
-from widgets.base_window import BaseWindow
 from models.room_model import (
     get_all_rooms,
     create_room,
@@ -35,31 +35,25 @@ from models.room_model import (
 )
 
 
-class EditRoomController(BaseWindow):
-    def __init__(self, user, preselect_room=None):
-        super().__init__(
-            user,
-            role_text="Admin",
-            show_search=False,
-            show_sidebar=True,
-            title="SmartLocker UEL - Edit Rooms",
-        )
-        self.ui = self.load_content_ui("RoomManagement.ui")
+class EditRoomPage(QWidget):
+    """Page Room Management cho Admin."""
+
+    def __init__(self, shell, preselect_room=None):
+        super().__init__()
+        self._shell = shell
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.ui = QWidget()
+        uic.loadUi(os.path.join(UI_DIR, "RoomManagement.ui"), self.ui)
+        layout.addWidget(self.ui)
+
         self._connect_signals()
         self._load_table()
 
         if preselect_room:
             self._preselect(preselect_room)
-
-    def _connect_sidebar(self):
-        self.sidebar.pushButtonOverview.clicked.connect(self._go_overview)
-        self.sidebar.pushButtonBookings.clicked.connect(self._go_bookings)
-        self.sidebar.pushButtonEdit.clicked.connect(lambda: None)
-        self.sidebar.pushButtonUsers.clicked.connect(self._go_users)
-        self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
-        self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
-        self.sidebar.pushButtonQuit.clicked.connect(self._quit)
-        self._highlight_sidebar("pushButtonEdit")
 
     def _connect_signals(self):
         self.ui.pushButtonAll.clicked.connect(self._apply_filter)
@@ -69,6 +63,9 @@ class EditRoomController(BaseWindow):
         self.ui.pushButtonAdd.clicked.connect(self._add_room)
         self.ui.pushButtonImportCSV.clicked.connect(self._import_csv)
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
+
+    def refresh(self):
+        self._load_table()
 
     # -- Table ----------------------------------------------------
 
@@ -92,9 +89,6 @@ class EditRoomController(BaseWindow):
             ]
 
         self._populate_table(rooms)
-
-    def _search(self):
-        self._apply_filter()
 
     def _populate_table(self, rooms):
         table = self.ui.tableWidget
@@ -170,7 +164,7 @@ class EditRoomController(BaseWindow):
     # -- Dialogs --------------------------------------------------
 
     def _build_room_dialog(self, room=None):
-        dlg = QDialog(self)
+        dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "RoomDialog.ui"), dlg)
         if room:
             dlg.setWindowTitle("Edit Room")
@@ -193,17 +187,19 @@ class EditRoomController(BaseWindow):
         cap_text = dlg.editCap.text().strip()
         status = dlg.comboStatus.currentText()
         if not room_id or not room_type:
-            QMessageBox.warning(self, "Error", "Please enter Room ID and Room Type.")
+            QMessageBox.warning(
+                self._shell, "Error", "Please enter Room ID and Room Type."
+            )
             return
         try:
             capacity = int(cap_text) if cap_text else 50
         except ValueError:
-            QMessageBox.warning(self, "Error", "Capacity must be a number.")
+            QMessageBox.warning(self._shell, "Error", "Capacity must be a number.")
             return
         if create_room(room_id, room_type, capacity, status):
             self._load_table()
         else:
-            QMessageBox.warning(self, "Error", "Room ID already exists.")
+            QMessageBox.warning(self._shell, "Error", "Room ID already exists.")
 
     def _edit_room(self, room):
         dlg = self._build_room_dialog(room)
@@ -214,20 +210,20 @@ class EditRoomController(BaseWindow):
         cap_text = dlg.editCap.text().strip()
         status = dlg.comboStatus.currentText()
         if not room_id or not room_type:
-            QMessageBox.warning(self, "Error", "Please fill in all fields.")
+            QMessageBox.warning(self._shell, "Error", "Please fill in all fields.")
             return
         try:
             capacity = int(cap_text) if cap_text else 50
         except ValueError:
-            QMessageBox.warning(self, "Error", "Capacity must be a number.")
+            QMessageBox.warning(self._shell, "Error", "Capacity must be a number.")
             return
         if update_room(room["id"], room_id, room_type, capacity, status):
             self._load_table()
         else:
-            QMessageBox.warning(self, "Error", "Failed to update room.")
+            QMessageBox.warning(self._shell, "Error", "Failed to update room.")
 
     def _delete_room(self, room_pk):
-        reply = QMessageBox.question(self, "Confirm", "Delete this room?")
+        reply = QMessageBox.question(self._shell, "Confirm", "Delete this room?")
         if reply == QMessageBox.StandardButton.Yes:
             delete_room(room_pk)
             self._load_table()
@@ -237,7 +233,9 @@ class EditRoomController(BaseWindow):
     def _import_csv(self):
         import csv
 
-        path, _ = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv)")
+        path, _ = QFileDialog.getOpenFileName(
+            self._shell, "Open CSV", "", "CSV Files (*.csv)"
+        )
         if not path:
             return
         imported = 0
@@ -267,7 +265,7 @@ class EditRoomController(BaseWindow):
                         errors.append(f"Row {i}: room_id '{room_id}' already exists")
                         skipped += 1
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to read file:\n{e}")
+            QMessageBox.critical(self._shell, "Error", f"Failed to read file:\n{e}")
             return
 
         self._load_table()
@@ -276,13 +274,16 @@ class EditRoomController(BaseWindow):
             msg += "\n\nDetails:\n" + "\n".join(errors[:10])
             if len(errors) > 10:
                 msg += f"\n... and {len(errors) - 10} more"
-        QMessageBox.information(self, "Import Complete", msg)
+        QMessageBox.information(self._shell, "Import Complete", msg)
 
     def _export_csv(self):
         import csv
 
         path, _ = QFileDialog.getSaveFileName(
-            self, "Save CSV", "rooms.csv", "CSV Files (*.csv)"
+            self._shell,
+            "Save CSV",
+            "rooms.csv",
+            "CSV Files (*.csv)",
         )
         if not path:
             return
@@ -290,7 +291,8 @@ class EditRoomController(BaseWindow):
         try:
             with open(path, "w", newline="", encoding="utf-8-sig") as f:
                 writer = csv.DictWriter(
-                    f, fieldnames=["room_id", "room_type", "capacity", "status"]
+                    f,
+                    fieldnames=["room_id", "room_type", "capacity", "status"],
                 )
                 writer.writeheader()
                 for r in rooms:
@@ -303,7 +305,9 @@ class EditRoomController(BaseWindow):
                         }
                     )
             QMessageBox.information(
-                self, "Export Complete", f"Exported {len(rooms)} rooms to:\n{path}"
+                self._shell,
+                "Export Complete",
+                f"Exported {len(rooms)} rooms to:\n{path}",
             )
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to export:\n{e}")
+            QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")
