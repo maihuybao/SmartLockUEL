@@ -33,9 +33,19 @@ QPushButton {
     padding: 12px;
     font-size: 16px;
     border: none;
+    border-radius: 6px;
 }
 QPushButton:hover {
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255,255,255,0.35);
+}
+QPushButton[active="true"] {
+    background-color: rgba(255,255,255,0.5);
+    font-weight: bold;
+    border-left: 3px solid #1F4F82;
+    border-radius: 0px 6px 6px 0px;
+}
+QPushButton[active="true"]:hover {
+    background-color: rgba(255,255,255,0.6);
 }</string>
   </property>
   <property name="frameShape">

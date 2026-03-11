@@ -1,8 +1,9 @@
 import os
 from PyQt6.QtWidgets import QFrame
 from PyQt6 import uic
+from paths import resource_dir
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
 
 

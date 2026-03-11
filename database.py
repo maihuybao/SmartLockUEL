@@ -2,7 +2,10 @@ import sqlite3
 import os
 import hashlib
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "datasets", "smartlocker.db")
+from paths import data_dir
+
+DB_PATH = os.path.join(data_dir(), "datasets", "smartlocker.db")
+os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 
 def get_connection():

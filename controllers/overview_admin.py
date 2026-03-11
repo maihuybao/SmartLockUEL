@@ -6,8 +6,9 @@ from widgets.base_window import BaseWindow
 from widgets.room_card import create_room_card, get_display_status
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
 from models.booking_model import get_dashboard_stats
+from paths import resource_dir
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
@@ -36,6 +37,7 @@ class OverviewAdminController(BaseWindow):
         self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
         self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
         self.sidebar.pushButtonQuit.clicked.connect(self._quit)
+        self._highlight_sidebar("pushButtonOverview")
 
     def _connect_signals(self):
         # Filters

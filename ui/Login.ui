@@ -311,9 +311,9 @@ QFrame:focus-within {
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">color: #003F87;
-font-size: 13px;
-spacing: 8px
+              <string notr="true">QRadioButton { color: #003F87; font-size: 13px; spacing: 8px; background: transparent; }
+QRadioButton::indicator { width: 16px; height: 16px; border: 2px solid #003F87; border-radius: 10px; background: white; }
+QRadioButton::indicator:checked { background: #003F87; border: 2px solid #003F87; }
 </string>
              </property>
              <property name="text">
@@ -327,9 +327,10 @@ spacing: 8px
            <item>
             <widget class="QRadioButton" name="radioButtonAdmin">
              <property name="styleSheet">
-              <string notr="true">color: #003F87;
-font-size: 13px;
-spacing: 8px</string>
+              <string notr="true">QRadioButton { color: #003F87; font-size: 13px; spacing: 8px; background: transparent; }
+QRadioButton::indicator { width: 16px; height: 16px; border: 2px solid #003F87; border-radius: 10px; background: white; }
+QRadioButton::indicator:checked { background: #003F87; border: 2px solid #003F87; }
+</string>
              </property>
              <property name="text">
               <string>Administrator</string>

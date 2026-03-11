@@ -7,8 +7,9 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QColor, QIcon
 from PyQt6 import uic
 import os
+from paths import resource_dir
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = resource_dir()
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
 UI_DIR = os.path.join(BASE_DIR, "ui")
 
@@ -50,6 +51,7 @@ class DeviceManagementController(BaseWindow):
         self.sidebar.pushButtonDevices.clicked.connect(lambda: None)
         self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
         self.sidebar.pushButtonQuit.clicked.connect(self._quit)
+        self._highlight_sidebar("pushButtonDevices")
 
     def _connect_signals(self):
         self.ui.pushButtonAll.clicked.connect(self._apply_filter)

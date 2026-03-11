@@ -9,8 +9,9 @@ from PyQt6 import uic
 
 from widgets.navbar import NavBar
 from widgets.sidebar import SideBar
+from paths import resource_dir
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
@@ -81,6 +82,19 @@ class BaseWindow(QMainWindow):
         self.sidebar.pushButtonDevices.clicked.connect(self._go_devices)
         self.sidebar.pushButtonLogOut.clicked.connect(self._logout)
         self.sidebar.pushButtonQuit.clicked.connect(self._quit)
+
+    def _highlight_sidebar(self, active_button_name):
+        """Highlight button dang active tren sidebar."""
+        nav_buttons = [
+            "pushButtonOverview", "pushButtonBookings", "pushButtonEdit",
+            "pushButtonUsers", "pushButtonDevices",
+        ]
+        for name in nav_buttons:
+            btn = getattr(self.sidebar, name, None)
+            if btn:
+                btn.setProperty("active", name == active_button_name)
+                btn.style().unpolish(btn)
+                btn.style().polish(btn)
 
     def load_content_ui(self, ui_filename):
         """Load file .ui vao content_area."""

@@ -10,8 +10,9 @@ from PyQt6 import uic
 
 from database import init_db
 from models.user_model import authenticate
+from paths import resource_dir
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
 IMG_DIR = os.path.join(BASE_DIR, "images")
 

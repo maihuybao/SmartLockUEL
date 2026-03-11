@@ -12,9 +12,10 @@ from PyQt6.QtGui import QColor, QIcon
 from PyQt6 import uic
 import os
 
-IMAGES_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "images"
-)
+from paths import resource_dir
+
+_BASE = resource_dir()
+IMAGES_DIR = os.path.join(_BASE, "images")
 
 
 def _png_icon(name):
@@ -35,7 +36,7 @@ from models.booking_model import (
     cancel_booking,
 )
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = _BASE
 UI_DIR = os.path.join(BASE_DIR, "ui")
 
 OP_START = QTime(6, 0)
