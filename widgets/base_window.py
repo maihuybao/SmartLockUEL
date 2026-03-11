@@ -23,11 +23,24 @@ UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 class BaseWindow(QMainWindow):
-    """
-    Window mac dinh chua san NavBar + SideBar.
-    Ho tro 2 che do:
-      - Che do cu: dung content_area + content_layout (cho User page)
-      - Che do stack: dung QStackedWidget (cho Admin shell)
+    """Base window providing a common layout with NavBar and optional SideBar.
+
+    Supports two content modes:
+        - Scroll mode (default): Uses a QScrollArea with content_area and
+          content_layout for single-page views such as the User dashboard.
+        - Stack mode: Uses a QStackedWidget for multi-page navigation
+          such as the Admin shell.
+
+    Args:
+        user (dict): The authenticated user record dictionary.
+        role_text (str): Display text for the role badge in the NavBar.
+            Defaults to 'Admin'.
+        show_search (bool): Whether to show the search field in the NavBar.
+            Defaults to False.
+        show_sidebar (bool): Whether to display the SideBar. Defaults to True.
+        title (str): The window title. Defaults to 'SmartLocker UEL'.
+        use_stack (bool): If True, uses QStackedWidget instead of scroll area.
+            Defaults to False.
     """
 
     def __init__(
@@ -99,7 +112,19 @@ class BaseWindow(QMainWindow):
     # -- Stack page management (Admin shell) -----------------------
 
     def add_page(self, page_widget, sidebar_button_name=None):
-        """Them page vao stack. Tra ve index cua page."""
+        """Add a page widget to the stacked widget with an optional sidebar link.
+
+        The page is wrapped in a QScrollArea for scrollable content.
+
+        Args:
+            page_widget (QWidget): The page widget to add to the stack.
+            sidebar_button_name (str or None): The object name of the
+                corresponding sidebar button for highlight tracking.
+                Defaults to None.
+
+        Returns:
+            int: The index of the newly added page in the stack.
+        """
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -112,13 +137,22 @@ class BaseWindow(QMainWindow):
         return idx
 
     def switch_page(self, index):
-        """Chuyen sang page tai index, highlight sidebar button tuong ung."""
+        """Switch to the page at the given index and highlight its sidebar button.
+
+        Args:
+            index (int): The zero-based index of the page to display.
+        """
         self._stack.setCurrentIndex(index)
         if self.sidebar and index < len(self._page_buttons):
             self._highlight_sidebar(self._page_buttons[index])
 
     def get_current_scroll_area(self):
-        """Tra ve scroll area hien tai (de page tinh layout)."""
+        """Return the QScrollArea currently visible to the user.
+
+        Returns:
+            QScrollArea: The active scroll area, either from the stacked widget
+                or the single scroll area depending on the content mode.
+        """
         if self._use_stack:
             return self._stack.currentWidget()
         return self._scroll
@@ -126,7 +160,12 @@ class BaseWindow(QMainWindow):
     # -- Sidebar ---------------------------------------------------
 
     def _highlight_sidebar(self, active_button_name):
-        """Highlight button dang active tren sidebar."""
+        """Highlight the active sidebar button and reset styles on others.
+
+        Args:
+            active_button_name (str): The object name of the sidebar button
+                to highlight as active.
+        """
         nav_buttons = [
             "pushButtonOverview",
             "pushButtonBookings",
@@ -144,7 +183,18 @@ class BaseWindow(QMainWindow):
     # -- Content loading (che do cu, cho User page) ----------------
 
     def load_content_ui(self, ui_filename):
-        """Load file .ui vao content_area (che do cu)."""
+        """Load a Qt Designer .ui file into the scroll-mode content area.
+
+        This method is intended for the scroll content mode (non-stack). The
+        loaded widget is added to the content_layout.
+
+        Args:
+            ui_filename (str): The filename of the .ui file located in the
+                ui/ directory.
+
+        Returns:
+            QWidget: The widget loaded from the .ui file.
+        """
         content_widget = QWidget()
         uic.loadUi(os.path.join(UI_DIR, ui_filename), content_widget)
         self.content_layout.addWidget(content_widget)
@@ -153,12 +203,18 @@ class BaseWindow(QMainWindow):
     # -- Common actions --------------------------------------------
 
     def _toggle_fullscreen(self):
+        """Toggle between fullscreen and normal window display modes."""
         if self.isFullScreen():
             self.showNormal()
         else:
             self.showFullScreen()
 
     def _logout(self):
+        """Log out the current user after confirmation.
+
+        Displays a confirmation dialog. If the user confirms, the login
+        window is shown and the current window is closed.
+        """
         reply = QMessageBox.question(
             self,
             "Log out",
@@ -174,6 +230,11 @@ class BaseWindow(QMainWindow):
 
     @staticmethod
     def _quit():
+        """Quit the application after confirmation.
+
+        Displays a confirmation dialog. If the user confirms, the entire
+        application is terminated.
+        """
         reply = QMessageBox.question(
             None,
             "Quit",

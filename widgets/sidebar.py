@@ -8,7 +8,14 @@ UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 class SideBar(QFrame):
-    """Sidebar chung cho các màn hình Admin. Load từ sidebar.ui."""
+    """Sidebar navigation panel for Admin screens.
+
+    Loads its layout from sidebar.ui and provides navigation buttons
+    for switching between admin management pages.
+
+    Args:
+        parent (QWidget or None): The parent widget. Defaults to None.
+    """
 
     def __init__(self, parent=None):
         super().__init__(parent)

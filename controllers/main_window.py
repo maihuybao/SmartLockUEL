@@ -18,11 +18,21 @@ IMG_DIR = os.path.join(BASE_DIR, "images")
 
 
 class _BgWidget:
-    """Mixin vẽ background.jpg scale-to-cover (giữ tỉ lệ) cho centralwidget."""
+    """Mixin that paints a background image scaled to cover the widget area.
+
+    The image is scaled while maintaining its aspect ratio, centered within
+    the widget bounds. If no background pixmap is set, the default paint
+    behavior is used.
+    """
 
     _bg_pixmap = None
 
     def paintEvent(self, event):
+        """Paint the background image scaled-to-cover, or delegate to the parent.
+
+        Args:
+            event (QPaintEvent): The paint event to handle.
+        """
         if self._bg_pixmap:
             painter = QPainter(self)
             scaled = self._bg_pixmap.scaled(
@@ -38,6 +48,13 @@ class _BgWidget:
 
 
 class MainWindowController(QMainWindow):
+    """Controller for the login screen of the SmartLocker UEL application.
+
+    Initializes the database, loads the Login UI, sets up background imagery,
+    eye-toggle for password visibility, and handles user authentication with
+    role-based routing to the appropriate dashboard.
+    """
+
     def __init__(self):
         super().__init__()
         uic.loadUi(os.path.join(UI_DIR, "Login.ui"), self)
@@ -58,6 +75,11 @@ class MainWindowController(QMainWindow):
         self._connect_signals()
 
     def _setup_background(self):
+        """Load and apply the background image to the central widget.
+
+        Dynamically injects the ``_BgWidget`` mixin into the central widget's
+        class hierarchy to enable scale-to-cover background painting.
+        """
         bg_path = os.path.join(IMG_DIR, "background.jpg")
         if not os.path.exists(bg_path):
             return
@@ -72,6 +94,11 @@ class MainWindowController(QMainWindow):
         central._bg_pixmap = pixmap
 
     def _make_login_responsive(self):
+        """Apply responsive styling to the login form widget.
+
+        Sets the size policy and applies a semi-transparent white background
+        with rounded corners to the login card.
+        """
         form = self.widget
         form.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         # Đảm bảo card login có nền trắng rõ trên ảnh nền
@@ -81,6 +108,7 @@ class MainWindowController(QMainWindow):
         )
 
     def _setup_ui(self):
+        """Configure UI elements including the logo, password toggle icons, and input styling."""
         # Fix logo path
         logo_path = os.path.join(IMG_DIR, "UEL_Logo final-09.png")
         if os.path.exists(logo_path):
@@ -107,12 +135,14 @@ class MainWindowController(QMainWindow):
             widget.setStyleSheet(current + input_style + placeholder_style)
 
     def _connect_signals(self):
+        """Connect UI signals to their respective handler slots."""
         self.pushButtonLogin.clicked.connect(self._handle_login)
         self.btnTogglePassword.clicked.connect(self._toggle_password)
         self.lineEditPassword.returnPressed.connect(self._handle_login)
         self.lineEditEmail.returnPressed.connect(self._handle_login)
 
     def _toggle_password(self):
+        """Toggle password field visibility between plain text and masked mode."""
         from PyQt6.QtWidgets import QLineEdit
 
         self._password_visible = not self._password_visible
@@ -124,6 +154,12 @@ class MainWindowController(QMainWindow):
             self.btnTogglePassword.setIcon(self._eye_closed)
 
     def _handle_login(self):
+        """Validate credentials and authenticate the user.
+
+        Checks that both fields are filled, authenticates against the database,
+        verifies the selected role matches the user's actual role, and routes
+        to the appropriate dashboard on success.
+        """
         if self._logging_in:
             return
         self._logging_in = True
@@ -155,12 +191,22 @@ class MainWindowController(QMainWindow):
         self._open_dashboard(user)
 
     def _toggle_fullscreen(self):
+        """Toggle between fullscreen and normal window display modes."""
         if self.isFullScreen():
             self.showNormal()
         else:
             self.showFullScreen()
 
     def _open_dashboard(self, user):
+        """Open the appropriate dashboard based on the user's role.
+
+        Creates and displays either the Admin shell or the User overview
+        controller, then closes the login window.
+
+        Args:
+            user (dict): The authenticated user record containing at least
+                a 'role' key with value 'admin' or 'user'.
+        """
         if user["role"] == "admin":
             from controllers.admin_shell import AdminShellController
 
