@@ -56,6 +56,7 @@ class DeviceManagementPage(QWidget):
     """
 
     def __init__(self, shell):
+        """Initialize the device management page, load UI, and display devices."""
         super().__init__()
         self._shell = shell
 

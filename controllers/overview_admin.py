@@ -23,6 +23,7 @@ class OverviewAdminPage(QWidget):
     """
 
     def __init__(self, shell):
+        """Initialize the overview page, load UI, and display initial data."""
         super().__init__()
         self._shell = shell
         self._current_filter = "All"
@@ -116,10 +117,12 @@ class OverviewAdminPage(QWidget):
         layout.setColumnStretch(cols, 1)
 
     def showEvent(self, event):
+        """Handle the widget show event by reflowing the room card grid."""
         super().showEvent(event)
         self._reflow_grid()
 
     def resizeEvent(self, event):
+        """Handle the widget resize event by reflowing the room card grid."""
         super().resizeEvent(event)
         self._reflow_grid()
 

@@ -56,6 +56,7 @@ class MainWindowController(QMainWindow):
     """
 
     def __init__(self):
+        """Initialize the login window, database, and UI components."""
         super().__init__()
         uic.loadUi(os.path.join(UI_DIR, "Login.ui"), self)
         self.setMinimumSize(1000, 600)

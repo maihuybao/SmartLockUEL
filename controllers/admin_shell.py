@@ -25,6 +25,7 @@ class AdminShellController(BaseWindow):
     PAGE_DEVICES = 4
 
     def __init__(self, user):
+        """Initialize the admin shell with all management pages and sidebar navigation."""
         super().__init__(
             user,
             role_text="Admin",

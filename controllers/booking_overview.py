@@ -57,6 +57,7 @@ class BookingOverviewPage(QWidget):
     """
 
     def __init__(self, shell):
+        """Initialize the booking management page, load UI, and display bookings."""
         super().__init__()
         self._shell = shell
         self._current_bookings = []

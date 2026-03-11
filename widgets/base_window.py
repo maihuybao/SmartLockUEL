@@ -52,6 +52,7 @@ class BaseWindow(QMainWindow):
         title="SmartLocker UEL",
         use_stack=False,
     ):
+        """Initialize the base window with NavBar, optional SideBar, and content area."""
         super().__init__()
         self.current_user = user
         self._use_stack = use_stack

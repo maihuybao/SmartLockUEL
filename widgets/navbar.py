@@ -25,6 +25,7 @@ class NavBar(QFrame):
     """
 
     def __init__(self, role_text="Admin", show_search=False, parent=None):
+        """Initialize the navigation bar from its UI file and configure widgets."""
         super().__init__(parent)
         uic.loadUi(os.path.join(UI_DIR, "navbar.ui"), self)
 

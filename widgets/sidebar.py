@@ -18,5 +18,6 @@ class SideBar(QFrame):
     """
 
     def __init__(self, parent=None):
+        """Initialize the sidebar from its UI file."""
         super().__init__(parent)
         uic.loadUi(os.path.join(UI_DIR, "sidebar.ui"), self)

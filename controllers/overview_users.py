@@ -70,6 +70,7 @@ class OverviewUsersController(BaseWindow):
     """
 
     def __init__(self, user):
+        """Initialize the user dashboard with room grid, filters, and booking controls."""
         super().__init__(
             user,
             role_text="User",
@@ -243,10 +244,12 @@ class OverviewUsersController(BaseWindow):
         layout.setColumnStretch(cols, 1)
 
     def showEvent(self, event):
+        """Handle the widget show event by reflowing the room card grid."""
         super().showEvent(event)
         self._reflow_grid()
 
     def resizeEvent(self, event):
+        """Handle the widget resize event by reflowing the room card grid."""
         super().resizeEvent(event)
         self._reflow_grid()
 

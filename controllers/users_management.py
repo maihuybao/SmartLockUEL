@@ -50,6 +50,7 @@ class UsersManagementPage(QWidget):
     """
 
     def __init__(self, shell):
+        """Initialize the user management page, load UI, and display users."""
         super().__init__()
         self._shell = shell
 

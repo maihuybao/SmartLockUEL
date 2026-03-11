@@ -56,6 +56,7 @@ class EditRoomPage(QWidget):
     """
 
     def __init__(self, shell, preselect_room=None):
+        """Initialize the room management page, load UI, and display rooms."""
         super().__init__()
         self._shell = shell
 
