@@ -21,6 +21,14 @@ UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
+    """Load a PNG icon from the images directory.
+
+    Args:
+        name (str): The filename of the icon (e.g., 'edit.png').
+
+    Returns:
+        QIcon: The loaded icon, or an empty QIcon if the file does not exist.
+    """
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
@@ -38,7 +46,14 @@ from models.room_model import get_all_rooms
 
 
 class DeviceManagementPage(QWidget):
-    """Page Device Management cho Admin."""
+    """Admin page for managing devices with CRUD operations and CSV support.
+
+    Provides a table view of devices with inline edit/delete actions,
+    status filtering, search, password management, and CSV import/export.
+
+    Args:
+        shell (AdminShellController): The parent admin shell controller.
+    """
 
     def __init__(self, shell):
         super().__init__()
@@ -55,6 +70,7 @@ class DeviceManagementPage(QWidget):
         self._load_table()
 
     def _connect_signals(self):
+        """Connect filter buttons, search field, and action buttons to handlers."""
         self.ui.pushButtonAll.clicked.connect(self._apply_filter)
         self.ui.pushButtonActive.clicked.connect(self._apply_filter)
         self.ui.pushButtonInactive.clicked.connect(self._apply_filter)
@@ -65,12 +81,15 @@ class DeviceManagementPage(QWidget):
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
 
     def refresh(self):
+        """Reload the devices table data from the database."""
         self._load_table()
 
     def _load_table(self):
+        """Load the devices table by applying current filters."""
         self._apply_filter()
 
     def _apply_filter(self):
+        """Filter and display devices based on status filter and search keyword."""
         devices = get_all_devices()
         if self.ui.pushButtonActive.isChecked():
             devices = [d for d in devices if d["status"] == "Active"]
@@ -89,6 +108,11 @@ class DeviceManagementPage(QWidget):
         self._populate_table(devices)
 
     def _populate_table(self, devices):
+        """Populate the devices table widget with device data and action buttons.
+
+        Args:
+            devices (list[dict]): The list of device dictionaries to display.
+        """
         table = self.ui.tableWidgetDevices
         table.setRowCount(0)
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -112,6 +136,14 @@ class DeviceManagementPage(QWidget):
             table.setCellWidget(row, 4, self._make_actions_widget(d))
 
     def _make_actions_widget(self, device):
+        """Build a widget with Edit and Delete buttons for a device row.
+
+        Args:
+            device (dict): The device dictionary for the table row.
+
+        Returns:
+            QWidget: A container widget with horizontally laid out action buttons.
+        """
         container = QWidget()
         lay = QHBoxLayout(container)
         lay.setContentsMargins(4, 2, 4, 2)
@@ -145,6 +177,19 @@ class DeviceManagementPage(QWidget):
         return container
 
     def _build_device_dialog(self, device=None):
+        """Build and configure a dialog for creating or editing a device.
+
+        For editing, includes a password generation button. For creating,
+        the password field is hidden.
+
+        Args:
+            device (dict or None): An existing device record to pre-fill the
+                dialog fields. If None, the dialog is configured for creating
+                a new device. Defaults to None.
+
+        Returns:
+            QDialog: The configured device dialog.
+        """
         rooms = get_all_rooms()
         dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "DeviceDialog.ui"), dlg)
@@ -171,6 +216,7 @@ class DeviceManagementPage(QWidget):
         return dlg
 
     def _add_device(self):
+        """Open a dialog to create a new device and save it to the database."""
         dlg = self._build_device_dialog()
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
@@ -186,6 +232,11 @@ class DeviceManagementPage(QWidget):
             QMessageBox.warning(self._shell, "Error", "Failed to add device.")
 
     def _edit_device(self, device):
+        """Open a dialog to edit a device, including status and optional password reset.
+
+        Args:
+            device (dict): The device dictionary to edit.
+        """
         dlg = self._build_device_dialog(device)
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
@@ -203,12 +254,22 @@ class DeviceManagementPage(QWidget):
         self._load_table()
 
     def _delete_device(self, device_id):
+        """Delete a device after user confirmation.
+
+        Args:
+            device_id (int): The primary key of the device to delete.
+        """
         reply = QMessageBox.question(self._shell, "Confirm", "Delete this device?")
         if reply == QMessageBox.StandardButton.Yes:
             delete_device(device_id)
             self._load_table()
 
     def _import_csv(self):
+        """Import devices from a CSV file into the database.
+
+        Expected CSV columns: room_id, device_name, status. Displays a summary
+        of imported and skipped rows upon completion.
+        """
         import csv
 
         path, _ = QFileDialog.getOpenFileName(
@@ -250,6 +311,7 @@ class DeviceManagementPage(QWidget):
         QMessageBox.information(self._shell, "Import Complete", msg)
 
     def _export_csv(self):
+        """Export all devices to a CSV file chosen by the user."""
         import csv
 
         path, _ = QFileDialog.getSaveFileName(

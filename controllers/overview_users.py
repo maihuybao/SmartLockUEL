@@ -19,6 +19,14 @@ IMAGES_DIR = os.path.join(_BASE, "images")
 
 
 def _png_icon(name):
+    """Load a PNG icon from the images directory.
+
+    Args:
+        name (str): The filename of the icon (e.g., 'view.png').
+
+    Returns:
+        QIcon: The loaded icon, or an empty QIcon if the file does not exist.
+    """
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
@@ -51,6 +59,16 @@ TIME_RANGES = {
 
 
 class OverviewUsersController(BaseWindow):
+    """User dashboard controller for browsing rooms and managing bookings.
+
+    Provides a filterable room grid with three independent filter dimensions
+    (status, capacity, time range), booking creation with conflict detection,
+    and booking history management.
+
+    Args:
+        user (dict): The authenticated user record.
+    """
+
     def __init__(self, user):
         super().__init__(
             user,
@@ -70,6 +88,7 @@ class OverviewUsersController(BaseWindow):
         self._load_rooms()
 
     def _connect_signals(self):
+        """Connect filter buttons, search field, and action buttons to handlers."""
         self.ui.pushButtonAll.clicked.connect(lambda: self._apply_filter("All"))
         self.ui.pushButtonAvailable.clicked.connect(
             lambda: self._apply_filter("Available")
@@ -100,18 +119,35 @@ class OverviewUsersController(BaseWindow):
     # -- Room grid ------------------------------------------------
 
     def _apply_filter(self, status):
+        """Apply a room status filter and reload the room grid.
+
+        Args:
+            status (str): The status filter ('All', 'Available', 'Occupied', 'Full').
+        """
         self._current_filter = status
         self._load_rooms()
 
     def _apply_capacity(self, cap):
+        """Apply a capacity filter and reload the room grid.
+
+        Args:
+            cap (str): The capacity filter ('All', '50' for <=50, '100' for >=100).
+        """
         self._capacity_filter = cap
         self._load_rooms()
 
     def _apply_time(self, session):
+        """Apply a time-of-day filter and reload the room grid.
+
+        Args:
+            session (str): The time session filter ('All', 'Morning',
+                'Afternoon', 'Evening').
+        """
         self._time_filter = session
         self._load_rooms()
 
     def _load_rooms(self):
+        """Load rooms applying all active filters (status, capacity, time, search)."""
         from datetime import date as _date
 
         keyword = (
@@ -151,6 +187,17 @@ class OverviewUsersController(BaseWindow):
 
     @staticmethod
     def _has_free_slot(room_pk, date_str, range_start, range_end):
+        """Check whether a room has at least one free 30-minute slot in a time range.
+
+        Args:
+            room_pk (int): The primary key of the room to check.
+            date_str (str): The date to check in 'YYYY-MM-DD' format.
+            range_start (int): The start of the time range in minutes since midnight.
+            range_end (int): The end of the time range in minutes since midnight.
+
+        Returns:
+            bool: True if at least one 30-minute slot is free, False otherwise.
+        """
         bookings = get_bookings_by_room_date(room_pk, date_str)
         booked = set()
         for b in bookings:
@@ -163,10 +210,16 @@ class OverviewUsersController(BaseWindow):
         return any(slot not in booked for slot in range(range_start, range_end, 30))
 
     def _render_room_cards(self, rooms):
+        """Store room data and trigger a grid reflow.
+
+        Args:
+            rooms (list[dict]): The list of room dictionaries to render.
+        """
         self._rooms_data = rooms
         self._reflow_grid()
 
     def _reflow_grid(self):
+        """Recalculate the grid layout and re-render all room cards."""
         if not hasattr(self, "_rooms_data"):
             return
         layout = self.ui.gridLayout
@@ -198,9 +251,23 @@ class OverviewUsersController(BaseWindow):
         self._reflow_grid()
 
     def _create_room_card(self, room):
+        """Create a room card widget with a booking context menu.
+
+        Args:
+            room (dict): The room dictionary to create a card for.
+
+        Returns:
+            QWidget: The room card widget.
+        """
         return create_room_card(room, on_context=self._on_card_context)
 
     def _on_card_context(self, room, global_pos):
+        """Display a context menu with a 'Book Room' action for a room card.
+
+        Args:
+            room (dict): The room dictionary for the right-clicked card.
+            global_pos (QPoint): The global screen position for the context menu.
+        """
         from PyQt6.QtWidgets import QMenu
         from PyQt6.QtGui import QAction
 
@@ -211,15 +278,30 @@ class OverviewUsersController(BaseWindow):
         menu.exec(global_pos)
 
     def _apply_filter(self, status):
+        """Apply a room status filter and reload the room grid.
+
+        Args:
+            status (str): The status filter ('All', 'Available', 'Occupied', 'Full').
+        """
         self._current_filter = status
         self._load_rooms()
 
     def _on_search(self):
+        """Handle search input changes by reloading the room grid."""
         self._load_rooms()
 
     # -- Booking dialog -------------------------------------------
 
     def _open_booking_dialog(self, preselect_room=None):
+        """Open a booking dialog for creating a new room booking.
+
+        Validates time range, checks for conflicts, and creates the booking
+        upon successful submission.
+
+        Args:
+            preselect_room (dict or None): An optional room dictionary to
+                pre-select in the room combo box. Defaults to None.
+        """
         available = [r for r in get_all_rooms() if r["status"] in ("Available",)]
         if not available:
             QMessageBox.information(self, "Thong bao", "No available rooms.")
@@ -300,6 +382,14 @@ class OverviewUsersController(BaseWindow):
                 QMessageBox.warning(self, "Error", "Failed to send booking request.")
 
     def _refresh_availability(self, dlg):
+        """Update the time availability table in the booking dialog.
+
+        Renders a color-coded hourly grid showing which slots are available,
+        pending, or approved for the selected room and date.
+
+        Args:
+            dlg (QDialog): The booking dialog containing the availability table.
+        """
         room_pk = dlg.comboRoom.currentData()
         date_str = dlg.dateEdit.date().toString("yyyy-MM-dd")
         if not room_pk:
@@ -358,6 +448,7 @@ class OverviewUsersController(BaseWindow):
     # -- Booking history ------------------------------------------
 
     def _show_history(self):
+        """Display the booking history dialog for the current user."""
         dlg = QDialog(self)
         uic.loadUi(os.path.join(UI_DIR, "BookingHistory.ui"), dlg)
         dlg.tableWidgetHistory.horizontalHeader().setSectionResizeMode(
@@ -371,6 +462,13 @@ class OverviewUsersController(BaseWindow):
         dlg.exec()
 
     def _populate_history(self, dlg, filter_text):
+        """Populate the booking history table with filtered booking data.
+
+        Args:
+            dlg (QDialog): The history dialog containing the bookings table.
+            filter_text (str): The status filter text ('All Status', 'Pending',
+                'Approved', or 'Rejected').
+        """
         bookings = get_bookings_by_user(self.current_user["id"])
         if filter_text != "All Status":
             bookings = [b for b in bookings if b["status"] == filter_text]
@@ -463,6 +561,12 @@ class OverviewUsersController(BaseWindow):
         dlg.lblCount.setText(f"{len(bookings)} bookings")
 
     def _view_booking(self, booking_id, parent_dlg):
+        """Display a read-only dialog showing booking details for the user.
+
+        Args:
+            booking_id (int): The primary key of the booking to view.
+            parent_dlg (QDialog): The parent dialog (history dialog).
+        """
         from models.booking_model import get_bookings_by_user
 
         bookings = get_bookings_by_user(self.current_user["id"])
@@ -502,6 +606,13 @@ class OverviewUsersController(BaseWindow):
         dlg.exec()
 
     def _edit_booking(self, booking_id, history_dlg):
+        """Open a dialog to edit a pending booking and refresh the history.
+
+        Args:
+            booking_id (int): The primary key of the booking to edit.
+            history_dlg (QDialog): The parent history dialog to refresh
+                after a successful edit.
+        """
         from models.booking_model import update_booking
 
         bookings = get_bookings_by_user(self.current_user["id"])
@@ -582,6 +693,13 @@ class OverviewUsersController(BaseWindow):
         self._load_rooms()
 
     def _cancel_booking(self, booking_id, dlg):
+        """Cancel a pending booking after user confirmation.
+
+        Args:
+            booking_id (int): The primary key of the booking to cancel.
+            dlg (QDialog): The parent history dialog to refresh after
+                cancellation.
+        """
         reply = QMessageBox.question(
             self, "Confirm", "Are you sure you want to cancel this booking?"
         )

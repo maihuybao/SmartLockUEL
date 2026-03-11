@@ -21,6 +21,14 @@ UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
+    """Load a PNG icon from the images directory.
+
+    Args:
+        name (str): The filename of the icon (e.g., 'edit.png').
+
+    Returns:
+        QIcon: The loaded icon, or an empty QIcon if the file does not exist.
+    """
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
@@ -39,7 +47,14 @@ from models.room_model import get_all_rooms
 
 
 class BookingOverviewPage(QWidget):
-    """Page Booking Management cho Admin."""
+    """Admin page for managing all bookings with filtering, search, and CRUD operations.
+
+    Provides a table view of bookings with inline actions for viewing,
+    approving, rejecting, editing, and deleting. Supports CSV import/export.
+
+    Args:
+        shell (AdminShellController): The parent admin shell controller.
+    """
 
     def __init__(self, shell):
         super().__init__()
@@ -57,6 +72,7 @@ class BookingOverviewPage(QWidget):
         self._load_table()
 
     def _connect_signals(self):
+        """Connect filter buttons, search field, and action buttons to handlers."""
         self.ui.pushButtonAll.clicked.connect(self._load_table)
         self.ui.pushButtonPending.clicked.connect(self._load_table)
         self.ui.pushButtonApproved.clicked.connect(self._load_table)
@@ -67,11 +83,13 @@ class BookingOverviewPage(QWidget):
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
 
     def refresh(self):
+        """Reload the bookings table data from the database."""
         self._load_table()
 
     # -- Table ----------------------------------------------------
 
     def _load_table(self):
+        """Load and display bookings in the table, applying status and search filters."""
         bookings = get_all_bookings()
 
         if self.ui.pushButtonPending.isChecked():
@@ -128,6 +146,18 @@ class BookingOverviewPage(QWidget):
             table.setCellWidget(row, 9, self._make_actions_widget(b["id"], b["status"]))
 
     def _make_icon_btn(self, icon_file, tooltip, bg, hover, slot):
+        """Create a small icon button with custom styling for table action cells.
+
+        Args:
+            icon_file (str): The icon filename in the images directory.
+            tooltip (str): The tooltip text for the button.
+            bg (str): The CSS background color for the button.
+            hover (str): The CSS background color on hover.
+            slot (callable): The callback function to connect to the click signal.
+
+        Returns:
+            QPushButton: The configured icon button.
+        """
         btn = QPushButton()
         btn.setToolTip(tooltip)
         btn.setFixedSize(22, 22)
@@ -141,6 +171,19 @@ class BookingOverviewPage(QWidget):
         return btn
 
     def _make_actions_widget(self, booking_id, status):
+        """Build a widget containing action buttons for a booking table row.
+
+        The available actions depend on the booking status. Pending bookings
+        include Approve and Reject buttons in addition to View, Edit, and Delete.
+
+        Args:
+            booking_id (int): The primary key of the booking.
+            status (str): The current booking status ('Pending', 'Approved',
+                or 'Rejected').
+
+        Returns:
+            QWidget: A container widget with horizontally laid out action buttons.
+        """
         container = QWidget()
         layout = QHBoxLayout(container)
         layout.setContentsMargins(4, 2, 4, 2)
@@ -195,6 +238,11 @@ class BookingOverviewPage(QWidget):
         return container
 
     def _view_booking(self, booking_id):
+        """Display a read-only dialog showing the full details of a booking.
+
+        Args:
+            booking_id (int): The primary key of the booking to view.
+        """
         bookings = get_all_bookings()
         b = next((x for x in bookings if x["id"] == booking_id), None)
         if not b:
@@ -235,6 +283,11 @@ class BookingOverviewPage(QWidget):
         dlg.exec()
 
     def _approve_booking_inline(self, booking_id):
+        """Approve a booking and display the generated locker password.
+
+        Args:
+            booking_id (int): The primary key of the booking to approve.
+        """
         password = approve_booking(booking_id)
         QMessageBox.information(
             self._shell,
@@ -244,6 +297,11 @@ class BookingOverviewPage(QWidget):
         self._load_table()
 
     def _reject_booking_inline(self, booking_id):
+        """Open a rejection dialog and reject a booking with a reason.
+
+        Args:
+            booking_id (int): The primary key of the booking to reject.
+        """
         bookings = get_all_bookings()
         b = next((x for x in bookings if x["id"] == booking_id), None)
         if not b:
@@ -262,6 +320,7 @@ class BookingOverviewPage(QWidget):
     # -- Actions --------------------------------------------------
 
     def _add_booking(self):
+        """Open a dialog to create a new booking and save it to the database."""
         dlg = self._build_booking_dialog()
         if dlg.exec() == QDialog.DialogCode.Accepted:
             user_id = dlg.comboUser.currentData()
@@ -279,6 +338,11 @@ class BookingOverviewPage(QWidget):
                 QMessageBox.warning(self._shell, "Error", "Failed to create booking.")
 
     def _edit_booking(self, booking_id):
+        """Open a dialog to edit an existing booking.
+
+        Args:
+            booking_id (int): The primary key of the booking to edit.
+        """
         bookings = get_all_bookings()
         b = next((x for x in bookings if x["id"] == booking_id), None)
         if not b:
@@ -299,12 +363,23 @@ class BookingOverviewPage(QWidget):
             self._load_table()
 
     def _delete_booking(self, booking_id):
+        """Delete a booking after user confirmation.
+
+        Args:
+            booking_id (int): The primary key of the booking to delete.
+        """
         reply = QMessageBox.question(self._shell, "Confirm", "Delete this booking?")
         if reply == QMessageBox.StandardButton.Yes:
             delete_booking(booking_id)
             self._load_table()
 
     def _import_csv(self):
+        """Import bookings from a CSV file into the database.
+
+        Expected CSV columns: username, room_id, date, start_time, end_time,
+        reason. Displays a summary of imported and skipped rows with error
+        details upon completion.
+        """
         import csv
         from models.user_model import get_all_users
 
@@ -370,6 +445,11 @@ class BookingOverviewPage(QWidget):
         QMessageBox.information(self._shell, "Import Complete", msg)
 
     def _export_csv(self):
+        """Export the currently filtered bookings to a CSV file.
+
+        Applies the active status filter and search keyword before exporting.
+        The user is prompted to choose a save location.
+        """
         import csv
 
         bookings = get_all_bookings()
@@ -441,6 +521,19 @@ class BookingOverviewPage(QWidget):
             QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")
 
     def _build_booking_dialog(self, booking=None, reject_mode=False):
+        """Build and configure a booking dialog for creating, editing, or rejecting.
+
+        Args:
+            booking (dict or None): An existing booking record to pre-fill the
+                dialog fields. If None, the dialog is configured for creating
+                a new booking. Defaults to None.
+            reject_mode (bool): If True, the dialog is configured for rejection
+                with most fields disabled and a rejection reason field visible.
+                Defaults to False.
+
+        Returns:
+            QDialog: The configured booking dialog.
+        """
         from models.user_model import get_all_users
 
         dlg = QDialog(self._shell)

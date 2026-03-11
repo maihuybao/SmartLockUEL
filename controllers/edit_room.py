@@ -21,6 +21,14 @@ UI_DIR = os.path.join(BASE_DIR, "ui")
 
 
 def _png_icon(name):
+    """Load a PNG icon from the images directory.
+
+    Args:
+        name (str): The filename of the icon (e.g., 'edit.png').
+
+    Returns:
+        QIcon: The loaded icon, or an empty QIcon if the file does not exist.
+    """
     path = os.path.join(IMAGES_DIR, name)
     if not os.path.exists(path):
         return QIcon()
@@ -36,7 +44,16 @@ from models.room_model import (
 
 
 class EditRoomPage(QWidget):
-    """Page Room Management cho Admin."""
+    """Admin page for managing rooms with CRUD operations, filtering, and CSV support.
+
+    Provides a table view of rooms with inline edit/delete actions,
+    status filtering, search, and CSV import/export capabilities.
+
+    Args:
+        shell (AdminShellController): The parent admin shell controller.
+        preselect_room (dict or None): An optional room dictionary to
+            highlight in the table after initialization. Defaults to None.
+    """
 
     def __init__(self, shell, preselect_room=None):
         super().__init__()
@@ -56,6 +73,7 @@ class EditRoomPage(QWidget):
             self._preselect(preselect_room)
 
     def _connect_signals(self):
+        """Connect filter buttons, search field, and action buttons to handlers."""
         self.ui.pushButtonAll.clicked.connect(self._apply_filter)
         self.ui.pushButtonAvailable.clicked.connect(self._apply_filter)
         self.ui.pushButtonOccupied.clicked.connect(self._apply_filter)
@@ -65,14 +83,17 @@ class EditRoomPage(QWidget):
         self.ui.pushButtonExportCSV.clicked.connect(self._export_csv)
 
     def refresh(self):
+        """Reload the rooms table data from the database."""
         self._load_table()
 
     # -- Table ----------------------------------------------------
 
     def _load_table(self):
+        """Load the rooms table by applying current filters."""
         self._apply_filter()
 
     def _apply_filter(self):
+        """Filter and display rooms based on status filter and search keyword."""
         rooms = get_all_rooms()
 
         if self.ui.pushButtonAvailable.isChecked():
@@ -91,6 +112,11 @@ class EditRoomPage(QWidget):
         self._populate_table(rooms)
 
     def _populate_table(self, rooms):
+        """Populate the rooms table widget with room data and action buttons.
+
+        Args:
+            rooms (list[dict]): The list of room dictionaries to display.
+        """
         table = self.ui.tableWidget
         table.setRowCount(0)
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -122,6 +148,14 @@ class EditRoomPage(QWidget):
         self._rooms_data = rooms
 
     def _make_actions_widget(self, room):
+        """Build a widget containing Edit and Delete buttons for a room row.
+
+        Args:
+            room (dict): The room dictionary for the table row.
+
+        Returns:
+            QWidget: A container widget with horizontally laid out action buttons.
+        """
         container = QWidget()
         layout = QHBoxLayout(container)
         layout.setContentsMargins(4, 2, 4, 2)
@@ -155,6 +189,12 @@ class EditRoomPage(QWidget):
         return container
 
     def _preselect(self, room):
+        """Select and highlight a specific room in the table.
+
+        Args:
+            room (dict): The room dictionary containing a 'room_id' key
+                to match against the table rows.
+        """
         table = self.ui.tableWidget
         for row in range(table.rowCount()):
             if table.item(row, 0) and table.item(row, 0).text() == room["room_id"]:
@@ -164,6 +204,16 @@ class EditRoomPage(QWidget):
     # -- Dialogs --------------------------------------------------
 
     def _build_room_dialog(self, room=None):
+        """Build and configure a dialog for creating or editing a room.
+
+        Args:
+            room (dict or None): An existing room record to pre-fill the
+                dialog fields. If None, the dialog is configured for creating
+                a new room. Defaults to None.
+
+        Returns:
+            QDialog: The configured room dialog.
+        """
         dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "RoomDialog.ui"), dlg)
         if room:
@@ -179,6 +229,7 @@ class EditRoomPage(QWidget):
         return dlg
 
     def _add_room(self):
+        """Open a dialog to create a new room and save it to the database."""
         dlg = self._build_room_dialog()
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
@@ -202,6 +253,11 @@ class EditRoomPage(QWidget):
             QMessageBox.warning(self._shell, "Error", "Room ID already exists.")
 
     def _edit_room(self, room):
+        """Open a dialog to edit an existing room.
+
+        Args:
+            room (dict): The room dictionary to edit.
+        """
         dlg = self._build_room_dialog(room)
         if dlg.exec() != QDialog.DialogCode.Accepted:
             return
@@ -223,6 +279,11 @@ class EditRoomPage(QWidget):
             QMessageBox.warning(self._shell, "Error", "Failed to update room.")
 
     def _delete_room(self, room_pk):
+        """Delete a room after user confirmation.
+
+        Args:
+            room_pk (int): The primary key of the room to delete.
+        """
         reply = QMessageBox.question(self._shell, "Confirm", "Delete this room?")
         if reply == QMessageBox.StandardButton.Yes:
             delete_room(room_pk)
@@ -231,6 +292,11 @@ class EditRoomPage(QWidget):
     # -- CSV ------------------------------------------------------
 
     def _import_csv(self):
+        """Import rooms from a CSV file into the database.
+
+        Expected CSV columns: room_id, room_type, capacity, status. Displays
+        a summary of imported and skipped rows upon completion.
+        """
         import csv
 
         path, _ = QFileDialog.getOpenFileName(
@@ -277,6 +343,7 @@ class EditRoomPage(QWidget):
         QMessageBox.information(self._shell, "Import Complete", msg)
 
     def _export_csv(self):
+        """Export all rooms to a CSV file chosen by the user."""
         import csv
 
         path, _ = QFileDialog.getSaveFileName(
