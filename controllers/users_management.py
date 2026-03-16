@@ -14,6 +14,7 @@ from PyQt6.QtGui import QColor, QIcon
 from PyQt6 import uic
 import os
 from paths import resource_dir
+from i18n import tr
 
 BASE_DIR = resource_dir()
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
@@ -106,7 +107,7 @@ class UsersManagementPage(QWidget):
         table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
         table.setColumnWidth(2, 100)
         table.verticalHeader().setDefaultSectionSize(32)
-        self.ui.lblCount.setText(f"{len(users)} users")
+        self.ui.lblCount.setText(tr("n_users", n=len(users)))
         role_colors = {"admin": "#E91E63", "user": "#4CAF50"}
         for row, u in enumerate(users):
             table.insertRow(row)
@@ -131,7 +132,7 @@ class UsersManagementPage(QWidget):
         lay.setSpacing(4)
 
         btn_view = QPushButton()
-        btn_view.setToolTip("View Bookings")
+        btn_view.setToolTip(tr("tooltip_view_bookings"))
         btn_view.setFixedSize(22, 22)
         btn_view.setIcon(_png_icon("view.png"))
         btn_view.setIconSize(QSize(14, 14))
@@ -142,7 +143,7 @@ class UsersManagementPage(QWidget):
         btn_view.clicked.connect(lambda _, u=user: self._view_user_bookings(u))
 
         btn_edit = QPushButton()
-        btn_edit.setToolTip("Edit")
+        btn_edit.setToolTip(tr("tooltip_edit"))
         btn_edit.setFixedSize(22, 22)
         btn_edit.setIcon(_png_icon("edit.png"))
         btn_edit.setIconSize(QSize(14, 14))
@@ -153,7 +154,7 @@ class UsersManagementPage(QWidget):
         btn_edit.clicked.connect(lambda _, u=user: self._edit_user(u))
 
         btn_del = QPushButton()
-        btn_del.setToolTip("Delete")
+        btn_del.setToolTip(tr("tooltip_delete"))
         btn_del.setFixedSize(22, 22)
         btn_del.setIcon(_png_icon("delete.png"))
         btn_del.setIconSize(QSize(14, 14))
@@ -183,8 +184,8 @@ class UsersManagementPage(QWidget):
         dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "UserDialog.ui"), dlg)
         if user:
-            dlg.setWindowTitle("Edit User")
-            dlg.lblTitle.setText("Edit User")
+            dlg.setWindowTitle(tr("dlg_edit_user"))
+            dlg.lblTitle.setText(tr("dlg_edit_user"))
             dlg.editUsername.setText(user["username"])
             dlg.comboRole.setCurrentText(user["role"])
         dlg.pushButtonCancel.clicked.connect(dlg.reject)
@@ -201,13 +202,13 @@ class UsersManagementPage(QWidget):
         role = dlg.comboRole.currentText()
         if not username or not password:
             QMessageBox.warning(
-                self._shell, "Error", "Please enter username and password."
+                self._shell, tr("common_error"), tr("msg_enter_username_password")
             )
             return
         if create_user(username, password, role):
             self._load_table()
         else:
-            QMessageBox.warning(self._shell, "Error", "Username already exists.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_username_exists"))
 
     def _edit_user(self, user):
         """Open a dialog to edit an existing user.
@@ -222,12 +223,12 @@ class UsersManagementPage(QWidget):
         password = dlg.editPassword.text().strip()
         role = dlg.comboRole.currentText()
         if not username:
-            QMessageBox.warning(self._shell, "Error", "Please enter a username.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_enter_username"))
             return
         if update_user(user["id"], username, password, role):
             self._load_table()
         else:
-            QMessageBox.warning(self._shell, "Error", "Failed to update user.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_update_user_failed"))
 
     def _delete_user(self, user_id):
         """Delete a user after confirmation, preventing self-deletion.
@@ -237,10 +238,10 @@ class UsersManagementPage(QWidget):
         """
         if user_id == self._shell.current_user["id"]:
             QMessageBox.warning(
-                self._shell, "Error", "You cannot delete your own account."
+                self._shell, tr("common_error"), tr("msg_cannot_delete_self")
             )
             return
-        reply = QMessageBox.question(self._shell, "Confirm", "Delete this user?")
+        reply = QMessageBox.question(self._shell, tr("common_confirm"), tr("msg_delete_user_confirm"))
         if reply == QMessageBox.StandardButton.Yes:
             delete_user(user_id)
             self._load_table()
@@ -256,8 +257,8 @@ class UsersManagementPage(QWidget):
         bookings = get_bookings_by_user(user["id"])
         dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "UserBookingsView.ui"), dlg)
-        dlg.setWindowTitle(f"Bookings -- {user['username']}")
-        dlg.lblHeader.setText(f"Booking history: {user['username']}")
+        dlg.setWindowTitle(tr("bookings_title_user", username=user['username']))
+        dlg.lblHeader.setText(tr("booking_history_user", username=user['username']))
         table = dlg.tableBookings
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         table.verticalHeader().setDefaultSectionSize(30)
@@ -277,7 +278,7 @@ class UsersManagementPage(QWidget):
             status_item = QTableWidgetItem(b["status"])
             status_item.setForeground(QColor(status_colors.get(b["status"], "#333")))
             table.setItem(row, 6, status_item)
-        dlg.lblCount.setText(f"{len(bookings)} bookings")
+        dlg.lblCount.setText(tr("n_bookings", n=len(bookings)))
         dlg.pushButtonClose.clicked.connect(dlg.accept)
         dlg.exec()
 
@@ -311,7 +312,7 @@ class UsersManagementPage(QWidget):
                         errors.append(f"Row {i}: username '{username}' already exists")
                         skipped += 1
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to read file:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_file_read_error", error=e))
             return
         self._load_table()
         msg = f"Imported: {imported}  |  Skipped: {skipped}"
@@ -319,7 +320,7 @@ class UsersManagementPage(QWidget):
             msg += "\n\nDetails:\n" + "\n".join(errors[:10])
             if len(errors) > 10:
                 msg += f"\n... and {len(errors) - 10} more"
-        QMessageBox.information(self._shell, "Import Complete", msg)
+        QMessageBox.information(self._shell, tr("msg_import_complete"), msg)
 
     def _export_csv(self):
         """Export all users to a CSV file chosen by the user."""
@@ -339,8 +340,25 @@ class UsersManagementPage(QWidget):
                     writer.writerow({"username": u["username"], "role": u["role"]})
             QMessageBox.information(
                 self._shell,
-                "Export Complete",
-                f"Exported {len(users)} users to:\n{path}",
+                tr("msg_export_complete"),
+                tr("msg_exported_to", n=len(users), type=tr("n_users", n=""), path=path),
             )
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_export_error", error=e))
+
+    def retranslate_ui(self):
+        self.ui.lblTitle.setText(tr("users_mgmt_title"))
+        self.ui.pushButtonAll.setText(tr("status_all"))
+        self.ui.pushButtonAdmin.setText(tr("role_admin"))
+        self.ui.pushButtonUser.setText(tr("role_user"))
+        self.ui.pushButtonAdd.setText(tr("btn_add"))
+        self.ui.pushButtonImportCSV.setText(tr("btn_import_csv"))
+        self.ui.pushButtonExportCSV.setText(tr("btn_export_csv"))
+        self.ui.lineEditSearch.setPlaceholderText(tr("search_placeholder"))
+        table = self.ui.tableWidget
+        headers = ["col_username", "col_role", "col_actions"]
+        for i, key in enumerate(headers):
+            item = table.horizontalHeaderItem(i)
+            if item:
+                item.setText(tr(key))
+        self._load_table()

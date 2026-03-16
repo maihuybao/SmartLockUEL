@@ -14,6 +14,7 @@ from PyQt6.QtGui import QColor, QIcon
 from PyQt6 import uic
 import os
 from paths import resource_dir
+from i18n import tr
 
 BASE_DIR = resource_dir()
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
@@ -125,7 +126,7 @@ class EditRoomPage(QWidget):
         table.setColumnWidth(4, 72)
         table.verticalHeader().setDefaultSectionSize(32)
 
-        self.ui.lblCount.setText(f"{len(rooms)} rooms")
+        self.ui.lblCount.setText(tr("n_rooms", n=len(rooms)))
 
         status_colors = {
             "Available": "#4CAF50",
@@ -163,7 +164,7 @@ class EditRoomPage(QWidget):
         layout.setSpacing(4)
 
         btn_edit = QPushButton()
-        btn_edit.setToolTip("Edit")
+        btn_edit.setToolTip(tr("tooltip_edit"))
         btn_edit.setFixedSize(22, 22)
         btn_edit.setIcon(_png_icon("edit.png"))
         btn_edit.setIconSize(QSize(14, 14))
@@ -174,7 +175,7 @@ class EditRoomPage(QWidget):
         btn_edit.clicked.connect(lambda _, r=room: self._edit_room(r))
 
         btn_del = QPushButton()
-        btn_del.setToolTip("Delete")
+        btn_del.setToolTip(tr("tooltip_delete"))
         btn_del.setFixedSize(22, 22)
         btn_del.setIcon(_png_icon("delete.png"))
         btn_del.setIconSize(QSize(14, 14))
@@ -218,8 +219,8 @@ class EditRoomPage(QWidget):
         dlg = QDialog(self._shell)
         uic.loadUi(os.path.join(UI_DIR, "RoomDialog.ui"), dlg)
         if room:
-            dlg.setWindowTitle("Edit Room")
-            dlg.lblTitle.setText("Edit Room")
+            dlg.setWindowTitle(tr("dlg_edit_room"))
+            dlg.lblTitle.setText(tr("dlg_edit_room"))
             dlg.editId.setText(room["room_id"])
             dlg.editType.setText(room["room_type"])
             dlg.editCap.setText(str(room["capacity"]))
@@ -240,18 +241,18 @@ class EditRoomPage(QWidget):
         status = dlg.comboStatus.currentText()
         if not room_id or not room_type:
             QMessageBox.warning(
-                self._shell, "Error", "Please enter Room ID and Room Type."
+                self._shell, tr("common_error"), tr("msg_enter_room_id_type")
             )
             return
         try:
             capacity = int(cap_text) if cap_text else 50
         except ValueError:
-            QMessageBox.warning(self._shell, "Error", "Capacity must be a number.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_capacity_number"))
             return
         if create_room(room_id, room_type, capacity, status):
             self._load_table()
         else:
-            QMessageBox.warning(self._shell, "Error", "Room ID already exists.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_room_id_exists"))
 
     def _edit_room(self, room):
         """Open a dialog to edit an existing room.
@@ -267,17 +268,17 @@ class EditRoomPage(QWidget):
         cap_text = dlg.editCap.text().strip()
         status = dlg.comboStatus.currentText()
         if not room_id or not room_type:
-            QMessageBox.warning(self._shell, "Error", "Please fill in all fields.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_fill_all_fields"))
             return
         try:
             capacity = int(cap_text) if cap_text else 50
         except ValueError:
-            QMessageBox.warning(self._shell, "Error", "Capacity must be a number.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_capacity_number"))
             return
         if update_room(room["id"], room_id, room_type, capacity, status):
             self._load_table()
         else:
-            QMessageBox.warning(self._shell, "Error", "Failed to update room.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_update_room_failed"))
 
     def _delete_room(self, room_pk):
         """Delete a room after user confirmation.
@@ -285,7 +286,7 @@ class EditRoomPage(QWidget):
         Args:
             room_pk (int): The primary key of the room to delete.
         """
-        reply = QMessageBox.question(self._shell, "Confirm", "Delete this room?")
+        reply = QMessageBox.question(self._shell, tr("common_confirm"), tr("msg_delete_room_confirm"))
         if reply == QMessageBox.StandardButton.Yes:
             delete_room(room_pk)
             self._load_table()
@@ -332,7 +333,7 @@ class EditRoomPage(QWidget):
                         errors.append(f"Row {i}: room_id '{room_id}' already exists")
                         skipped += 1
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to read file:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_file_read_error", error=e))
             return
 
         self._load_table()
@@ -341,7 +342,7 @@ class EditRoomPage(QWidget):
             msg += "\n\nDetails:\n" + "\n".join(errors[:10])
             if len(errors) > 10:
                 msg += f"\n... and {len(errors) - 10} more"
-        QMessageBox.information(self._shell, "Import Complete", msg)
+        QMessageBox.information(self._shell, tr("msg_import_complete"), msg)
 
     def _export_csv(self):
         """Export all rooms to a CSV file chosen by the user."""
@@ -374,8 +375,25 @@ class EditRoomPage(QWidget):
                     )
             QMessageBox.information(
                 self._shell,
-                "Export Complete",
-                f"Exported {len(rooms)} rooms to:\n{path}",
+                tr("msg_export_complete"),
+                tr("msg_exported_to", n=len(rooms), type=tr("n_rooms", n=""), path=path),
             )
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_export_error", error=e))
+
+    def retranslate_ui(self):
+        self.ui.lblTitle.setText(tr("room_mgmt_title"))
+        self.ui.pushButtonAll.setText(tr("status_all"))
+        self.ui.pushButtonAvailable.setText(tr("status_available"))
+        self.ui.pushButtonOccupied.setText(tr("status_occupied"))
+        self.ui.pushButtonAdd.setText(tr("btn_add"))
+        self.ui.pushButtonImportCSV.setText(tr("btn_import_csv"))
+        self.ui.pushButtonExportCSV.setText(tr("btn_export_csv"))
+        self.ui.lineEditSearch.setPlaceholderText(tr("search_placeholder"))
+        table = self.ui.tableWidget
+        headers = ["col_room_id", "col_room_type", "col_capacity", "col_status", "col_actions"]
+        for i, key in enumerate(headers):
+            item = table.horizontalHeaderItem(i)
+            if item:
+                item.setText(tr(key))
+        self._load_table()

@@ -14,6 +14,7 @@ from PyQt6.QtGui import QColor, QIcon
 from PyQt6 import uic
 import os
 from paths import resource_dir
+from i18n import tr
 
 BASE_DIR = resource_dir()
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
@@ -120,7 +121,7 @@ class DeviceManagementPage(QWidget):
         table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
         table.setColumnWidth(4, 100)
         table.verticalHeader().setDefaultSectionSize(32)
-        self.ui.lblCount.setText(f"{len(devices)} devices")
+        self.ui.lblCount.setText(tr("n_devices", n=len(devices)))
         status_colors = {
             "Active": "#4CAF50",
             "Inactive": "#9E9E9E",
@@ -151,7 +152,7 @@ class DeviceManagementPage(QWidget):
         lay.setSpacing(4)
 
         btn_edit = QPushButton()
-        btn_edit.setToolTip("Edit / Reset Password")
+        btn_edit.setToolTip(tr("tooltip_edit_reset_pw"))
         btn_edit.setFixedSize(22, 22)
         btn_edit.setIcon(_png_icon("edit.png"))
         btn_edit.setIconSize(QSize(14, 14))
@@ -162,7 +163,7 @@ class DeviceManagementPage(QWidget):
         btn_edit.clicked.connect(lambda _, d=device: self._edit_device(d))
 
         btn_del = QPushButton()
-        btn_del.setToolTip("Delete")
+        btn_del.setToolTip(tr("tooltip_delete"))
         btn_del.setFixedSize(22, 22)
         btn_del.setIcon(_png_icon("delete.png"))
         btn_del.setIconSize(QSize(14, 14))
@@ -197,8 +198,8 @@ class DeviceManagementPage(QWidget):
         for r in rooms:
             dlg.comboRoom.addItem(f"{r['room_id']} -- {r['room_type']}", r["id"])
         if device:
-            dlg.setWindowTitle("Edit Device")
-            dlg.lblTitle.setText("Edit Device")
+            dlg.setWindowTitle(tr("dlg_edit_device"))
+            dlg.lblTitle.setText(tr("dlg_edit_device"))
             for i in range(dlg.comboRoom.count()):
                 if dlg.comboRoom.itemData(i) == device.get("room_id"):
                     dlg.comboRoom.setCurrentIndex(i)
@@ -225,12 +226,12 @@ class DeviceManagementPage(QWidget):
         device_name = dlg.editName.text().strip()
         status = dlg.comboStatus.currentText()
         if not device_name:
-            QMessageBox.warning(self._shell, "Error", "Please enter a device name.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_enter_device_name"))
             return
         if create_device(room_id, device_name, status):
             self._load_table()
         else:
-            QMessageBox.warning(self._shell, "Error", "Failed to add device.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_add_device_failed"))
 
     def _edit_device(self, device):
         """Open a dialog to edit a device, including status and optional password reset.
@@ -245,7 +246,7 @@ class DeviceManagementPage(QWidget):
         status = dlg.comboStatus.currentText()
         new_pw = dlg.editPw.text().strip()
         if not device_name:
-            QMessageBox.warning(self._shell, "Error", "Please enter a device name.")
+            QMessageBox.warning(self._shell, tr("common_error"), tr("msg_enter_device_name"))
             return
         from models.device_model import update_device_status
 
@@ -260,7 +261,7 @@ class DeviceManagementPage(QWidget):
         Args:
             device_id (int): The primary key of the device to delete.
         """
-        reply = QMessageBox.question(self._shell, "Confirm", "Delete this device?")
+        reply = QMessageBox.question(self._shell, tr("common_confirm"), tr("msg_delete_device_confirm"))
         if reply == QMessageBox.StandardButton.Yes:
             delete_device(device_id)
             self._load_table()
@@ -301,7 +302,7 @@ class DeviceManagementPage(QWidget):
                         errors.append(f"Row {i}: failed to create '{device_name}'")
                         skipped += 1
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to read file:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_file_read_error", error=e))
             return
         self._load_table()
         msg = f"Imported: {imported}  |  Skipped: {skipped}"
@@ -309,7 +310,7 @@ class DeviceManagementPage(QWidget):
             msg += "\n\nDetails:\n" + "\n".join(errors[:10])
             if len(errors) > 10:
                 msg += f"\n... and {len(errors) - 10} more"
-        QMessageBox.information(self._shell, "Import Complete", msg)
+        QMessageBox.information(self._shell, tr("msg_import_complete"), msg)
 
     def _export_csv(self):
         """Export all devices to a CSV file chosen by the user."""
@@ -338,8 +339,26 @@ class DeviceManagementPage(QWidget):
                     )
             QMessageBox.information(
                 self._shell,
-                "Export Complete",
-                f"Exported {len(devices)} devices to:\n{path}",
+                tr("msg_export_complete"),
+                tr("msg_exported_to", n=len(devices), type=tr("n_devices", n=""), path=path),
             )
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_export_error", error=e))
+
+    def retranslate_ui(self):
+        self.ui.lblTitle.setText(tr("device_mgmt_title"))
+        self.ui.pushButtonAll.setText(tr("status_all"))
+        self.ui.pushButtonActive.setText(tr("status_active"))
+        self.ui.pushButtonInactive.setText(tr("status_inactive"))
+        self.ui.pushButtonMaintenance.setText(tr("status_maintenance"))
+        self.ui.pushButtonAdd.setText(tr("btn_add"))
+        self.ui.pushButtonImportCSV.setText(tr("btn_import_csv"))
+        self.ui.pushButtonExportCSV.setText(tr("btn_export_csv"))
+        self.ui.lineEditSearch.setPlaceholderText(tr("search_room_device"))
+        table = self.ui.tableWidgetDevices
+        headers = ["col_room", "col_device", "col_cabinet_password", "col_status", "col_actions"]
+        for i, key in enumerate(headers):
+            item = table.horizontalHeaderItem(i)
+            if item:
+                item.setText(tr(key))
+        self._load_table()

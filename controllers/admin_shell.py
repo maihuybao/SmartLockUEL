@@ -100,3 +100,14 @@ class AdminShellController(BaseWindow):
         self.switch_page(self.PAGE_ROOMS)
         if preselect_room:
             self._rooms_page._preselect(preselect_room)
+
+    def retranslate_ui(self):
+        for page in [
+            self._overview_page,
+            self._bookings_page,
+            self._rooms_page,
+            self._users_page,
+            self._devices_page,
+        ]:
+            if hasattr(page, "retranslate_ui"):
+                page.retranslate_ui()

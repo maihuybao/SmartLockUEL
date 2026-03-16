@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QSizePolicy,
+    QPushButton,
 )
 from PyQt6.QtGui import QIcon, QPixmap, QKeySequence, QShortcut, QPainter
 from PyQt6.QtCore import QSize, Qt
@@ -11,6 +12,7 @@ from PyQt6 import uic
 from database import init_db
 from models.user_model import authenticate
 from paths import resource_dir
+from i18n import tr, get_manager
 
 BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
@@ -73,7 +75,11 @@ class MainWindowController(QMainWindow):
         self._password_visible = False
         self._logging_in = False
         self._setup_ui()
+        self._setup_lang_button()
         self._connect_signals()
+
+        get_manager().language_changed.connect(self.retranslate_ui)
+        self.retranslate_ui()
 
     def _setup_background(self):
         """Load and apply the background image to the central widget.
@@ -142,6 +148,43 @@ class MainWindowController(QMainWindow):
         self.lineEditPassword.returnPressed.connect(self._handle_login)
         self.lineEditEmail.returnPressed.connect(self._handle_login)
 
+    def _setup_lang_button(self):
+        self._btnLang = QPushButton(self)
+        self._btnLang.setFixedSize(48, 32)
+        self._btnLang.setStyleSheet(
+            "QPushButton { background: rgba(0,0,0,0.35); color: white;"
+            " border: 1.5px solid rgba(255,255,255,0.6); border-radius: 8px;"
+            " font-weight: 600; font-size: 12px; }"
+            "QPushButton:hover { background: rgba(0,0,0,0.5); }"
+        )
+        self._update_lang_btn()
+        self._btnLang.clicked.connect(self._toggle_lang)
+
+    def _update_lang_btn(self):
+        mgr = get_manager()
+        self._btnLang.setText("VI" if mgr.current_language() == "en" else "EN")
+
+    def _toggle_lang(self):
+        mgr = get_manager()
+        new_lang = "vi" if mgr.current_language() == "en" else "en"
+        mgr.set_language(new_lang)
+
+    def retranslate_ui(self):
+        self.label_8.setText(tr("login_subtitle"))
+        self.label_3.setText(tr("login_email"))
+        self.label_4.setText(tr("login_password"))
+        self.lineEditPassword.setPlaceholderText(tr("login_password_placeholder"))
+        self.radioButtonUser.setText(tr("login_role_user"))
+        self.radioButtonAdmin.setText(tr("login_role_admin"))
+        self.pushButtonLogin.setText(tr("login_btn"))
+        self._update_lang_btn()
+
+    def resizeEvent(self, event):
+        """Reposition the language button on resize."""
+        super().resizeEvent(event)
+        if hasattr(self, "_btnLang"):
+            self._btnLang.move(self.width() - 63, 15)
+
     def _toggle_password(self):
         """Toggle password field visibility between plain text and masked mode."""
         from PyQt6.QtWidgets import QLineEdit
@@ -169,13 +212,13 @@ class MainWindowController(QMainWindow):
         password = self.lineEditPassword.text().strip()
 
         if not email or not password:
-            QMessageBox.warning(self, "Error", "Please enter your email and password.")
+            QMessageBox.warning(self, tr("common_error"), tr("msg_enter_email_password"))
             self._logging_in = False
             return
 
         user = authenticate(email, password)
         if not user:
-            QMessageBox.warning(self, "Error", "Incorrect email or password.")
+            QMessageBox.warning(self, tr("common_error"), tr("msg_wrong_credentials"))
             self._logging_in = False
             return
 
@@ -183,8 +226,8 @@ class MainWindowController(QMainWindow):
         if user["role"] != selected_role:
             QMessageBox.warning(
                 self,
-                "Error",
-                f"This account does not have '{selected_role}' permission.",
+                tr("common_error"),
+                tr("msg_wrong_role", role=selected_role),
             )
             self._logging_in = False
             return

@@ -117,6 +117,36 @@ QPushButton:pressed {
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="btnLang">
+     <property name="minimumSize">
+      <size>
+       <width>40</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+    background-color: transparent;
+    color: white;
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 12px;
+}
+QPushButton:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+QPushButton:pressed {
+    background-color: rgba(255,255,255,0.25);
+}</string>
+     </property>
+     <property name="text">
+      <string>VI</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

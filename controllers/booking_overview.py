@@ -14,6 +14,7 @@ from PyQt6.QtGui import QColor, QIcon
 from PyQt6 import uic
 import os
 from paths import resource_dir
+from i18n import tr
 
 BASE_DIR = resource_dir()
 IMAGES_DIR = os.path.join(BASE_DIR, "images")
@@ -115,7 +116,7 @@ class BookingOverviewPage(QWidget):
                 or keyword in b.get("date", "").lower()
             ]
 
-        self.ui.lblCount.setText(f"{len(bookings)} bookings")
+        self.ui.lblCount.setText(tr("n_bookings", n=len(bookings)))
         self._current_bookings = bookings
         table = self.ui.tableWidgetBookings
         table.setRowCount(0)
@@ -192,7 +193,7 @@ class BookingOverviewPage(QWidget):
         layout.addWidget(
             self._make_icon_btn(
                 "view.png",
-                "View",
+                tr("tooltip_view"),
                 "#F3E5F5",
                 "#E1BEE7",
                 lambda _, bid=booking_id: self._view_booking(bid),
@@ -202,7 +203,7 @@ class BookingOverviewPage(QWidget):
             layout.addWidget(
                 self._make_icon_btn(
                     "approve.png",
-                    "Approve",
+                    tr("tooltip_approve"),
                     "#E8F5E9",
                     "#C8E6C9",
                     lambda _, bid=booking_id: self._approve_booking_inline(bid),
@@ -211,7 +212,7 @@ class BookingOverviewPage(QWidget):
             layout.addWidget(
                 self._make_icon_btn(
                     "reject.png",
-                    "Reject",
+                    tr("tooltip_reject"),
                     "#FFF3E0",
                     "#FFE0B2",
                     lambda _, bid=booking_id: self._reject_booking_inline(bid),
@@ -220,7 +221,7 @@ class BookingOverviewPage(QWidget):
         layout.addWidget(
             self._make_icon_btn(
                 "edit.png",
-                "Edit",
+                tr("tooltip_edit"),
                 "#E3F2FD",
                 "#BBDEFB",
                 lambda _, bid=booking_id: self._edit_booking(bid),
@@ -229,7 +230,7 @@ class BookingOverviewPage(QWidget):
         layout.addWidget(
             self._make_icon_btn(
                 "delete.png",
-                "Delete",
+                tr("tooltip_delete"),
                 "#FFEBEE",
                 "#FFCDD2",
                 lambda _, bid=booking_id: self._delete_booking(bid),
@@ -292,8 +293,8 @@ class BookingOverviewPage(QWidget):
         password = approve_booking(booking_id)
         QMessageBox.information(
             self._shell,
-            "Approved",
-            f"Booking approved.\nLocker password: {password}",
+            tr("status_approved"),
+            tr("msg_booking_approved", password=password),
         )
         self._load_table()
 
@@ -312,7 +313,7 @@ class BookingOverviewPage(QWidget):
             reason = dlg.editRejectReason.text().strip()
             if not reason:
                 QMessageBox.warning(
-                    self._shell, "Error", "Please enter a rejection reason."
+                    self._shell, tr("common_error"), tr("msg_enter_reject_reason")
                 )
                 return
             reject_booking(booking_id, reason)
@@ -331,12 +332,12 @@ class BookingOverviewPage(QWidget):
             end_str = dlg.timeEditEnd.time().toString("HH:mm")
             reason = dlg.editReason.toPlainText().strip()
             if not reason:
-                QMessageBox.warning(self._shell, "Error", "Please enter a reason.")
+                QMessageBox.warning(self._shell, tr("common_error"), tr("msg_enter_reason"))
                 return
             if create_booking(user_id, room_id, date_str, start_str, end_str, reason):
                 self._load_table()
             else:
-                QMessageBox.warning(self._shell, "Error", "Failed to create booking.")
+                QMessageBox.warning(self._shell, tr("common_error"), tr("msg_create_booking_failed"))
 
     def _edit_booking(self, booking_id):
         """Open a dialog to edit an existing booking.
@@ -356,7 +357,7 @@ class BookingOverviewPage(QWidget):
             reason = dlg.editReason.toPlainText().strip()
             status = dlg.comboStatus.currentText()
             if not reason:
-                QMessageBox.warning(self._shell, "Error", "Please enter a reason.")
+                QMessageBox.warning(self._shell, tr("common_error"), tr("msg_enter_reason"))
                 return
             admin_update_booking(
                 booking_id, date_str, start_str, end_str, reason, status
@@ -369,7 +370,7 @@ class BookingOverviewPage(QWidget):
         Args:
             booking_id (int): The primary key of the booking to delete.
         """
-        reply = QMessageBox.question(self._shell, "Confirm", "Delete this booking?")
+        reply = QMessageBox.question(self._shell, tr("common_confirm"), tr("msg_delete_booking_confirm"))
         if reply == QMessageBox.StandardButton.Yes:
             delete_booking(booking_id)
             self._load_table()
@@ -434,7 +435,7 @@ class BookingOverviewPage(QWidget):
                         )
                         skipped += 1
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to read file:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_file_read_error", error=e))
             return
 
         self._load_table()
@@ -443,7 +444,7 @@ class BookingOverviewPage(QWidget):
             msg += "\n\nDetails:\n" + "\n".join(errors[:10])
             if len(errors) > 10:
                 msg += f"\n... and {len(errors) - 10} more"
-        QMessageBox.information(self._shell, "Import Complete", msg)
+        QMessageBox.information(self._shell, tr("msg_import_complete"), msg)
 
     def _export_csv(self):
         """Export the currently filtered bookings to a CSV file.
@@ -471,7 +472,7 @@ class BookingOverviewPage(QWidget):
             ]
 
         if not bookings:
-            QMessageBox.information(self._shell, "Export CSV", "No data to export.")
+            QMessageBox.information(self._shell, tr("btn_export_csv"), tr("msg_no_data_export"))
             return
 
         path, _ = QFileDialog.getSaveFileName(
@@ -515,11 +516,11 @@ class BookingOverviewPage(QWidget):
                     )
             QMessageBox.information(
                 self._shell,
-                "Export CSV",
-                f"Exported {len(bookings)} bookings successfully.",
+                tr("btn_export_csv"),
+                tr("msg_exported_count", n=len(bookings), type=tr("n_bookings", n="")),
             )
         except Exception as e:
-            QMessageBox.critical(self._shell, "Error", f"Failed to export:\n{e}")
+            QMessageBox.critical(self._shell, tr("common_error"), tr("msg_export_error", error=e))
 
     def _build_booking_dialog(self, booking=None, reject_mode=False):
         """Build and configure a booking dialog for creating, editing, or rejecting.
@@ -541,11 +542,11 @@ class BookingOverviewPage(QWidget):
         uic.loadUi(os.path.join(UI_DIR, "AdminBookingDialog.ui"), dlg)
 
         if reject_mode:
-            dlg.setWindowTitle("Reject Booking")
-            dlg.lblTitle.setText("Reject Booking")
+            dlg.setWindowTitle(tr("dlg_reject_booking"))
+            dlg.lblTitle.setText(tr("dlg_reject_booking"))
         elif booking:
-            dlg.setWindowTitle("Edit Booking")
-            dlg.lblTitle.setText("Edit Booking")
+            dlg.setWindowTitle(tr("dlg_edit_booking"))
+            dlg.lblTitle.setText(tr("dlg_edit_booking"))
 
         users = get_all_users()
         for u in users:
@@ -604,3 +605,25 @@ class BookingOverviewPage(QWidget):
         dlg.pushButtonCancel.clicked.connect(dlg.reject)
         dlg.pushButtonSave.clicked.connect(dlg.accept)
         return dlg
+
+    def retranslate_ui(self):
+        self.ui.lblTitle.setText(tr("booking_mgmt_title"))
+        self.ui.pushButtonAll.setText(tr("status_all"))
+        self.ui.pushButtonPending.setText(tr("status_pending"))
+        self.ui.pushButtonApproved.setText(tr("status_approved"))
+        self.ui.pushButtonRejected.setText(tr("status_rejected"))
+        self.ui.pushButtonAdd.setText(tr("btn_add"))
+        self.ui.pushButtonImportCSV.setText(tr("btn_import_csv"))
+        self.ui.pushButtonExportCSV.setText(tr("btn_export_csv"))
+        self.ui.lineEditSearch.setPlaceholderText(tr("search_placeholder"))
+        table = self.ui.tableWidgetBookings
+        headers = [
+            "col_fullname", "col_room", "col_room_type", "col_date",
+            "col_start_time", "col_end_time", "col_purpose",
+            "col_status", "col_password", "col_actions",
+        ]
+        for i, key in enumerate(headers):
+            item = table.horizontalHeaderItem(i)
+            if item:
+                item.setText(tr(key))
+        self._load_table()

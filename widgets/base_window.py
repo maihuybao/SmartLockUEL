@@ -10,13 +10,14 @@ from PyQt6.QtWidgets import (
     QFrame,
     QStackedWidget,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6 import uic
 
 from widgets.navbar import NavBar
 from widgets.sidebar import SideBar
 from paths import resource_dir
+from i18n import tr, get_manager
 
 BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
@@ -109,6 +110,11 @@ class BaseWindow(QMainWindow):
             body.addWidget(self._scroll, 1)
 
         main_layout.addLayout(body)
+
+        # Language signal
+        get_manager().language_changed.connect(self._on_language_changed)
+        # Apply current language after subclass __init__ finishes
+        QTimer.singleShot(0, self._on_language_changed)
 
     # -- Stack page management (Admin shell) -----------------------
 
@@ -211,15 +217,11 @@ class BaseWindow(QMainWindow):
             self.showFullScreen()
 
     def _logout(self):
-        """Log out the current user after confirmation.
-
-        Displays a confirmation dialog. If the user confirms, the login
-        window is shown and the current window is closed.
-        """
+        """Log out the current user after confirmation."""
         reply = QMessageBox.question(
             self,
-            "Log out",
-            "Are you sure you want to log out?",
+            tr("btn_logout"),
+            tr("confirm_logout"),
         )
         if reply != QMessageBox.StandardButton.Yes:
             return
@@ -231,15 +233,20 @@ class BaseWindow(QMainWindow):
 
     @staticmethod
     def _quit():
-        """Quit the application after confirmation.
-
-        Displays a confirmation dialog. If the user confirms, the entire
-        application is terminated.
-        """
+        """Quit the application after confirmation."""
         reply = QMessageBox.question(
             None,
-            "Quit",
-            "Are you sure you want to quit?",
+            tr("btn_quit"),
+            tr("confirm_quit"),
         )
         if reply == QMessageBox.StandardButton.Yes:
             QApplication.quit()
+
+    def _on_language_changed(self):
+        self.navbar.retranslate_ui()
+        if self.sidebar:
+            self.sidebar.retranslate_ui()
+        self.retranslate_ui()
+
+    def retranslate_ui(self):
+        pass

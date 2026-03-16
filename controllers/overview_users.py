@@ -13,6 +13,7 @@ from PyQt6 import uic
 import os
 
 from paths import resource_dir
+from i18n import tr
 
 _BASE = resource_dir()
 IMAGES_DIR = os.path.join(_BASE, "images")
@@ -275,7 +276,7 @@ class OverviewUsersController(BaseWindow):
         from PyQt6.QtGui import QAction
 
         menu = QMenu(self)
-        act = QAction("Book Room", self)
+        act = QAction(tr("btn_book_room"), self)
         act.triggered.connect(lambda: self._open_booking_dialog(room))
         menu.addAction(act)
         menu.exec(global_pos)
@@ -307,7 +308,7 @@ class OverviewUsersController(BaseWindow):
         """
         available = [r for r in get_all_rooms() if r["status"] in ("Available",)]
         if not available:
-            QMessageBox.information(self, "Thong bao", "No available rooms.")
+            QMessageBox.information(self, tr("common_confirm"), tr("msg_no_available_rooms"))
             return
 
         dlg = QDialog(self)
@@ -355,34 +356,33 @@ class OverviewUsersController(BaseWindow):
             purpose = dlg.lineEditPurpose.toPlainText().strip()
 
             if not purpose:
-                QMessageBox.warning(self, "Loi", "Please enter a purpose.")
+                QMessageBox.warning(self, tr("common_error"), tr("msg_enter_purpose"))
                 return
             if start_t < OP_START or end_t > OP_END:
                 QMessageBox.warning(
                     self,
-                    "Loi",
-                    f"Booking hours are 06:00 – 22:00 only.",
+                    tr("common_error"),
+                    tr("msg_booking_hours"),
                 )
                 return
             if end_t <= start_t:
-                QMessageBox.warning(self, "Loi", "End time must be after start time.")
+                QMessageBox.warning(self, tr("common_error"), tr("msg_end_after_start"))
                 return
             if has_conflict(room_pk, date_str, start_str, end_str):
                 QMessageBox.warning(
                     self,
-                    "Conflict",
-                    "This time slot overlaps an existing booking.\n"
-                    "Please choose a different time.",
+                    tr("msg_conflict_title"),
+                    tr("msg_time_conflict"),
                 )
                 return
 
             if create_booking(self.current_user["id"], room_pk, date_str, start_str, end_str, purpose):
                 QMessageBox.information(
-                    self, "Success", "Booking request sent successfully."
+                    self, tr("common_success"), tr("msg_booking_success")
                 )
                 self._load_rooms()
             else:
-                QMessageBox.warning(self, "Error", "Failed to send booking request.")
+                QMessageBox.warning(self, tr("common_error"), tr("msg_booking_failed"))
 
     def _refresh_availability(self, dlg):
         """Update the time availability table in the booking dialog.
@@ -439,13 +439,13 @@ class OverviewUsersController(BaseWindow):
             item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             if cell_status == "Approved":
                 item.setBackground(COLOR_APPROVED)
-                item.setToolTip("Booked (Approved)")
+                item.setToolTip(tr("availability_approved"))
             elif cell_status == "Pending":
                 item.setBackground(COLOR_PENDING)
-                item.setToolTip("Pending approval")
+                item.setToolTip(tr("availability_pending"))
             else:
                 item.setBackground(COLOR_FREE)
-                item.setToolTip("Available")
+                item.setToolTip(tr("availability_free"))
             table.setItem(0, col, item)
 
     # -- Booking history ------------------------------------------
@@ -515,7 +515,7 @@ class OverviewUsersController(BaseWindow):
             btn_layout.setSpacing(4)
 
             btn_view = QPushButton()
-            btn_view.setToolTip("View")
+            btn_view.setToolTip(tr("tooltip_view"))
             btn_view.setFixedSize(22, 22)
             btn_view.setIcon(_png_icon("view.png"))
             btn_view.setIconSize(QSize(14, 14))
@@ -530,7 +530,7 @@ class OverviewUsersController(BaseWindow):
 
             if b["status"] == "Pending":
                 btn_edit = QPushButton()
-                btn_edit.setToolTip("Edit")
+                btn_edit.setToolTip(tr("tooltip_edit"))
                 btn_edit.setFixedSize(22, 22)
                 btn_edit.setIcon(_png_icon("edit.png"))
                 btn_edit.setIconSize(QSize(14, 14))
@@ -543,7 +543,7 @@ class OverviewUsersController(BaseWindow):
                 )
 
                 btn_cancel = QPushButton()
-                btn_cancel.setToolTip("Cancel")
+                btn_cancel.setToolTip(tr("tooltip_cancel"))
                 btn_cancel.setFixedSize(22, 22)
                 btn_cancel.setIcon(_png_icon("delete.png"))
                 btn_cancel.setIconSize(QSize(14, 14))
@@ -561,7 +561,7 @@ class OverviewUsersController(BaseWindow):
             btn_layout.addStretch()
             table.setCellWidget(row, 9, container)
 
-        dlg.lblCount.setText(f"{len(bookings)} bookings")
+        dlg.lblCount.setText(tr("n_bookings", n=len(bookings)))
 
     def _view_booking(self, booking_id, parent_dlg):
         """Display a read-only dialog showing booking details for the user.
@@ -625,9 +625,9 @@ class OverviewUsersController(BaseWindow):
 
         dlg = QDialog(self)
         uic.loadUi(os.path.join(UI_DIR, "BookingDialog.ui"), dlg)
-        dlg.setWindowTitle("Edit Booking")
-        dlg.lblTitle.setText("Edit Booking")
-        dlg.pushButtonSubmit.setText("Save Changes")
+        dlg.setWindowTitle(tr("dlg_edit_booking"))
+        dlg.lblTitle.setText(tr("dlg_edit_booking"))
+        dlg.pushButtonSubmit.setText(tr("dlg_save_changes"))
 
         # Room combo — pre-select, disable change
         rooms = get_all_rooms()
@@ -677,21 +677,21 @@ class OverviewUsersController(BaseWindow):
         purpose = dlg.lineEditPurpose.toPlainText().strip()
 
         if not purpose:
-            QMessageBox.warning(self, "Error", "Please enter a purpose.")
+            QMessageBox.warning(self, tr("common_error"), tr("msg_enter_purpose"))
             return
         if end_t <= start_t:
-            QMessageBox.warning(self, "Error", "End time must be after start time.")
+            QMessageBox.warning(self, tr("common_error"), tr("msg_end_after_start"))
             return
         if has_conflict(room_pk, date_str, start_str, end_str, exclude_id=booking_id):
             QMessageBox.warning(
                 self,
-                "Conflict",
-                "This time slot overlaps an existing booking.\nPlease choose a different time.",
+                tr("msg_conflict_title"),
+                tr("msg_time_conflict"),
             )
             return
 
         update_booking(booking_id, date_str, start_str, end_str, purpose)
-        QMessageBox.information(self, "Success", "Booking updated successfully.")
+        QMessageBox.information(self, tr("common_success"), tr("msg_booking_updated"))
         self._populate_history(history_dlg, history_dlg.comboFilter.currentText())
         self._load_rooms()
 
@@ -704,9 +704,29 @@ class OverviewUsersController(BaseWindow):
                 cancellation.
         """
         reply = QMessageBox.question(
-            self, "Confirm", "Are you sure you want to cancel this booking?"
+            self, tr("common_confirm"), tr("msg_cancel_confirm")
         )
         if reply == QMessageBox.StandardButton.Yes:
             cancel_booking(booking_id)
             self._populate_history(dlg, dlg.comboFilter.currentText())
             self._load_rooms()
+
+    def retranslate_ui(self):
+        self.ui.pushButtonAll.setText(tr("status_all"))
+        self.ui.pushButtonAvailable.setText(tr("status_available"))
+        self.ui.pushButtonOccupied.setText(tr("status_occupied"))
+        self.ui.pushButtonBooked.setText(tr("status_full"))
+        self.ui.pushButtonCapAll.setText(tr("status_all"))
+        self.ui.pushButtonCap50.setText(tr("filter_cap_50"))
+        self.ui.pushButtonCap100.setText(tr("filter_cap_100"))
+        self.ui.pushButtonTimeAll.setText(tr("status_all"))
+        self.ui.pushButtonMorning.setText(tr("filter_morning"))
+        self.ui.pushButtonAfternoon.setText(tr("filter_afternoon"))
+        self.ui.pushButtonEvening.setText(tr("filter_evening"))
+        self.ui.labelCapacity.setText(tr("filter_capacity"))
+        self.ui.labelSession.setText(tr("filter_session"))
+        self.ui.pushButtonHistory.setText(tr("btn_my_bookings"))
+        self.ui.pushButtonBooking.setText(tr("btn_booking"))
+        self.ui.pushButtonLogout.setText(tr("btn_logout"))
+        self.ui.pushButtonQuit.setText(tr("btn_quit"))
+        self._load_rooms()

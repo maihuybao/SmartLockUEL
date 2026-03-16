@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from models.booking_model import get_bookings_by_room_date
+from i18n import tr
 
 OP_START = 6 * 60   # 06:00
 OP_END   = 22 * 60  # 22:00
@@ -153,7 +154,7 @@ def create_room_card(room, on_context=None):
     header.addWidget(lbl_status)
     vbox.addLayout(header)
 
-    lbl_type = QLabel(f"{room['room_type']}  ·  {room['capacity']} seats")
+    lbl_type = QLabel(tr("card_type_capacity", type=room['room_type'], capacity=room['capacity']))
     lbl_type.setStyleSheet("color:#888;font-size:11px;border:none;")
     vbox.addWidget(lbl_type)
 
@@ -163,10 +164,11 @@ def create_room_card(room, on_context=None):
     vbox.addWidget(line)
 
     if active_count > 0:
-        lbl_bookings = QLabel(f"{active_count} active booking{'s' if active_count > 1 else ''}")
+        key = "card_active_one" if active_count == 1 else "card_active_many"
+        lbl_bookings = QLabel(tr(key, n=active_count))
         lbl_bookings.setStyleSheet("color:#FF9800;font-size:11px;border:none;")
     else:
-        lbl_bookings = QLabel("No active bookings")
+        lbl_bookings = QLabel(tr("card_no_bookings"))
         lbl_bookings.setStyleSheet("color:#9E9E9E;font-size:11px;border:none;")
     lbl_bookings.setAlignment(Qt.AlignmentFlag.AlignCenter)
     vbox.addWidget(lbl_bookings)

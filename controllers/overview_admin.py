@@ -6,6 +6,7 @@ from widgets.room_card import create_room_card, get_display_status
 from models.room_model import get_all_rooms, get_rooms_by_status, search_rooms
 from models.booking_model import get_dashboard_stats
 from paths import resource_dir
+from i18n import tr
 
 BASE_DIR = resource_dir()
 UI_DIR = os.path.join(BASE_DIR, "ui")
@@ -148,7 +149,7 @@ class OverviewAdminPage(QWidget):
         from PyQt6.QtGui import QAction
 
         menu = QMenu(self)
-        act = QAction("Edit Room", self)
+        act = QAction(tr("overview_edit_room"), self)
         act.triggered.connect(lambda: self._shell.go_to_rooms(preselect_room=room))
         menu.addAction(act)
         menu.exec(global_pos)
@@ -175,3 +176,14 @@ class OverviewAdminPage(QWidget):
         self.ui.lblPendingVal.setText(str(stats["pending"]))
         self.ui.lblApprovedVal.setText(str(stats["approved"]))
         self.ui.lblRejectedVal.setText(str(stats["rejected"]))
+
+    def retranslate_ui(self):
+        self.ui.pushButtonAll.setText(tr("status_all"))
+        self.ui.pushButtonAvailable.setText(tr("status_available"))
+        self.ui.pushButtonOccupied.setText(tr("status_occupied"))
+        self.ui.pushButtonBooked.setText(tr("status_full"))
+        self.ui.lblTotalRoomsTitle.setText(tr("overview_total_rooms"))
+        self.ui.lblTotalBookingsTitle.setText(tr("overview_total_bookings"))
+        self.ui.lblPendingTitle.setText(tr("status_pending"))
+        self.ui.lblApprovedTitle.setText(tr("status_approved"))
+        self.ui.lblRejectedTitle.setText(tr("status_rejected"))
