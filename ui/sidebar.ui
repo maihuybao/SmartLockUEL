@@ -88,14 +88,14 @@ QPushButton[active="true"]:hover {
    <item>
     <widget class="QPushButton" name="pushButtonUsers">
      <property name="text">
-      <string>Users Management</string>
+      <string>User Management</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pushButtonDevices">
      <property name="text">
-      <string>Devices Management</string>
+      <string>Device Management</string>
      </property>
     </widget>
    </item>

@@ -16,7 +16,7 @@
      <property name="styleSheet">
       <string notr="true">QLabel { font-size: 24px; font-weight: bold; color: #1F4F82; padding: 10px; border-bottom: 2px solid #E0E0E0; }</string>
      </property>
-     <property name="text"><string>Users Management</string></property>
+     <property name="text"><string>User Management</string></property>
      <property name="alignment"><set>Qt::AlignCenter</set></property>
     </widget>
    </item>

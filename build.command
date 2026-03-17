@@ -8,15 +8,10 @@ pyinstaller --onefile \
   --icon images/UEL_Logo.icns \
   --add-data "ui:ui" \
   --add-data "images:images" \
+  --add-data "datasets/language.json:datasets" \
+  --distpath dist/macOS \
   --noconfirm \
   main.py
 
 # Windows:
- pyinstaller --onefile ^
-   --name "SmartLockerUEL" ^
-   --windowed ^
-   --icon images/UEL_Logo.ico ^
-   --add-data "ui;ui" ^
-   --add-data "images;images" ^
-   --noconfirm ^
-   main.py
+pyinstaller --onefile --name "SmartLockerUEL" --windowed --icon images/UEL_Logo.ico --add-data "ui:ui" --add-data "images:images" --add-data "datasets/language.json:datasets" --distpath dist/Windows --noconfirm main.py
