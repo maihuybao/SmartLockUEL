@@ -92,62 +92,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QFrame" name="filterDivider">
-       <property name="frameShape"><enum>QFrame::VLine</enum></property>
-       <property name="styleSheet"><string notr="true">color:#D0D0D0;</string></property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblSession">
-       <property name="text"><string>Session:</string></property>
-       <property name="styleSheet"><string notr="true">color:#555;font-size:12px;font-weight:600;</string></property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QWidget" name="timeGroup" native="true">
-       <layout class="QHBoxLayout" name="timeLayout">
-        <property name="spacing"><number>4</number></property>
-        <property name="leftMargin"><number>0</number></property>
-        <property name="topMargin"><number>0</number></property>
-        <property name="rightMargin"><number>0</number></property>
-        <property name="bottomMargin"><number>0</number></property>
-        <item>
-         <widget class="QPushButton" name="pushButtonTimeAll">
-          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
-          <property name="text"><string>All</string></property>
-          <property name="checkable"><bool>true</bool></property>
-          <property name="checked"><bool>true</bool></property>
-          <property name="autoExclusive"><bool>true</bool></property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButtonMorning">
-          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
-          <property name="text"><string>Morning (06-12)</string></property>
-          <property name="checkable"><bool>true</bool></property>
-          <property name="autoExclusive"><bool>true</bool></property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButtonAfternoon">
-          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
-          <property name="text"><string>Afternoon (12-17)</string></property>
-          <property name="checkable"><bool>true</bool></property>
-          <property name="autoExclusive"><bool>true</bool></property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButtonEvening">
-          <property name="styleSheet"><string notr="true">QPushButton{background:#F0F4F8;border:1px solid #B0BEC5;border-radius:12px;padding:4px 12px;color:#555;font-size:12px;}QPushButton:checked{background:#1565C0;color:white;border-color:#1565C0;}QPushButton:hover{background:#1E88E5;color:white;}</string></property>
-          <property name="text"><string>Evening (17-22)</string></property>
-          <property name="checkable"><bool>true</bool></property>
-          <property name="autoExclusive"><bool>true</bool></property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
       <spacer>
        <property name="orientation"><enum>Qt::Horizontal</enum></property>
        <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>

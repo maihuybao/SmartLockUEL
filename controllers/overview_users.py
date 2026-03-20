@@ -52,13 +52,6 @@ OP_START = QTime(6, 0)
 OP_END = QTime(22, 0)
 
 
-TIME_RANGES = {
-    "Morning": (6 * 60, 12 * 60),
-    "Afternoon": (12 * 60, 17 * 60),
-    "Evening": (17 * 60, 22 * 60),
-}
-
-
 class OverviewUsersController(BaseWindow):
     """User dashboard controller for browsing rooms and managing bookings.
 
@@ -81,7 +74,6 @@ class OverviewUsersController(BaseWindow):
         )
         self._current_filter = "All"
         self._capacity_filter = "All"
-        self._time_filter = "All"
 
         self.ui = self.load_content_ui("OverviewUsers.ui")
 
@@ -103,13 +95,6 @@ class OverviewUsersController(BaseWindow):
         self.ui.pushButtonCapAll.clicked.connect(lambda: self._apply_capacity("All"))
         self.ui.pushButtonCap50.clicked.connect(lambda: self._apply_capacity("50"))
         self.ui.pushButtonCap100.clicked.connect(lambda: self._apply_capacity("100"))
-
-        self.ui.pushButtonTimeAll.clicked.connect(lambda: self._apply_time("All"))
-        self.ui.pushButtonMorning.clicked.connect(lambda: self._apply_time("Morning"))
-        self.ui.pushButtonAfternoon.clicked.connect(
-            lambda: self._apply_time("Afternoon")
-        )
-        self.ui.pushButtonEvening.clicked.connect(lambda: self._apply_time("Evening"))
 
         self.navbar.lineEditSearch.textChanged.connect(self._on_search)
 
@@ -136,16 +121,6 @@ class OverviewUsersController(BaseWindow):
             cap (str): The capacity filter ('All', '50' for <=50, '100' for >=100).
         """
         self._capacity_filter = cap
-        self._load_rooms()
-
-    def _apply_time(self, session):
-        """Apply a time-of-day filter and reload the room grid.
-
-        Args:
-            session (str): The time session filter ('All', 'Morning',
-                'Afternoon', 'Evening').
-        """
-        self._time_filter = session
         self._load_rooms()
 
     def _load_rooms(self):
@@ -177,39 +152,7 @@ class OverviewUsersController(BaseWindow):
         elif self._capacity_filter == "100":
             rooms = [r for r in rooms if r["capacity"] >= 100]
 
-        # Time filter — rooms with at least one free slot in the session today
-        if self._time_filter != "All":
-            today = _date.today().strftime("%Y-%m-%d")
-            r_start, r_end = TIME_RANGES[self._time_filter]
-            rooms = [
-                r for r in rooms if self._has_free_slot(r["id"], today, r_start, r_end)
-            ]
-
         self._render_room_cards(rooms)
-
-    @staticmethod
-    def _has_free_slot(room_pk, date_str, range_start, range_end):
-        """Check whether a room has at least one free 30-minute slot in a time range.
-
-        Args:
-            room_pk (int): The primary key of the room to check.
-            date_str (str): The date to check in 'YYYY-MM-DD' format.
-            range_start (int): The start of the time range in minutes since midnight.
-            range_end (int): The end of the time range in minutes since midnight.
-
-        Returns:
-            bool: True if at least one 30-minute slot is free, False otherwise.
-        """
-        bookings = get_bookings_by_room_date(room_pk, date_str)
-        booked = set()
-        for b in bookings:
-            def _m(t):
-                hh, mm = map(int, t.strip().split(":"))
-                return hh * 60 + mm
-
-            for slot in range(_m(b["time_start"]), _m(b["time_end"]), 30):
-                booked.add(slot)
-        return any(slot not in booked for slot in range(range_start, range_end, 30))
 
     def _render_room_cards(self, rooms):
         """Store room data and trigger a grid reflow.
@@ -719,12 +662,7 @@ class OverviewUsersController(BaseWindow):
         self.ui.pushButtonCapAll.setText(tr("status_all"))
         self.ui.pushButtonCap50.setText(tr("filter_cap_50"))
         self.ui.pushButtonCap100.setText(tr("filter_cap_100"))
-        self.ui.pushButtonTimeAll.setText(tr("status_all"))
-        self.ui.pushButtonMorning.setText(tr("filter_morning"))
-        self.ui.pushButtonAfternoon.setText(tr("filter_afternoon"))
-        self.ui.pushButtonEvening.setText(tr("filter_evening"))
         self.ui.lblCapacity.setText(tr("filter_capacity"))
-        self.ui.lblSession.setText(tr("filter_session"))
         self.ui.pushButtonHistory.setText(tr("btn_my_bookings"))
         self.ui.pushButtonBooking.setText(tr("btn_booking"))
         self.ui.pushButtonLogout.setText(tr("btn_logout"))
