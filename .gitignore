@@ -4,3 +4,4 @@ seed.py
 *.pyc
 /build
 /dist
+PHAN_CONG.md
